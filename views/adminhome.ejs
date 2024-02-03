@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Admin Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+    }
+
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #575757;
+      padding-top: 20px;
+      overflow-x: hidden;
+    }
+
+    .sidebar a {
+      padding: 10px 20px;
+      text-decoration: none;
+      font-size: 16px;
+      color: white;
+      display: block;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #495057;
+    }
+
+    .content {
+      margin-left: 260px;
+      padding: 20px;
+    }
+
+    .content h2 {
+      margin-bottom: 20px;
+    }
+
+    .content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .content table th,
+    .content table td {
+      border: 1px solid #dee2e6;
+      padding: 8px;
+    }
+
+    .content table th {
+      background-color: #343a40;
+      color: white;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 40vh;
+      width: 80vw;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding-top: 15px;
+      }
+
+      .content {
+        margin-left: 0;
+      }
+    }
+
+    @media only screen and (max-width: 600px) {
+      .content table {
+        border: 0;
+      }
+
+      .content table thead {
+        display: none;
+      }
+
+      .content table,
+      .content table tbody,
+      .content table tr,
+      .content table td {
+        display: block;
+        width: 100%;
+      }
+
+      .content table tr {
+        margin-bottom: 15px;
+      }
+
+      .content table td {
+        text-align: left;
+      }
+    }
+
+    .chart-container canvas {
+      display: none;
+    }
+
+    .content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 0;
+      /* Remove default margin for better alignment */
+    }
+
+    .chart-container {
+      max-width: 600px;
+      /* Adjust the maximum width based on your design */
+    }
+
+    /* Optional: Add animation to the content */
+    .content {
+      animation: fadeInUp 0.8s ease-out;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid mt-4">
+    <div class="content bg-white">
+        <div class="row">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <span>.</span>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <div class="sidebar">
+                            <a href="/admin/salesreport">Dashboard</a>
+                            <a href="/admin/adminHome">User Management</a>
+                            <a href="/admin/productlist"> Product</a>
+                            <a href="/admin/category"> Category</a>
+                            <a href="/admin/viewcoupen"> Coupen</a>
+                            <a href="/admin/userorders">Show Orders</a>
+                            <a href="/admin/productoffers">Product Offer</a>
+                            <a href="/admin/logout"><i class="fas fa-sign-out-alt"
+                                    style="font-size:20px;color:red"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+           
+
+         
+        </div>
+    </div>
+</div>
+
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <!-- Include Bootstrap CSS and JS (for modal) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

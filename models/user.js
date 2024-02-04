@@ -14,6 +14,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isBlocked:{
+    type:Boolean,
+    default:false
+  },
+  otp: {
+    type: String,
+    default: null,
+  },
+  otpExpiresAt: {
+    type: Date,
+    default: null,
+  }
 });
 
 const User = mongoose.model('User', userSchema);

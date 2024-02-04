@@ -14,6 +14,8 @@ dotenv.config({ path: 'config.env' });
 const PORT = process.env.PORT || 8080;
 
 connectDB();
+const adminRoutes = require('./routes/admin'); // Adjust the path accordingly
+app.use('/admin', adminRoutes);
 
 app.set('view engine', 'ejs');
 

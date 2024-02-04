@@ -50,3 +50,40 @@ exports.adminLogin = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+// List users
+exports.listUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.render('usermanagement', { users });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// Block user
+exports.blockUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    await User.findByIdAndUpdate(userId, { isBlocked: true });
+    res.redirect('/admin/usermanagement');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// Unblock user
+exports.unblockUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    await User.findByIdAndUpdate(userId, { isBlocked: false });
+    res.redirect('/admin/usermanagement');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};

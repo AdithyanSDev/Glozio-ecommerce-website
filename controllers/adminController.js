@@ -36,7 +36,7 @@ exports.adminLogin = async (req, res) => {
         if (req.session.user) {
           res.render('adminhome');
         } else {
-          res.redirect('/admin/login');
+          res.redirect('/adminlogin');
         }
 
         return;

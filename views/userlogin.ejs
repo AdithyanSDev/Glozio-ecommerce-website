@@ -238,10 +238,10 @@ body{
 </style>
 
 <body>
-    <a href="/admin/login">Admin</a>
+    <a href="/adminlogin">Admin</a>
     <div class="container" id="container">
         <div class="form-container sign-up">
-            <form action="/user/register" method="post">
+            <form action="/api/user/register" method="post">
                 <h1>Create Account</h1>
                     <div class="social-icons">
                         <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
@@ -260,7 +260,7 @@ body{
                 </form>
             </div>
         <div class="form-container sign-in">
-            <form action="/user/login" method="post">
+            <form action="/api/user/login" method="post">
                 <h1>Sign In</h1>
                 <div class="social-icons">
                     <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
@@ -270,7 +270,7 @@ body{
                 <input type="email" placeholder="Email" name="email">
                 <input type="password" placeholder="Password" name="password">
                 <a href="#">Forget Your Password?</a>
-                <button>Sign In</button>
+                <button type="submit">Sign In</button>
             </form>
         </div>
         <div class="toggle-container">

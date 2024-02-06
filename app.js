@@ -3,9 +3,11 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const path = require('path');
-const connectDB =require('./connection.js')
+const connectDB = require('./connection.js');
 const authRoutes = require('./routes/authRoutes');
-const nocache = require('nocache')
+const homeRoutes = require('./routes/homeRoutes');
+const nocache = require('nocache');
+const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -15,10 +17,11 @@ const PORT = process.env.PORT || 8080;
 
 connectDB();
 const adminRoutes = require('./routes/admin'); // Adjust the path accordingly
-app.use('/admin', adminRoutes);
 
 app.set('view engine', 'ejs');
 
+
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(nocache());
@@ -33,12 +36,29 @@ app.use(
   })
 );
 
+app.use('/', homeRoutes);
+app.use('/admin', adminRoutes);
+app.use('/api', authRoutes);
+
+
 app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', authRoutes);
+// // route for the home page
+// app.get('/', (req, res) => {
+//   const token = req.cookies.token;
+//   console.log("This is tlekn",token)
+  
+
+//   // Render home page with token information
+//   res.render('home', { token });
+// });
+
+app.get('/adminlogin', (req, res) => {
+  // Render admin login page
+  res.render('adminlogin'); // Assuming your admin login page is named 'adminlogin.ejs'
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-

@@ -4,6 +4,7 @@ const adminController = require('../controllers/adminController');
 const productController = require('../controllers/productController'); // Import productController
 
 // User management routes
+router.post('/adminlogin',adminController.adminLogin)
 router.get('/usermanagement', adminController.listUsers);
 router.post('/blockuser/:userId', adminController.blockUser);
 router.post('/unblockuser/:userId', adminController.unblockUser);

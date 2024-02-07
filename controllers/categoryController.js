@@ -1,5 +1,7 @@
 // controllers/categoryController.js
+
 const Category = require('../models/category');
+const Product = require('../models/product');
 
 exports.listCategories = async (req, res) => {
   try {
@@ -55,6 +57,17 @@ exports.softDeleteCategory = async (req, res) => {
     const categoryId = req.params.categoryId;
     await Category.findByIdAndUpdate(categoryId, { isDeleted: true });
     res.redirect('/admin/categories');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+exports.listProductsByCategory = async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    const category = await Category.findById(categoryId).populate('products');
+    res.render('category/products', { category });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');

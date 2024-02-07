@@ -44,15 +44,6 @@ app.use('/api', authRoutes);
 app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// // route for the home page
-// app.get('/', (req, res) => {
-//   const token = req.cookies.token;
-//   console.log("This is tlekn",token)
-  
-
-//   // Render home page with token information
-//   res.render('home', { token });
-// });
 
 app.get('/adminlogin', (req, res) => {
   // Render admin login page

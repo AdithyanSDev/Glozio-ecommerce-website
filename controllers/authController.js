@@ -21,21 +21,30 @@ exports.redirectToUserLogin = (req, res) => {
 exports.userLogin = async (req, res) => {
   const { email, password } = req.body;
 
- 
-
   try {
     const user = await User.findOne({ email });
 
-    if (user && await bcrypt.compare(password, user.password)) {
-      // User authenticated
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    if (user) {
+      if (user.isBlocked) {
+        // User is blocked, render login page with an error message
+        return res.render('userlogin', { error: 'Your account has been blocked. Please contact the administrator.' });
+      }
 
-      req.session.user = user;
-      res.cookie('token', token); // Set the token as a cookie
-   req.session.token=token;
+      if (await bcrypt.compare(password, user.password)) {
+        // User authenticated
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-      res.redirect('/');
+        req.session.user = user;
+        res.cookie('token', token); // Set the token as a cookie
+        req.session.token = token;
+
+        res.redirect('/');
+      } else {
+        // Incorrect password
+        res.render('userlogin', { error: 'Invalid email or password' });
+      }
     } else {
+      // User not found
       res.render('userlogin', { error: 'Invalid email or password' });
     }
   } catch (error) {
@@ -44,19 +53,12 @@ exports.userLogin = async (req, res) => {
   }
 };
 
+
 // Function to generate a random string (OTP)
-const generateRandomString = () => {
-  const digits = "0123456789";
-  let OTP = "";
-
-  for (let i = 0; i < 4; i++) {
-    const randomIndex = Math.floor(Math.random() * digits.length);
-    OTP += digits[randomIndex];
-  }
-  
-
-  return OTP;
-};
+const generateRandomString=()=>{
+  const otp=Math.floor(1000 + Math.random() * 9999);;
+  return String(otp);
+}
 
 
 // Update the function to send OTP after registration
@@ -64,7 +66,7 @@ exports.registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
 
   try {
-    console.log("exeutsdfj")
+    
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -73,7 +75,7 @@ exports.registerUser = async (req, res, next) => {
 
     // Generate OTP and send it to the user's email
     const otp = generateRandomString(4); // Generate a 4-digit OTP
-    // await sendOtpEmail(email, otp);
+    await sendOtpEmail(email, otp);
     console.log("register page otp ",otp)
 
     // Store the OTP in the session or database for verification
@@ -161,10 +163,18 @@ exports.verifyOTPPost = async (req, res) => {
 
     if (otp === storedOTP) {
       // OTP is correct
-      // Perform necessary actions, such as creating a new user
-      // For example:
-      // const newUser = new User(req.session.userData);
-      // await newUser.save();
+      const { name, email, password } = req.session.userData; // Assuming you stored user data in session during registration
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Create a new user
+      const newUser = new User({ name, email, password: hashedPassword });
+      await newUser.save();
+
+      // Clear the session data
+      delete req.session.userData;
+      delete req.session.otp;
+
       res.status(200).json({ success: true, redirect: '/user/login' });
     } else {
       // OTP is incorrect

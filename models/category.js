@@ -1,4 +1,3 @@
-// models/category.js
 const mongoose = require('mongoose');
 
 const categorySchema = new mongoose.Schema({
@@ -13,9 +12,9 @@ const categorySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] // Reference to the Product model
 }, { timestamps: true });
 
 const Category = mongoose.model('Category', categorySchema);
 
 module.exports = Category;
-    

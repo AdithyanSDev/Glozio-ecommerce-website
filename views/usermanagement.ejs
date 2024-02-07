@@ -1,319 +1,217 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-
-
-:root{
-    --dark: #2b2d42;
-    --light: #adb5bd;
-    --border: #dee2e6;
-    --border-btn: #edf2f4;
-
-
-}
-
-*{
-    padding:0;
-    margin:0;
-    box-sizing:border-box;
-
-}
-
-a{
-    text-decoration: none;
-    font-family:'PT Sans'sans-serif;
-}
-.container{
-    max-width: 1024px;
-    margin: auto;
-}
-.nav-brand{
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-.d-flex{
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.justify-between{
-    justify-content: space-between;
-}
-
-.text-center{
-    text-align: center;
-}
-
-.border-shadow{
-    border: 1px solid var(--border-btn);
-    box-shadow: 1px 3px 10px #e9ecef;
-}
-.text-dark{
-    color: var(--dark);
-}
-
-.inline{
-    display: inline-block;
-}
-
-.text-light{
-    color: var(--light);
-}
-
-.text-gradient{
-    background: linear-gradient(to right, #0b1d66, #000000);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-#header nav{
-    background-color:  #ffac6d;
-    padding: 1em 0;
-    width: 100%;
-}
-
-#site-main{
-    margin-top: 6em;
-    font-family: 'Barlow', sans-serif;
-}
-
-#site-main .container .box-nav > a{
-    font-size: 1em;
-    padding: .5em 1em;
-}
-
-#site-main .container form{
-    margin: 2em 0;
-}
-
-table{
-    border-spacing: 0px;
-    width: 100%;
-}
-
-.table td, .table th{
-    padding: .75em;
-    vertical-align: top;
-    text-align: center;
-    border-top: 1px solid var(--border);
-}
-.table td > a.btn{
-    padding: .3em 1em;
-    font-size: 1.1em;
-    margin: 0 .2em;
-   
-}
-.table td > a.btn:hover{
-    background-color:  #ff8940;
-}
-
-
-.table tr:hover{
-    background-color:  #e6b79f ;
-}
-
-.table tr:hover td > a{
-    box-shadow: none;
-}
-
-.table .thead-dark th{
-    color: #fff;
-    background-color: var(--dark) ;
-    border-color: #32383e;
-}
-
-@media only screen and (max-width: 1024px){
-    table, thead, tbody, th, td, tr{
-        display: block;
-    }
-
-    thead tr{
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
-
-    tr { border: 1px solid var(--border);}
-
-    td{
-        border: none;
-        position: relative;
-    }
-
-}
-
-/*  add user & update user template */
-.form-title{
-    margin-top: 2em;
-}
-
-.form-title > h2{
-    padding: .5em 0;
-}
-
-.new_user{
-    max-width: 786px;
-    margin: auto;
-}
-
-#update_user .form-group,
-#add_user .form-group{
-    margin: .4em 0;
-}
-
-#update_user .form-group input[type="text"],
-#add_user .form-group input[type="text"],
-#update_user .password input[type="password"],
-#add_user .password input[type="password"] {
-    width: 100%;
-    padding: .6em 1em;
-    margin: .5em 0;
-    border: 1px solid var(--border);
-    font-family: 'Barlow', sans-serif;
-    font-size: 1em;
-    border-radius: .2em;
-}
-
-
-
-#update_user .form-group .radio,
-#add_user .form-group .radio{
-    margin: 1em 2em;
-}
-
-/* adding style to radio buttons */
-.radio input[type='radio']{
-    position: absolute;
-    opacity: 0;
-}
-
-.radio input[type='radio'] + .radio-label:before{
-    content: "";
-    background: var(--border-btn);
-    border-radius: 100%;
-    border: 1px solid var(--border);
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    position: relative;
-    top: -0em;
-    margin-right: .5em;
-    vertical-align: top;
-    cursor: pointer;
-    text-align: center;
-    -webkit-transition: all 250ms ease;
-    transition: all 250ms ease;
-}
-.radio input[type='radio']:checked + .radio-label:before{
-    background-color:  #9360e4;
-    box-shadow: inset 0 0 0 4px #e9ecef;
-}
-
-.radio input[type='radio']:focus + .radio-label:before{
-    outline: none;
-    border-color:  #9360e4;
-}
-
-.radio input[type='radio']:disabled + .radio-label:before{
-    box-shadow: inset 0 0 0 4px #e9ecef;
-    border-color: #b4b4b4;
-    background: #b4b4b4;
-}
-#update_user .form-group .btn,
-#add_user .form-group .btn{
-    width: 100%;
-    padding: .9em 1em;
-    background-color:  #9360e4; 
-    border: none;
-    font-family: 'PT Sans', sans-serif;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: .2em;
-    margin: .5em 0;
-}
-#update_user .form-group .btn:hover,
-#add_user .form-group .btn:hover{
-    background-color: var(--dark);
-    color: var(--border);
-}
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <title>
+   User management
+  </title>
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <!-- Nucleo Icons -->
+  <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <!-- CSS Files -->
+  <link id="pagestyle" href="../assets/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+  <!-- Nepcha Analytics (nepcha.com) -->
+  <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
+  <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
 </head>
-<body>
-    
-    <!-- Header -->
-        <header id="header">
-            <nav>
-                 <div class="container">
-                     <div class="text-center">
-                        <a href="/" class="nav-brand text-dark">User Management System</a>
-                        <form
-            class="flex items-center gap-4"
-          >
-            
-            </form>
-                    </div>
-                </div>
-            </nav>
-        </header>
-    <!-- /Header -->
-    <!--Main site-->
- <main id="site-main">
-    <div class="container">
-        <div class="box-nav d-flex-justify-between">
-            <a href="/add-user" class="border-shadow">
-                <span class="text-gradient">New user<i class="fa-solid fa-user-large"></i></span>
-            </a>
-        </div>
 
-        <!--form handling-->
-       <form action="/" method="POST">
-        <table>
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-                <% users.forEach(user => { %>
-                  <tr>
-                    <td><%= user.name %></td>
-                    <td><%= user.email %></td>
-                  <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
-                  <td>
-                    <% if (user.isBlocked) { %>
-                      <form action="/admin/unblockuser/<%= user._id %>" method="post">
-                        <button type="submit">Unblock</button>
-                      </form>
-                    <% } else { %>
-                      <form action="/admin/blockuser/<%= user._id %>" method="post">
-                        <button type="submit">Block</button>
-                      </form>
-                    <% } %>
-                  </td>
-                </tr>
-              <% }); %>
-            </tbody>
-          </table>        
-
-       </form>
-  
-
+<body class="g-sidenav-show  bg-gray-200">
+  <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">
+        <img src="../assets/img/logo-ct.png" class="navbar-brand-img h-100" alt="main_logo">
+        <span class="ms-1 font-weight-bold text-white">GLOZIO</span>
+      </a>
     </div>
-</main>
-<!--/Main site-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-<script src="/js/index.js"></script>
-</body>
-</html
+    <hr class="horizontal light mt-0 mb-2">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link text-white " href="/admin/adminhome">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white active bg-gradient-primary" href="../pages/tables.html">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">person</i>
+            </div>
+            <span class="nav-link-text ms-1">User management</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white " href="../pages/billing.html">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">table_view</i>
+            </div>
+            <span class="nav-link-text ms-1">Category</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white " href="../pages/virtual-reality.html">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">view_in_ar</i>
+            </div>
+            <span class="nav-link-text ms-1">Products</span>
+          </a>
+        </li>
+       
+       
+      </ul>
+    </div>
 
+  </aside>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">User management</li>
+          </ol>
+          <h6 class="font-weight-bolder mb-0">User management</h6>
+        </nav>
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            <div class="input-group input-group-outline">
+              <label class="form-label">Search here...</label>
+              <input type="text" class="form-control">
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Gmail</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(user => { %>
+              <tr>
+                <td><%= user.name %></td>
+                <td><%= user.email %></td>
+              <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
+              <td>
+                <% if (user.isBlocked) { %>
+                  <form action="/admin/unblockuser/<%= user._id %>" method="post">
+                    <button class="button-1" type="submit">Unblock</button>
+                  </form>
+                <% } else { %>
+                  <form action="/admin/blockuser/<%= user._id %>" method="post">
+                    <button class="button-1" type="submit">Block</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+  </main>
+  <div class="fixed-plugin">
+    <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
+      <i class="material-icons py-2">settings</i>
+    </a>
+    <div class="card shadow-lg">
+      <div class="card-header pb-0 pt-3">
+        <div class="float-start">
+          <h5 class="mt-3 mb-0">Material UI Configurator</h5>
+          <p>See our dashboard options.</p>
+        </div>
+        <div class="float-end mt-4">
+          <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <!-- End Toggle Button -->
+      </div>
+      <hr class="horizontal dark my-1">
+      <div class="card-body pt-sm-3 pt-0">
+        <!-- Sidebar Backgrounds -->
+        <div>
+          <h6 class="mb-0">Sidebar Colors</h6>
+        </div>
+        <a href="javascript:void(0)" class="switch-trigger background-color">
+          <div class="badge-colors my-2 text-start">
+            <span class="badge filter bg-gradient-primary active" data-color="primary" onclick="sidebarColor(this)"></span>
+            <span class="badge filter bg-gradient-dark" data-color="dark" onclick="sidebarColor(this)"></span>
+            <span class="badge filter bg-gradient-info" data-color="info" onclick="sidebarColor(this)"></span>
+            <span class="badge filter bg-gradient-success" data-color="success" onclick="sidebarColor(this)"></span>
+            <span class="badge filter bg-gradient-warning" data-color="warning" onclick="sidebarColor(this)"></span>
+            <span class="badge filter bg-gradient-danger" data-color="danger" onclick="sidebarColor(this)"></span>
+          </div>
+        </a>
+        <!-- Sidenav Type -->
+        <div class="mt-3">
+          <h6 class="mb-0">Sidenav Type</h6>
+          <p class="text-sm">Choose between 2 different sidenav types.</p>
+        </div>
+        <div class="d-flex">
+          <button class="btn bg-gradient-dark px-3 mb-2 active" data-class="bg-gradient-dark" onclick="sidebarType(this)">Dark</button>
+          <button class="btn bg-gradient-dark px-3 mb-2 ms-2" data-class="bg-transparent" onclick="sidebarType(this)">Transparent</button>
+          <button class="btn bg-gradient-dark px-3 mb-2 ms-2" data-class="bg-white" onclick="sidebarType(this)">White</button>
+        </div>
+        <p class="text-sm d-xl-none d-block mt-2">You can change the sidenav type just on desktop view.</p>
+        <!-- Navbar Fixed -->
+        <div class="mt-3 d-flex">
+          <h6 class="mb-0">Navbar Fixed</h6>
+          <div class="form-check form-switch ps-0 ms-auto my-auto">
+            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="navbarFixed" onclick="navbarFixed(this)">
+          </div>
+        </div>
+        <hr class="horizontal dark my-3">
+        <div class="mt-2 d-flex">
+          <h6 class="mb-0">Light / Dark</h6>
+          <div class="form-check form-switch ps-0 ms-auto my-auto">
+            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
+          </div>
+        </div>
+       
+       
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--   Core JS Files   -->
+  <script src="../assets/js/core/popper.min.js"></script>
+  <script src="../assets/js/core/bootstrap.min.js"></script>
+  <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="../assets/js/material-dashboard.min.js?v=3.1.0"></script>
+</body>
+
+</html>

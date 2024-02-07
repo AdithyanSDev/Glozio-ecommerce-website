@@ -50,6 +50,14 @@ exports.adminLogin = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+//admin home
+exports.adminhome = async(req,res)=>{
+  try{
+   res.render('adminhome')
+  }catch{
+    res.send(500).send('Internal server error')
+  }
+}
 
 // List users
 exports.listUsers = async (req, res) => {

@@ -14,28 +14,12 @@ router.get('/user/login', (req, res) => {
 
 // User login route
 router.post('/user/login', userLogin);
-
-// router.get('/user/register', (req, res) => {
-//   res.render('userlogin'); // Replace 'userlogin' with the actual name of your registration page
-// });
-
-// // User registration route
-// router.post('/user/register', (req, res, next) => {
-//   // Redirect to OTP page after registration
-//   registerUser(req, res, next);
-// }, (req, res) => {
-//   res.redirect('/otp'); // Redirect to the OTP page after registration
-// });
-
 router.post('/user/register',registerUser)
-
 // OTP page route
 router.get('/otp', (req, res) => {
   res.render('otp');
 });
-
 router.post('/otp',verifyOTP)
-
 router.get('/admin/login', (req, res) => {
   res.render('adminlogin'); // Render the admin login page
 });

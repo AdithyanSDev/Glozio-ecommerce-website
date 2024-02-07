@@ -32,8 +32,8 @@ exports.addCategory = async (req, res) => {
 exports.showEditCategoryForm = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
-    const category = await Category.findById(categoryId);
-    res.render('category/edit', { category });
+    const Category = await Category.findById(categoryId);
+    res.render('category/edit', { Category }); 
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -43,14 +43,27 @@ exports.showEditCategoryForm = async (req, res) => {
 exports.editCategory = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
-    const { name, description } = req.body;
-    await Category.findByIdAndUpdate(categoryId, { name, description });
-    res.redirect('/admin/categories');
+    const category = await Category.findById(categoryId);
+    res.render('category/edit', { category }); // This line renders the edit.ejs template with the category data
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
+
+exports.updateCategory = async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    const { name, description } = req.body;
+    await Category.findByIdAndUpdate(categoryId, { name, description });
+    res.redirect('/admin/categories'); // Redirect to the categories list after updating
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
 
 exports.softDeleteCategory = async (req, res) => {
   try {

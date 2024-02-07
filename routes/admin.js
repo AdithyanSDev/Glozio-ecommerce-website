@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
-const productController = require('../controllers/productController'); // Import productController
+const productController = require('../controllers/productController'); 
+const categoryController=require('../controllers/categoryController')
 
 // User management routes
 router.post('/adminlogin',adminController.adminLogin)
@@ -11,16 +12,24 @@ router.post('/blockuser/:userId', adminController.blockUser);
 router.post('/unblockuser/:userId', adminController.unblockUser);
 
 // Category routes
+router.get('/categories', categoryController.listCategories); 
+router.get('/categories/add', categoryController.showAddCategoryForm); 
+router.post('/categories/add', categoryController.addCategory); 
+router.get('/categories/:categoryId/products', categoryController.listProductsByCategory); 
+router.get('/categories/:categoryId/edit', categoryController.editCategory);
+router.post('/categories/:categoryId/edit', categoryController.updateCategory);
+router.post('/categories/:categoryId/delete', categoryController.softDeleteCategory);
+
+
 
 
 // Product routes
 router.get('/products', productController.listProducts);
 router.get('/products/add', productController.showAddProductForm);
 router.post('/products/add', productController.addProduct);
-router.get('/products/edit/:productId', productController.showEditProductForm);
-router.post('/products/edit/:productId', productController.editProduct);
-router.post('/products/delete/:productId', productController.softDeleteProduct);
-
+router.get('/products/:productId/edit', productController.showEditProductForm); 
+router.post('/products/:productId/edit', productController.editProduct); 
+router.post('/products/:productId/delete', productController.deleteProduct);
 
 
 module.exports = router;

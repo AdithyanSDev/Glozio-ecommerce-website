@@ -1,19 +1,21 @@
 const Product = require('../models/product');
+const Category = require('../models/category');
 
 // Function to list all products
 exports.listProducts = async (req, res) => {
   try {
     const products = await Product.find({ isDeleted: false });
-    res.render('productmanagement', { products });
+    res.render('product/productmanagement', { products });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
 
+
 // Function to show the add product form
 exports.showAddProductForm = (req, res) => {
-  res.render('addproduct');
+  res.render('product/addproduct');
 };
 
 // Function to add a new product
@@ -38,12 +40,13 @@ exports.showEditProductForm = async (req, res) => {
   const productId = req.params.productId;
   try {
     const product = await Product.findById(productId);
-    res.render('editproduct', { product });
+    res.render('product/editproduct', { product }); // Assuming your editproduct.ejs is located in the "product" folder
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
+
 
 // Function to edit an existing product
 exports.editProduct = async (req, res) => {
@@ -58,11 +61,11 @@ exports.editProduct = async (req, res) => {
   }
 };
 
-// Function to soft delete a product
-exports.softDeleteProduct = async (req, res) => {
+// Function to delete a product
+exports.deleteProduct = async (req, res) => {
   const productId = req.params.productId;
   try {
-    await Product.findByIdAndUpdate(productId, { isDeleted: true });
+    await Product.findByIdAndDelete(productId);
     res.redirect('/admin/products');
   } catch (error) {
     console.error(error);

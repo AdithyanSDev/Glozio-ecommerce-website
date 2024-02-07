@@ -23,7 +23,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #4070f4;
+  background: #dbdbdb;
 }
 :where(.container, form, .input-field, header) {
   display: flex;
@@ -71,7 +71,7 @@ form .input-field {
 .input-field input::-webkit-outer-spin-button {
   display: none;
 }
-form button {
+ form button {
   margin-top: 25px;
   width: 100%;
   color: #fff;
@@ -90,30 +90,37 @@ form button.active {
 }
 form button:hover {
   background: #0e4bf1;
-}
+} 
   </style>
   <body>
-    <div class="container">
+
+    <form action="/api/otp" method="post">
+      <input name="otp" type="number"/>
+      <button type="submit">button</button>
+    </form>
+
+
+
+    <!-- <div class="container">
       <header>
         <i class="bx bxs-check-shield"></i>
       </header>
       <h4>Enter OTP Code</h4>
-      <form action="#">
-        <div class="input-field">
-          <input type="number" />
-          <input type="number" disabled />
-          <input type="number" disabled />
-          <input type="number" disabled />
-        </div>
-        <button>Verify OTP</button>
+      <form action="/api/otp" method="post" >
+        <input name="otp"/>
+        <button>Button</button>
+       
       </form>
-    </div>
-    <script>
+
+
+
+    </div> -->
+    <!-- <script>
         const inputs = document.querySelectorAll("input"),
   button = document.querySelector("button");
 
 // iterate over all inputs
-inputs.forEach((input, index1) => {
+inputs.forEach((input, index1) => { 
   input.addEventListener("keyup", (e) => {
     // This code gets the current input element and stores it in the currentInput variable
     // This code gets the next sibling element of the current input element and stores it in the nextInput variable
@@ -159,6 +166,6 @@ inputs.forEach((input, index1) => {
 
 //focus the first input which index is 0 on window load
 window.addEventListener("load", () => inputs[0].focus());
-    </script>
+    </script> -->
   </body>
 </html>

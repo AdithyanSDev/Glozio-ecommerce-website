@@ -13,12 +13,25 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  // Add more fields as needed
+  discount:{
+type:Number,
+required:true,
+  },
+  images: {
+    type: [String],  
+    required: true,
+    validate: [arrayLimit, 'At least 3 images are required'],
+  },
   isDeleted: {
     type: Boolean,
     default: false,
   },
 });
+
+// Validator function to check array length
+function arrayLimit(val) {
+  return val.length >= 3;
+}
 
 const Product = mongoose.model('Product', productSchema);
 

@@ -35,14 +35,17 @@ app.use(
     cookie: { secure: false }
   })
 );
+app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static('uploads'));
 
 app.use('/', homeRoutes);
 app.use('/admin', adminRoutes);
 app.use('/api', authRoutes);
 
 
-app.use(express.static('public'));
-app.use(express.static(path.join(__dirname, 'public')));
+
+
 
 
 app.get('/adminlogin', (req, res) => {

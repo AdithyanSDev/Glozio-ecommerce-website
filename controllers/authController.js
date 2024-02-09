@@ -2,13 +2,22 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
+const Product = require('../models/product');
+
 
 
 // Render home page
-exports.renderHomePage = (req, res) => {
- const token = req.session.token
- console.log("token form ",token)
-  res.render('home',{token}); // Assuming your home.ejs file is in the 'views' directory
+exports.renderHomePage = async (req, res) => {
+  try {
+
+    const products = await Product.find({ isDeleted: false });
+    const token = req.session.token;
+    console.log("token from:", token);
+    res.render('home', { products, token }); // Assuming your home.ejs file is in the 'views' directory
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
 };
 
 // Redirect to user login page
@@ -61,25 +70,23 @@ const generateRandomString=()=>{
 }
 
 
-// Update the function to send OTP after registration
 exports.registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
 
   try {
-    
+    // Store user data in the session
+    req.session.userData = { name, email, password };
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await User({ name, email, password: hashedPassword });
-    await newUser.save();
 
     // Generate OTP and send it to the user's email
     const otp = generateRandomString(4); // Generate a 4-digit OTP
     await sendOtpEmail(email, otp);
     console.log("register page otp ",otp)
 
-    // Store the OTP in the session or database for verification
-    req.session.otp = otp;
+    // Store the OTP and its creation time in the session or database for verification
+    req.session.otp = { code: otp, timestamp: Date.now() };
 
     const successMessage = 'User registered successfully!';
     if(successMessage){
@@ -94,6 +101,7 @@ exports.registerUser = async (req, res, next) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
 
 
 // Function to send OTP email
@@ -126,19 +134,28 @@ const sendOtpEmail = async (email, otp) => {
 exports.verifyOTP = async (req, res) => {
   try {
     const { otp } = req.body;
-    // const storedOTP = req.session.otp; // Retrieve the stored OTP from session
-    
-    const session_otp=req.session.otp;
+    const sessionOtp = req.session.otp;
 
- 
-    if (otp == session_otp) {
-      console.log("executed")
-      // If OTP matches, redirect to login page
-      res.redirect('/api/user/login');
+    if (otp === sessionOtp.code && (Date.now() - sessionOtp.timestamp) <= 30000) { // Check if OTP is correct and not expired
+      // If OTP matches and not expired, retrieve user data from session and register the user
+      const userData = req.session.userData;
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+      // Create a new user
+      const newUser = new User({ name: userData.name, email: userData.email, password: hashedPassword });
+      await newUser.save();
+
+      // Clear session data
+      delete req.session.userData;
+      delete req.session.otp;
+
+      // Redirect to login page or send response indicating successful registration
+      res.render('userlogin')
     } else {
-    
-      // If OTP doesn't match, redirect to registration page with an error message
-      res.redirect('/api/user/register');
+      // If OTP doesn't match or expired, redirect to registration page with an error message
+      res.status(400).json({ success: false, message: "Invalid OTP" });
     }
   } catch (error) {
     console.error(error);
@@ -146,14 +163,17 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 
-// Function to render the OTP page
+
 exports.renderOTPPage = (req, res) => {
+  console.log("Rendering OTP page"); // Add this line
   if (req.session.user) {
     res.redirect('/userHome');
   } else {
-    res.render('otp');
+    const timer = calculateRemainingTime(req.session.otp.timestamp); // Calculate remaining time for the timer
+    res.render('otp', { timer }); // Pass timer value to the template
   }
 };
+
 
 // Function to handle OTP verification post request
 exports.verifyOTPPost = async (req, res) => {
@@ -175,7 +195,7 @@ exports.verifyOTPPost = async (req, res) => {
       delete req.session.userData;
       delete req.session.otp;
 
-      res.status(200).json({ success: true, redirect: '/user/login' });
+      res.render('userlogin')
     } else {
       // OTP is incorrect
       res.status(400).json({ success: false, message: "Invalid OTP" });
@@ -183,5 +203,18 @@ exports.verifyOTPPost = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
+exports.resendOTP = async (req, res) => {
+  try {
+    const newOTP = generateRandomString(4);
+    const userEmail = req.session.userData.email;
+    await sendOtpEmail(userEmail, newOTP);
+    req.session.otp = { code: newOTP, timestamp: Date.now() };
+    res.status(200).json({ success: true, message: "OTP has been resent successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };

@@ -2,7 +2,21 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const productController = require('../controllers/productController'); 
-const categoryController=require('../controllers/categoryController')
+const categoryController=require('../controllers/categoryController');
+const multer = require('multer');
+const path = require('path');
+
+
+const storage = multer.diskStorage({
+    destination: 'uploads/',
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const fileExtension = path.extname(file.originalname);
+      cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
+    }
+  });
+  
+  const upload = multer({ storage: storage });
 
 // User management routes
 router.post('/adminlogin',adminController.adminLogin)
@@ -26,7 +40,7 @@ router.post('/categories/:categoryId/delete', categoryController.softDeleteCateg
 // Product routes
 router.get('/products', productController.listProducts);
 router.get('/products/add', productController.showAddProductForm);
-router.post('/products/add', productController.addProduct);
+router.post('/products/add', upload.array('images', 3), productController.addProduct);
 router.get('/products/:productId/edit', productController.showEditProductForm); 
 router.post('/products/:productId/edit', productController.editProduct); 
 router.post('/products/:productId/delete', productController.deleteProduct);

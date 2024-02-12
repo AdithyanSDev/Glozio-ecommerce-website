@@ -3,22 +3,23 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
 const Product = require('../models/product');
+const Category= require('../models/category')
 
 
-
-// Render home page
 exports.renderHomePage = async (req, res) => {
   try {
-
     const products = await Product.find({ isDeleted: false });
+    const categories = await Category.find({ isDeleted: false }).populate('products'); // Populate products in each category
     const token = req.session.token;
     console.log("token from:", token);
-    res.render('home', { products, token }); // Assuming your home.ejs file is in the 'views' directory
+    res.render('home', { products, token, categories }); // Make sure categories is passed here
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
+
+
 
 // Redirect to user login page
 exports.redirectToUserLogin = (req, res) => {
@@ -218,3 +219,52 @@ exports.resendOTP = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+
+
+//render the productlist.ejs
+exports.productsByCategory = async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    const category = await Category.findById(categoryId).populate('products');
+    
+    if (!category) {
+      return res.status(404).send('Category not found');
+    }
+
+    // Extract product IDs from the category
+    const productIds = category.products.map(product => product._id);
+
+    // Find products using the extracted IDs
+    const products = await Product.find({ _id: { $in: productIds } });
+
+    res.render('productlist', { category, products });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// exports.renderProductlist = async (req, res) => {
+//   try {
+//     const categoryId = req.params.categoryId;
+//     console.log(categoryId)
+    
+//     // Find the category by ID
+//     const category = await Category.findById(categoryId);
+
+//     // If the category is not found, return a 404 error
+//     if (!category) {
+//       return res.status(404).send('Category not found');
+//     }
+
+//     // Find all products belonging to the category
+//     const products = await Product.find({ category: categoryId });
+
+//     // Render the product list page and pass the category and products data
+//     res.render('productlist', { category, products });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Internal Server Error');
+//   }
+// };

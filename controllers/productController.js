@@ -40,10 +40,9 @@ exports.showAddProductForm = async (req, res) => {
   }
 };
 
-
 exports.addProduct = async (req, res) => {
   try {
-    const { name, description, price, discount_price } = req.body; // Extract discount_price from request body
+    const { name, description, price, discount_price, category } = req.body;
     const images = req.files.map(file => file.path);
 
     if (!images || images.length === 0) {
@@ -54,11 +53,16 @@ exports.addProduct = async (req, res) => {
       name,
       description,
       price,
-      discount: discount_price, // Assign discount_price to discount field
+      discount: discount_price,
+      category,
       images: images,
     });
 
     await newProduct.save();
+
+    // Find the category by its ID and update its products array
+    await Category.findByIdAndUpdate(category, { $push: { products: newProduct._id } });
+
     res.redirect('/admin/products');
   } catch (error) {
     console.error('Error adding product:', error);

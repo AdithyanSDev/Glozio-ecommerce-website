@@ -95,3 +95,12 @@ exports.unblockUser = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+exports.adminlogout = async (req,res)=>{
+  try{
+    res.redirect('/adminlogin')
+  }catch(error){
+    console.error(error)
+    res.status(500).send(('Internal server error'))
+  }
+}

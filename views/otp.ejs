@@ -111,7 +111,7 @@
             <input name="otp" type="number" placeholder="Enter OTP" required/>
             <button type="submit">Verify OTP</button>
             <button type="button" id="resendBtn">Resend OTP</button>
-            <div id="timerDisplay"><%= timer %></div> 
+            <div id="timerDisplay"></div> 
         </form>
     </div>
       
@@ -138,16 +138,27 @@
     }
 
     // Resend OTP button click event handler
-    document.getElementById('resendBtn').addEventListener('click', () => {
-        // Call your backend to resend OTP here
-        console.log('Resend OTP clicked');
-        // Start timer after OTP is resent
-        startTimer(30, () => {
-            // Handle timer expiration (e.g., disable the resend button)
-            document.getElementById('resendBtn').disabled = true;
-            console.log('OTP expired');
+    document.getElementById('resendBtn').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/resendOTP', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // No need to send any data in the request body
         });
-    });
+        if (response.ok) {
+            const responseData = await response.json();
+            alert(responseData.message); // Show success message
+        } else {
+            const errorData = await response.json();
+            alert(errorData.message); // Show error message
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while resending OTP. Please try again.');
+    }
+});
 
     // Start the timer when the page loads
     window.addEventListener('load', () => {
@@ -157,19 +168,21 @@
             console.log('OTP expired'); 
         });
     });
+
+    // Function to calculate remaining time
     function calculateRemainingTime(timestamp) {
-    const currentTime = Date.now();
-    const elapsedTime = (currentTime - timestamp) / 1000; // Convert to seconds
-    const remainingTime = Math.max(0, 30 - elapsedTime); // Maximum time is 30 seconds
-    return formatTime(remainingTime);
-}
+        const currentTime = Date.now();
+        const elapsedTime = (currentTime - timestamp) / 1000; // Convert to seconds
+        const remainingTime = Math.max(0, 30 - elapsedTime); // Maximum time is 30 seconds
+        return formatTime(remainingTime);
+    }
 
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-}
-
+    // Function to format time
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
 </script>
 
 </body>

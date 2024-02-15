@@ -4,20 +4,36 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
 const Product = require('../models/product');
 const Category= require('../models/category')
+const Review = require('../models/review');
+
 
 
 exports.renderHomePage = async (req, res) => {
   try {
     const products = await Product.find({ isDeleted: false });
-    const categories = await Category.find({ isDeleted: false }).populate('products'); // Populate products in each category
-    const token = req.session.token;
+    
+    // Fetch review counts for each product
+    const productReviewCounts = await Promise.all(products.map(async product => {
+      const reviewCount = await Review.countDocuments({ productId: product._id });
+      return { productId: product._id, reviewCount };
+    }));
+
+    // Create a map of product IDs to review counts for easy access
+    const reviewCountMap = productReviewCounts.reduce((map, obj) => {
+      map[obj.productId] = obj.reviewCount;
+      return map;
+    }, {});
+
+    const categories = await Category.find({ isDeleted: false }).populate('products'); 
+    const token = req.session.token;  
     console.log("token from:", token);
-    res.render('home', { products, token, categories }); // Make sure categories is passed here
+    res.render('home', { products, token, categories, reviewCountMap }); 
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
+
 
 
 
@@ -166,6 +182,20 @@ exports.verifyOTP = async (req, res) => {
 
 
 exports.renderOTPPage = (req, res) => {
+     // Function to calculate remaining time
+     function calculateRemainingTime(timestamp) {
+      const currentTime = Date.now();
+      const elapsedTime = (currentTime - timestamp) / 1000; // Convert to seconds
+      const remainingTime = Math.max(0, 30 - elapsedTime); // Maximum time is 30 seconds
+      return formatTime(remainingTime);
+  }
+
+  // Function to format time
+  function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  }
   console.log("Rendering OTP page"); // Add this line
   if (req.session.user) {
     res.redirect('/userHome');
@@ -207,18 +237,54 @@ exports.verifyOTPPost = async (req, res) => {
   }
 };
 
+// Function to resend OTP
 exports.resendOTP = async (req, res) => {
   try {
     const newOTP = generateRandomString(4);
-    const userEmail = req.session.userData.email;
-    await sendOtpEmail(userEmail, newOTP);
-    req.session.otp = { code: newOTP, timestamp: Date.now() };
+    const {email} = req.body;
+    await sendOtpEmail(email,newOTP);
+    // req.session.otp = { code: newOTP, timestamp: Date.now() };
+    storedOTP(email,newOTP)
     res.status(200).json({ success: true, message: "OTP has been resent successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+// const resendOTP=async(req,res)=>{
+//   try {
+//       const {email}=req.body; 
+//       const otp=generateOtp();
+//       await sendMail(email, otp);  
+//       storeOTP(email, otp);
+//       res.status(200).json({message:"OTP resend success"});
+//   } catch (error) {
+//       console.log(error);
+//   }
+//   }
+
+exports.logout = async (req, res) => {
+  try {
+    if (!req.session.token) {
+      return res.render('userlogin');
+    }
+
+    req.session.destroy(err => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        res.status(500).send('Internal Server Error');
+      } else {
+        console.log('Session destroyed successfully');
+        res.redirect('/api/user/login');
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
 
 
 
@@ -245,26 +311,3 @@ exports.productsByCategory = async (req, res) => {
   }
 };
 
-// exports.renderProductlist = async (req, res) => {
-//   try {
-//     const categoryId = req.params.categoryId;
-//     console.log(categoryId)
-    
-//     // Find the category by ID
-//     const category = await Category.findById(categoryId);
-
-//     // If the category is not found, return a 404 error
-//     if (!category) {
-//       return res.status(404).send('Category not found');
-//     }
-
-//     // Find all products belonging to the category
-//     const products = await Product.find({ category: categoryId });
-
-//     // Render the product list page and pass the category and products data
-//     res.render('productlist', { category, products });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send('Internal Server Error');
-//   }
-// };

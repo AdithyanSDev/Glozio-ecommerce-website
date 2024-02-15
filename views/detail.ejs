@@ -107,14 +107,13 @@
                         <a href="" class="nav-item nav-link">Laptop</a>
                         <a href="" class="nav-item nav-link">Mobiles</a>
                         <a href="" class="nav-item nav-link">Headphones</a>
+                        <a href="" class="nav-item nav-link">Camera</a>
                     </div>
                 </nav>
             </div>
             <div class="col-lg-9">
                 <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0">
                     <a href="" class="text-decoration-none d-block d-lg-none">
-                        <span class="h1 text-uppercase text-dark bg-light px-2">Multi</span>
-                        <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">Shop</span>
                     </a>
                     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                         <span class="navbar-toggler-icon"></span>
@@ -198,10 +197,24 @@
                             <small class="fas fa-star-half-alt"></small>
                             <small class="far fa-star"></small>
                         </div>
-                        <small class="pt-1">(99 Reviews)</small>
+                        <small class="pt-1"><%= reviewCount %></small>
                     </div>
-                    <h3 class="font-weight-semi-bold mb-4">$<%= product.price.toFixed(2) %></h3>
-                    <p class="mb-4"><%= product.description %></p>
+                    <h3 class="font-weight-semi-bold mb-4">$<%= product.price.toFixed(2) %> <small class="text-muted ml-2"><del>$<%= product.discount %></del></small></h3>                    <p class="mb-4"><%= product.description %></p>
+                    <p class="font-weight-bold mb-2 <%= product.stock === 0 ? 'text-danger' : 'text-success' %>">
+                        <% if (product.stock > 0) { %>
+                        Stock: <%= product.stock %>
+                        <% } else { %>
+                        Stock: Out of Stock
+                        <% } %>
+                    </p>
+                    <!-- Display Highlights/Specs -->
+                    <h4 class="font-weight-bold mb-2">Highlights/Specs</h4>
+                    <ul>
+                        <% product.highlights.forEach(highlight => { %>
+                        <li><%= highlight %></li>
+                        <% }); %>
+                    </ul>
+               
                 </div>
             </div>
             
@@ -232,7 +245,7 @@
                 <div class="bg-light p-30">
                     <div class="nav nav-tabs mb-4">
                         <a class="nav-item nav-link text-dark active" data-toggle="tab" href="#tab-pane-1">Description</a>
-                        <a class="nav-item nav-link text-dark" data-toggle="tab" href="#tab-pane-2">Information</a>
+         
                         <a class="nav-item nav-link text-dark" data-toggle="tab" href="#tab-pane-3">Reviews (<%= reviewCount %>)</a>
 
                     </div>
@@ -343,7 +356,7 @@
                                         <% for (let i = 0; i < 5; i++) { %>
                                             <small class="fa fa-star text-primary mr-1"></small>
                                         <% } %>
-                                        <small>(99)</small>
+                                        <small>(<%= reviewCount %>)</small>
                                     </div>
                                 </div>
                             </div>

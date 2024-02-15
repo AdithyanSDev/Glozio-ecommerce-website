@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { renderHomePage,productsByCategory, renderProductlist } = require('../controllers/authController');
+const { renderHomePage,productsByCategory} = require('../controllers/authController');
 const { renderDetailPage, reviewSubmit ,getRelatedProducts } = require('../controllers/detailController'); // Import reviewSubmit function
 const Review = require('../models/review');
 const Product = require('../models/product');

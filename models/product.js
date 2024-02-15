@@ -13,19 +13,46 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  discount:{
-type:Number,
-required:true,
-  },
-  images: {
-    type: [String],  
+  discount: {
+    type: Number,
     required: true,
-    validate: [arrayLimit, 'At least 3 images are required'],
+    default: 0, // Default discount is 0 if not provided
+  },
+  stock: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  highlights: [String],
+  images: {
+    type: [String],
+    required: function() {
+      // Require at least 3 images when creating a new product
+      return this.isNew ? this.images.length < 3 : false;
+    }
   },
   isDeleted: {
     type: Boolean,
     default: false,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  totalPrice: {
+    type: Number,
+    default: function() {
+      // Calculate total price based on price and discount
+      return this.price * (1 - this.discount / 100);
+    }
+  },
+  sellingPrice: {
+    type: Number,
+    default: function() {
+      // Selling price is the calculated total price
+      return this.totalPrice;
+    }
+  }
 });
 
 // Validator function to check array length

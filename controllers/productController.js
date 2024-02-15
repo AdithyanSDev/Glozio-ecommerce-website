@@ -1,21 +1,5 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
-const multer = require('multer')
-const sharp = require('sharp');
-
-// Multer configuration for file upload
-const upload = multer({
-  limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB limit per file
-  },
-  fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith('image/')) {
-          cb(null, true);
-      } else {
-          cb(new Error('Only images are allowed'));
-      }
-  },
-});
 
 
 
@@ -42,8 +26,8 @@ exports.showAddProductForm = async (req, res) => {
 
 exports.addProduct = async (req, res) => {
   try {
-    const { name, description, price, discount_price, category } = req.body;
-    const images = req.files.map(file => file.path);
+    const { name, description, price, discount_price, category, stock, highlights } = req.body;
+    let images = req.files.map(file => file.path);
 
     if (!images || images.length === 0) {
       throw new Error('No images uploaded');
@@ -55,6 +39,8 @@ exports.addProduct = async (req, res) => {
       price,
       discount: discount_price,
       category,
+      stock,
+      highlights,
       images: images,
     });
 
@@ -71,30 +57,48 @@ exports.addProduct = async (req, res) => {
 };
 
 
+
 // Function to show the edit product form
 exports.showEditProductForm = async (req, res) => {
   const productId = req.params.productId;
   try {
     const product = await Product.findById(productId);
-    res.render('product/editproduct', { product }); // Assuming your editproduct.ejs is located in the "product" folder
+    res.render('product/editproduct', { product }); 
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
 
-// Function to edit an existing product
-exports.editProduct = async (req, res) => {
-  const productId = req.params.productId;
+
+// Edit product
+exports.editProduct = async (req, res, next) => {
   try {
-    const { name, description, price } = req.body;
-    await Product.findByIdAndUpdate(productId, { name, description, price });
-    res.redirect('/admin/products');
+      const productId = req.params.productId;
+      const updates = req.body;
+      const product = await Product.findById(productId); // Fetch the product
+      if (!product) {
+          return res.status(404).send('Product not found');
+      }
+      if (req.files) {
+          // Handle new images
+          const newImages = req.files.map(file => file.path);
+          product.images.forEach(imagePath => {
+              // Remove the image from file system (you need to implement this part)
+              fs.unlink(imagePath, (err) => {
+                  if (err) console.error(err);
+              });
+          });
+          updates.images = newImages;
+      }
+      await Product.findByIdAndUpdate(productId, updates);
+      res.redirect('/admin/products');
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+      next(error);
   }
 };
+
+
 
 // Function to delete a product
 exports.deleteProduct = async (req, res) => {

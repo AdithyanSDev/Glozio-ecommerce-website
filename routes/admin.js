@@ -24,6 +24,7 @@ router.get('/adminhome',adminController.adminhome)
 router.get('/usermanagement', adminController.listUsers);
 router.post('/blockuser/:userId', adminController.blockUser);
 router.post('/unblockuser/:userId', adminController.unblockUser);
+router.get('/adminlogout',adminController.adminlogout)
 
 // Category routes
 router.get('/categories', categoryController.listCategories); 
@@ -41,8 +42,9 @@ router.post('/categories/:categoryId/delete', categoryController.softDeleteCateg
 router.get('/products', productController.listProducts);
 router.get('/products/add', productController.showAddProductForm);
 router.post('/products/add', upload.array('images', 3), productController.addProduct);
-router.get('/products/:productId/edit', productController.showEditProductForm); 
-router.post('/products/:productId/edit', productController.editProduct); 
+router.get('/products/:productId/edit', productController.showEditProductForm);
+router.post('/products/:productId/edit', upload.array('new_images', 3), productController.editProduct);
+
 router.post('/products/:productId/delete', productController.deleteProduct);
 
 

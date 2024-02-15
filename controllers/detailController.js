@@ -8,7 +8,7 @@ exports.renderDetailPage = async (req, res) => {
   try {
     const productId = req.params.productId;
     const product = await Product.findById(productId);
-    
+    console.log("hehe",product)
     // Fetch reviews for the product
     const reviews = await Review.find({ productId });
 
@@ -16,7 +16,7 @@ exports.renderDetailPage = async (req, res) => {
     const reviewCount = await Review.countDocuments({ productId });
 
       // Fetch related products based on the current product's category
-      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(5);
+      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
 
     // Render the detail page and pass the product object, reviews, and reviewCount
     res.render('detail', { product, reviews, reviewCount,relatedProducts });

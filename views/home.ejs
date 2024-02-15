@@ -298,12 +298,13 @@
    <div class="container-fluid py-4">   
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Featured Products</span></h2>
     <div class="row">
+    
         <% products.forEach(product => { %>
         <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
             <div class="product-item bg-light mb-4"> <!-- Added the product-item class here -->
                 <div class="product-img position-relative overflow-hidden">
                     <% if (product.images.length > 0) { %>
-                    <img class="img-fluid w-100 product-image" src="<%= product.images[0] %>" alt="<%= products.name %>">
+                    <img class="img-fluid w-70 product-image" src="<%= product.images[0] %>" alt="<%= products.name %>">
                     <% } else { %>
                     <% } %>
                     <div class="product-action">

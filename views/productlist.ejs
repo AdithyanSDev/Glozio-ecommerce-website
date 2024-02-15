@@ -241,7 +241,7 @@
             <div class="product-item bg-light mb-4"> <!-- Added the product-item class here -->
                 <div class="product-img position-relative overflow-hidden">
                     <% if (product.images.length > 0) { %>
-                    <img class="img-fluid w-100 product-image" src="<%= product.images[0] %>" alt="<%= product.name %>">
+                    <img class="img-fluid w-100 product-image" src="/<%= product.images[0] %>" alt="<%= product.name %>">
                     <% } else { %>
                     <img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">
                     <% } %>

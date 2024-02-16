@@ -13,7 +13,7 @@ router.post('/user/login', userLogin);
 router.post('/user/register', registerUser);
 router.get('/otp', renderOTPPage);
 router.post('/otp', verifyOTP);
-router.post('/resend-otp', resendOTP);
+router.post('/resend-otp',resendOTP );
 router.get('/user/logout',logout)
 
 router.get('/admin/login', (req, res) => {

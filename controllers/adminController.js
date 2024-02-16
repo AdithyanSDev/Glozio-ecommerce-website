@@ -14,45 +14,44 @@ exports.adminLogin = async (req, res) => {
   const { email, password } = req.body;
   console.log(req.body);
   const predefinedAdminEmail = 'adithyansdev46@gmail.com';
-  const predefinedAdminPassword = '971919'; // Plain text password
+  const predefinedAdminPassword = '971919'; 
 
   try {
     if (email === predefinedAdminEmail) {
-      const predefinedAdminPasswordHash = await hashPassword(predefinedAdminPassword); // Corrected line
-
+      const predefinedAdminPasswordHash = await hashPassword(predefinedAdminPassword); 
       const match = await bcrypt.compare(password, predefinedAdminPasswordHash);
 
       if (match) {
         const token = jwt.sign({ userId: predefinedAdminEmail }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // Set up session
-        req.session.user = predefinedAdminEmail;
-
-        res.cookie('token', token); // Set the token as a cookie
+        req.session.admin = predefinedAdminEmail;
+        req.session.token = token; // Set the token in session
 
         // Log admin details to console
         console.log(`Admin logged in: ${predefinedAdminEmail}`);
+        console.log("admin token", token);
 
-        if (req.session.user) {
-          res.render('adminhome');
-        } else {
-          res.redirect('/adminlogin');
-        }
-
+        // Redirect to admin home page
+        res.render('adminhome');
         return;
       }
     }
 
-    // Invalid email or password
-    res.render('adminlogin', { error: 'Invalid email or password' });
+    // If admin authentication fails, redirect back to admin login page
+    res.redirect('/adminlogin');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
+
 //admin home
 exports.adminhome = async(req,res)=>{
   try{
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '-1');
    res.render('adminhome')
   }catch{
     res.send(500).send('Internal server error')
@@ -96,11 +95,12 @@ exports.unblockUser = async (req, res) => {
   }
 };
 
-exports.adminlogout = async (req,res)=>{
-  try{
-    res.redirect('/adminlogin')
-  }catch(error){
-    console.error(error)
-    res.status(500).send(('Internal server error'))
+exports.adminlogout = async (req, res) => {
+  try {
+    req.session.destroy();
+    res.redirect('/adminlogin');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal server error');
   }
-}
+};

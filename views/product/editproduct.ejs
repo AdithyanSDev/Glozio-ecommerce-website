@@ -8,48 +8,74 @@
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center text-primary mt-5">Edit Product</h2>
-        <form action="/admin/products/<%= product._id %>/edit" method="post" enctype="multipart/form-data">
+        <h1 class="text-center text-primary mt-5">Edit Product</h1>
+        <form action="/admin/products/<%= product._id %>/edit" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="name">Name:</label>
+                <label for="name">Product Name:</label>
                 <input type="text" class="form-control" id="name" name="name" value="<%= product.name %>" required>
             </div>
             <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea class="form-control" id="description" name="description" required><%= product.description %></textarea>
-            </div>
+                <label for="description">Product Description:</label>
+                <textarea class="form-control" id="description" name="description" rows="4" required><%= product.description %></textarea>
+                </div>
             <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="number" class="form-control" id="price" name="price" value="<%= product.price %>" required>
+                <label for="price">Product Price:</label>
+                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" onchange="calculateSellingPrice()" value="<%= product.price %>" required>
             </div>
             <div class="form-group">
                 <label for="discount">Discount Percentage:</label>
-                <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01">
+                <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" onchange="calculateSellingPrice()" value="<%= product.discount %>">
             </div>
+            <!-- Removed the input field for discount price -->
+            
             <div class="form-group">
-                <label for="discount_price">Discount Price:</label>
-                <input type="number" class="form-control" id="discount_price" name="discount_price" min="0" step="0.01" value="<%= product.discount_price %>">
+                <label for="category">Category:</label>
+                <select class="form-control" id="category" name="category" required>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category._id %>" <%= product.category && product.category.equals(category._id) ? 'selected' : '' %>><%= category.name %></option>
+                    <% }); %>
+                </select>
             </div>
-            <div class="form-group">
-                <label>Current Images:</label>
-                <% product.images.forEach(image => { %>
-                    <img src="<%= image %>" class="img-fluid img-thumbnail" alt="Product Image">
-                <% }); %>
-            </div>
-            <div class="form-group">
-                <label for="new_images">New Images:</label>
-                <input type="file" class="form-control-file" id="new_images" name="new_images" accept="image/*" multiple>
-            </div>
+            
+            
             <div class="form-group">
                 <label for="stock">Stock:</label>
-                <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required>
+                <input type="number" class="form-control" id="stock" name="stock" min="0" value="<%= product.stock %>" required>
             </div>
             <div class="form-group">
                 <label for="highlights">Highlights/Specs:</label>
-                <textarea class="form-control" id="highlights" name="highlights" required><%= product.highlights %></textarea>
+                <textarea class="form-control" id="highlights" name="highlights" rows="4" required><%= product.highlights %></textarea>
             </div>
+            <div class="form-group">
+                <label for="images">Product Images:</label>
+                <input type="file" class="form-control-file" id="new_images" name="new_images" accept="image/*" multiple>
+            </div>
+            <!-- Displaying selling price and discount percentage -->
+            <h3 class="font-weight-semi-bold mb-4">
+                $<span id="selling_price"><%= product.discount ? (product.price * (1 - product.discount / 100)).toFixed(2) : product.price.toFixed(2) %></span> 
+                <small class="text-muted ml-2">
+                    <del>$<span id="original_price"><%= product.price.toFixed(2) %></span></del> 
+                    (<span id="discount_percentage"><%= product.discount ? product.discount.toFixed(2) : '0.00' %>%</span>)
+                </small>
+            </h3>
+            
             <button type="submit" class="btn btn-primary btn-block">Update Product</button>
         </form>
     </div>
+    <script>
+        function calculateSellingPrice() {
+            var price = parseFloat(document.getElementById("price").value);
+            var discount = parseFloat(document.getElementById("discount").value);
+            var sellingPrice = price * (1 - discount / 100);
+            document.getElementById("selling_price").innerText = sellingPrice.toFixed(2);
+            document.getElementById("original_price").innerText = price.toFixed(2);
+            var discountPercentage = ((price - sellingPrice) / price * 100).toFixed(2);
+            document.getElementById("discount_percentage").innerText = "(" + discountPercentage + "%)";
+        }
+        // Call calculateSellingPrice() on page load if discount is already set
+        if(document.getElementById("discount").value) {
+            calculateSellingPrice();
+        }
+    </script>
 </body>
 </html>

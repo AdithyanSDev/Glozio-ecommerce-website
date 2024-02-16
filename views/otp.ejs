@@ -102,20 +102,19 @@
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <i class="bx bxs-check-shield"></i>
-        </header>
-        <h4>Enter OTP Code</h4>
-        <form action="/api/otp" method="post" id="otpForm">
-            <input name="otp" type="number" placeholder="Enter OTP" required/>
-            <button type="submit">Verify OTP</button>
-            <button type="button" id="resendBtn">Resend OTP</button>
-            <div id="timerDisplay"></div> 
-        </form>
-    </div>
-      
-  
+   
+        <div class="container">
+            <header>
+                <i class="bx bxs-check-shield"></i>
+            </header>
+            <h4>Enter OTP Code</h4>
+            <form action="/api/otp" method="post" id="otpForm">
+                <input name="otp" type="number" placeholder="Enter OTP" required/>
+                <button type="submit">Verify OTP</button>
+                <button type="button" id="resendBtn">Resend OTP</button>
+                <div id="timerDisplay"></div> 
+            </form>
+        </div>
 <script>
     // Function to update the timer display
     function updateTimerDisplay(seconds) {
@@ -138,7 +137,7 @@
     }
 
     // Resend OTP button click event handler
-    document.getElementById('resendBtn').addEventListener('click', async () => {
+document.getElementById('resendBtn').addEventListener('click', async () => {
     try {
         const response = await fetch('/api/resendOTP', {
             method: 'POST',
@@ -159,6 +158,7 @@
         alert('An error occurred while resending OTP. Please try again.');
     }
 });
+
 
     // Start the timer when the page loads
     window.addEventListener('load', () => {

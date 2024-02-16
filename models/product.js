@@ -27,7 +27,6 @@ const productSchema = new mongoose.Schema({
   images: {
     type: [String],
     required: function() {
-      // Require at least 3 images when creating a new product
       return this.isNew ? this.images.length < 3 : false;
     }
   },
@@ -39,18 +38,12 @@ const productSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  totalPrice: {
-    type: Number,
-    default: function() {
-      // Calculate total price based on price and discount
-      return this.price * (1 - this.discount / 100);
-    }
-  },
+  
   sellingPrice: {
     type: Number,
     default: function() {
       // Selling price is the calculated total price
-      return this.totalPrice;
+      return this.price * (1-this.discount/100);
     }
   }
 });

@@ -20,23 +20,24 @@
             </div>
             <div class="form-group">
                 <label for="price">Product Price:</label>
-                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
+                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" onchange="calculateSellingPrice()" required>
             </div>
             <div class="form-group">
                 <label for="discount">Discount Percentage:</label>
-                <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01">
+                <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" onchange="calculateSellingPrice()">
             </div>
-            <div class="form-group">
-                <label for="discount_price">Discount Price:</label>
-                <input type="number" class="form-control" id="discount_price" name="discount_price" min="0" step="0.01">
-            </div>
+            <!-- Removed the input field for discount price -->
+            
             <div class="form-group">
                 <label for="category">Category:</label>
                 <select class="form-control" id="category" name="category" required>
                     <option value="" disabled selected>Select a category</option>
-                    <!-- Options for categories will be dynamically generated -->
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category._id %>"><%= category.name %></option>
+                    <% }); %>
                 </select>
             </div>
+            
             <div class="form-group">
                 <label for="stock">Stock:</label>
                 <input type="number" class="form-control" id="stock" name="stock" min="0" required>
@@ -49,8 +50,28 @@
                 <label for="images">Product Images:</label>
                 <input type="file" class="form-control-file" id="images" name="images" accept="image/*" multiple required>
             </div>
+            <!-- Displaying selling price and discount percentage -->
+            <h3 class="font-weight-semi-bold mb-4">
+                $<span id="selling_price">0.00</span> 
+                <small class="text-muted ml-2">
+                    <del>$<span id="original_price">0.00</span></del> 
+                    (<span id="discount_percentage">0.00%</span>)
+                </small>
+            </h3>
+            
             <button type="submit" class="btn btn-primary btn-block">Add Product</button>
         </form>
     </div>
+    <script>
+        function calculateSellingPrice() {
+            var price = parseFloat(document.getElementById("price").value);
+            var discount = parseFloat(document.getElementById("discount").value);
+            var sellingPrice = price * (1 - discount / 100);
+            document.getElementById("selling_price").innerText = sellingPrice.toFixed(2);
+            document.getElementById("original_price").innerText = price.toFixed(2);
+            var discountPercentage = ((price - sellingPrice) / price * 100).toFixed(2);
+            document.getElementById("discount_percentage").innerText = "(" + discountPercentage + "%)";
+        }
+    </script>
 </body>
 </html>

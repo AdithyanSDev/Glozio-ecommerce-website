@@ -57,7 +57,7 @@ exports.getRelatedProducts = async (req, res) => {
   try {
       const productId = req.params.productId;
       const product = await Product.findById(productId);
-      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(5); // Fetch related products based on category excluding the chosen product
+      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(5); 
 
       res.render('relatedProducts', { relatedProducts });
   } catch (error) {

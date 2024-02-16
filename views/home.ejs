@@ -58,7 +58,7 @@
                    
                 </div>
                 <div class="d-inline-flex align-items-center d-block d-lg-none">
-                    <% if (token) { %>
+                   
                         <a href="" class="btn px-0 ml-2">
                             <i class="fas fa-heart text-dark"></i>
                             <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
@@ -67,9 +67,7 @@
                             <i class="fas fa-shopping-cart text-dark"></i>
                             <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
                         </a>
-                    <% } else { %>
-                        
-                    <% } %>
+                    
                 </div>
                 
                 
@@ -294,17 +292,16 @@
     
 
     
-   <!-- Products Start -->
-   <div class="container-fluid py-4">   
+  <!-- Products Start -->
+<div class="container-fluid py-4">   
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Featured Products</span></h2>
     <div class="row">
-    
         <% products.forEach(product => { %>
         <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
             <div class="product-item bg-light mb-4"> <!-- Added the product-item class here -->
-                <div class="product-img position-relative overflow-hidden">
+                <div class="product-img position-relative overflow-hidden d-flex align-items-center justify-content-center"> <!-- Modified this line -->
                     <% if (product.images.length > 0) { %>
-                    <img class="img-fluid w-70 product-image" src="<%= product.images[0] %>" alt="<%= products.name %>">
+                    <img class="img-fluid w-50 product-image" src="<%= product.images[0] %>" alt="<%= products.name %>">
                     <% } else { %>
                     <% } %>
                     <div class="product-action">
@@ -315,8 +312,8 @@
                 <div class="text-center py-4">
                     <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
                     <div class="d-flex align-items-center justify-content-center mt-2">
-                        <h5>$<%= product.price %></h5>
-                        <h6 class="text-muted ml-2"><del>$<%= product.discount %></del></h6>
+                        <h5>₹<%= product.sellingPrice.toFixed(2) %></h5> 
+                        <h6 class="text-muted ml-2"><del>₹<%= product.price %></del></h6> <!-- Replaced $ with ₹ -->
                     </div>
                    
                     <div class="d-flex align-items-center justify-content-center mb-1">
@@ -334,6 +331,7 @@
         <% }); %>
     </div>
 </div>
+
 
   
     <!-- Footer Start -->

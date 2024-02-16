@@ -7,6 +7,7 @@ const multer = require('multer');
 const path = require('path');
 
 
+
 const storage = multer.diskStorage({
     destination: 'uploads/',
     filename: function (req, file, cb) {
@@ -18,9 +19,23 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage });
 
+
+
+
+
+
+  // Middleware to check if admin is authenticated
+const checkAdminAuth = (req, res, next) => {
+  if (!req.session.admin || !req.session.token) { 
+    // If admin is not authenticated, redirect to admin login page
+    return res.redirect('/adminlogin');
+  }
+  next(); // Proceed to the next middleware or route handler
+};
+
 // User management routes
 router.post('/adminlogin',adminController.adminLogin)
-router.get('/adminhome',adminController.adminhome)
+router.get('/adminhome',checkAdminAuth,adminController.adminhome)
 router.get('/usermanagement', adminController.listUsers);
 router.post('/blockuser/:userId', adminController.blockUser);
 router.post('/unblockuser/:userId', adminController.unblockUser);

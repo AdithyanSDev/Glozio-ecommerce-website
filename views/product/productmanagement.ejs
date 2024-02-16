@@ -127,9 +127,9 @@
                               <div class="d-flex flex-column">
                                   <h6 class="mb-3 text-sm"><%= product.name %></h6>
                                   <span class="mb-2 text-xs">Description: <span class="text-dark font-weight-bold ms-sm-2"><%= product.description %></span></span>
-                                  <span class="mb-2 text-xs">Price: <span class="text-dark font-weight-bold ms-sm-2">$<%= product.selling_price %></span></span>
+                                  <span class="mb-2 text-xs">Price: <span class="text-dark font-weight-bold ms-sm-2">₹<%= product.sellingPrice.toFixed(2) %></span></span>
                                   <% if (product.price) { %>
-                                  <span class="mb-2 text-xs"><span class="text-dark font-weight-bold ms-sm-2">$<%= product.price %></span></span>
+                                  <span class="mb-2 text-xs"><span class="text-dark font-weight-bold ms-sm-2">₹<%= product.price %></span></span>
                                   <% } %>
                                   <div class="d-flex flex-row flex-wrap">
                                       <% product.images.forEach(image => { %>

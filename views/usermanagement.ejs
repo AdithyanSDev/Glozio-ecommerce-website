@@ -122,26 +122,26 @@
             <th scope="col">Action</th>
           </tr>
         </thead>
-        <tbody>
-            <% users.forEach(user => { %>
-              <tr>
-                <td><%= user.name %></td>
-                <td><%= user.email %></td>
-              <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
-              <td>
-                <% if (user.isBlocked) { %>
-                  <form action="/admin/unblockuser/<%= user._id %>" method="post">
-                    <button class="button-1" type="submit">Unblock</button>
-                  </form>
-                <% } else { %>
-                  <form action="/admin/blockuser/<%= user._id %>" method="post">
-                    <button class="button-1" type="submit">Block</button>
-                  </form>
-                <% } %>
-              </td>
-            </tr>
-          <% }); %>
-        </tbody>
+          <tbody>
+              <% users.forEach(user => { %>
+                <tr>
+                  <td><%= user.name %></td>
+                  <td><%= user.email %></td>
+                <td><%= user.isBlocked ? 'Blocked' : 'Active' %></td>
+                <td>
+                  <% if (user.isBlocked) { %>
+                    <form action="/admin/unblockuser/<%= user._id %>" method="post">
+                      <button class="button-1" type="submit">Unblock</button>
+                    </form>
+                  <% } else { %>
+                    <form action="/admin/blockuser/<%= user._id %>" method="post">
+                      <button class="button-1" type="submit">Block</button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
       </table>
   </main>
   <div class="fixed-plugin">

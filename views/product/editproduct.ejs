@@ -52,9 +52,9 @@
             </div>
             <!-- Displaying selling price and discount percentage -->
             <h3 class="font-weight-semi-bold mb-4">
-                $<span id="selling_price"><%= product.discount ? (product.price * (1 - product.discount / 100)).toFixed(2) : product.price.toFixed(2) %></span> 
+                ₹<span id="selling_price"><%= product.discount ? (product.price * (1 - product.discount / 100)).toFixed(2) : product.price.toFixed(2) %></span> 
                 <small class="text-muted ml-2">
-                    <del>$<span id="original_price"><%= product.price.toFixed(2) %></span></del> 
+                    <del>₹<span id="original_price"><%= product.price.toFixed(2) %></span></del> 
                     (<span id="discount_percentage"><%= product.discount ? product.discount.toFixed(2) : '0.00' %>%</span>)
                 </small>
             </h3>

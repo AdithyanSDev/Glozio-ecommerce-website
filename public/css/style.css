@@ -292,7 +292,26 @@ button:focus {
   display: none;
 }
 
+.carousel-item img {
+  width: 100%; /* Adjust the width as needed */
+  height: auto; /* This will maintain the aspect ratio */
+  /* Add any additional styling here */
+}
+/* Ensure all elements fit within the viewport */
+html, body {
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
 
+/* Adjust styles for specific elements causing overflow */
+.container-fluid {
+  overflow-x: hidden; /* Prevent horizontal scroll for container */
+}
+
+/* Example of adjusting image size */
+.img-fluid {
+  max-width: 100%; /* Ensure images don't overflow parent container */
+  height: auto; /* Maintain aspect ratio */
+}
 
 
 
@@ -582,7 +601,7 @@ mark,
 .blockquote-footer {
   display: block;
   font-size: 80%;
-  color: #6c757d;
+  color: #162f45;
 }
 
 .blockquote-footer::before {

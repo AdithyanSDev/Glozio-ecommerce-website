@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
 
-// Function to hash a password using bcrypt
+
 const hashPassword = async (password) => {
   const saltRounds = 10;
   return await bcrypt.hash(password, saltRounds);
@@ -18,27 +18,17 @@ exports.adminLogin = async (req, res) => {
 
   try {
     if (email === predefinedAdminEmail) {
-      const predefinedAdminPasswordHash = await hashPassword(predefinedAdminPassword); 
+      const predefinedAdminPasswordHash = await hashPassword(predefinedAdminPassword);
       const match = await bcrypt.compare(password, predefinedAdminPasswordHash);
-
+      
       if (match) {
-        const token = jwt.sign({ userId: predefinedAdminEmail }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        // Set up session
-        req.session.admin = predefinedAdminEmail;
-        req.session.token = token; // Set the token in session
-
-        // Log admin details to console
-        console.log(`Admin logged in: ${predefinedAdminEmail}`);
-        console.log("admin token", token);
-
-        // Redirect to admin home page
-        res.render('adminhome');
+        const token = jwt.sign({ userId: predefinedAdminEmail }, process.env.JWT_SECRET);
+        res.cookie('Authorization', token); 
+        console.log('Generated token:', token);
+        res.redirect('/admin/adminhome');
         return;
       }
     }
-
-    // If admin authentication fails, redirect back to admin login page
     res.redirect('/adminlogin');
   } catch (error) {
     console.error(error);
@@ -46,17 +36,26 @@ exports.adminLogin = async (req, res) => {
   }
 };
 
-//admin home
-exports.adminhome = async(req,res)=>{
-  try{
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '-1');
-   res.render('adminhome')
-  }catch{
-    res.send(500).send('Internal server error')
+// admin home
+exports.adminhome = async (req, res) => {
+  try {
+    const token = req.cookies.Authorization;
+    console.log("login token", token);
+    if (token) {
+      // Token exists, render admin home page
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '-1');
+      res.render('adminhome');
+    } else {
+      // Token doesn't exist, render admin login page
+      res.render('adminlogin');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal server error');
   }
-}
+};
 
 // List users
 exports.listUsers = async (req, res) => {

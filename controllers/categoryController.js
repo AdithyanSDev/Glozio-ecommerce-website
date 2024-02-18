@@ -20,6 +20,11 @@ exports.showAddCategoryForm = (req, res) => {
 exports.addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
+    // Check if the category already exists
+    const existingCategory = await Category.findOne({ name });
+    if (existingCategory) {
+      return res.status(400).send('Category already exists');
+    }
     const newCategory = new Category({ name, description });
     await newCategory.save();
     res.redirect('/admin/categories');

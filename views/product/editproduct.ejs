@@ -17,16 +17,20 @@
             <div class="form-group">
                 <label for="description">Product Description:</label>
                 <textarea class="form-control" id="description" name="description" rows="4" required><%= product.description %></textarea>
-                </div>
+            </div>
             <div class="form-group">
                 <label for="price">Product Price:</label>
-                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" onchange="calculateSellingPrice()" value="<%= product.price %>" required>
+                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" value="<%= product.price %>" onchange="calculateSellingPrice()" required>
             </div>
             <div class="form-group">
                 <label for="discount">Discount Percentage:</label>
-                <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" onchange="calculateSellingPrice()" value="<%= product.discount %>">
+                <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" value="<%= product.discount %>" onchange="calculateSellingPrice()">
             </div>
             <!-- Removed the input field for discount price -->
+            <div class="form-group">
+                <label for="brand">Brand:</label>
+                <input type="text" class="form-control" id="brand" name="brand" value="<%= product.brand %>" required>
+            </div>
             
             <div class="form-group">
                 <label for="category">Category:</label>
@@ -37,7 +41,6 @@
                 </select>
             </div>
             
-            
             <div class="form-group">
                 <label for="stock">Stock:</label>
                 <input type="number" class="form-control" id="stock" name="stock" min="0" value="<%= product.stock %>" required>
@@ -46,6 +49,18 @@
                 <label for="highlights">Highlights/Specs:</label>
                 <textarea class="form-control" id="highlights" name="highlights" rows="4" required><%= product.highlights %></textarea>
             </div>
+            <div class="form-group">
+                <label>Existing Product Images:</label>
+                <div class="row">
+                    <% product.images.forEach((image, index) => { %>
+                        <div class="col-md-3">
+                            <img src="/<%= image %>" class="img-thumbnail" alt="Product Image" style="width: 100px;">
+                            <button class="delete-btn btn-danger mt-2" data-image-index="<%= index %>" onclick="deleteImage(this)">Delete</button>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+            
             <div class="form-group">
                 <label for="images">Product Images:</label>
                 <input type="file" class="form-control-file" id="new_images" name="new_images" accept="image/*" multiple>
@@ -62,7 +77,29 @@
             <button type="submit" class="btn btn-primary btn-block">Update Product</button>
         </form>
     </div>
+    
     <script>
+        function deleteImage(button) {
+            // Get the image index from the button's data-image-index attribute
+            const imageIndex = button.getAttribute('data-image-index');
+        
+            // Send AJAX request to delete the image at the specified index
+            fetch(`/admin/products/:productId/delete-image/${imageIndex}`, {
+                method: 'DELETE'
+            })
+            .then(response => { 
+                if (response.ok) {
+                    // Remove the image from the UI
+                    button.closest('.col-md-3').remove();
+                } else {    
+                    console.error('Failed to delete image');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
         function calculateSellingPrice() {
             var price = parseFloat(document.getElementById("price").value);
             var discount = parseFloat(document.getElementById("discount").value);

@@ -45,7 +45,7 @@
                     <div class="btn-group">
                         <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <% if (token) { %>
+                            <% if (token !== undefined) { %>
                                 <!-- Provide absolute path for logout -->
                                 <button class="btn btn-sm " type="button" onclick="window.location.href='/api/user/logout'">Logout</button>
                             <% } else { %>
@@ -54,6 +54,7 @@
                             <% } %>
                         </div>
                     </div>
+                    
                     
                    
                 </div>

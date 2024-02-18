@@ -6,19 +6,12 @@ const Review = require('../models/review');
 const Product = require('../models/product');
 
 
-// Home route
+
 router.get('/', renderHomePage);
-
-
-
-// GET request to render detail page
 router.get('/detail', (req, res) => {
-    // Render the detail page
-    res.render('detail'); // Assuming your detail page is named 'detail.ejs'
+    res.render('detail'); 
 });
-
 router.get('/detail/:productId', renderDetailPage);
-
 router.get('/review/:productId', async (req, res) => {
     try {
         const productId = req.params.productId;
@@ -30,7 +23,6 @@ router.get('/review/:productId', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
-
 router.post('/review/:productId', async (req, res) => {
     try {
         const { productId, userId, rating, review } = req.body;
@@ -47,13 +39,6 @@ router.post('/review/:productId', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
-
-// Use the reviewSubmit function here
-router.post('/submit-review', reviewSubmit); // Use reviewSubmit function
-
-// Route for displaying products by category
+router.post('/submit-review', reviewSubmit); 
 router.get('/category/:categoryId', productsByCategory);
-
-// router.get('/categories/:categoriesId',renderProductlist)
-
 module.exports = router;

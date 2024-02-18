@@ -45,8 +45,6 @@ passport.use(new GoogleStrategy({
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
-  // This function will be called when a user successfully authenticates with Google
-  // You can perform actions like saving the user to your database here
   return done(null, profile);
 }));
 
@@ -70,8 +68,7 @@ app.use('/api', authRoutes);
 app.use('/admin',adminRoutes)
 
 app.get('/adminlogin', (req, res) => {
-  // Render admin login page
-  res.render('adminlogin'); // Assuming your admin login page is named 'adminlogin.ejs'
+  res.render('adminlogin'); 
 });
 
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

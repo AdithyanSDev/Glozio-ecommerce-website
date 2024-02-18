@@ -102,58 +102,63 @@
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-            <div class="input-group input-group-outline">
-              <label class="form-label">Type here...</label>
-              <input type="text" class="form-control">
-            </div>
+            <a class="button-1" type="submit" href="/admin/products/add">Add Product</a>
           </div>
-         
         </div>
+        
       </div>
     </nav>
     <!-- End Navbar -->
-    <div class="container-fluid py-4">
-      <div class="row">
-          <div class="col-lg-8 col-md-10 mx-auto">
-              <div class="card mt-4">
-                  <a class="button-1" type="submit" href="/admin/products/add">Add product+</a>
-                  <div class="card-header p-3">
-                      <h5 class="mb-0">Products</h5>
-                  </div>
-                  <div class="card-body pt-4 p-3">
-                      <ul class="list-group">
-                          <% products.forEach(product => { %>
-                          <li class="list-group-item border-0 d-flex p-4 mb-2 mt-3 bg-gray-100 border-radius-lg">
-                              <div class="d-flex flex-column">
-                                  <h6 class="mb-3 text-sm"><%= product.name %></h6>
-                                  <span class="mb-2 text-xs">Description: <span class="text-dark font-weight-bold ms-sm-2"><%= product.description %></span></span>
-                                  <span class="mb-2 text-xs">Price: <span class="text-dark font-weight-bold ms-sm-2">₹<%= product.sellingPrice.toFixed(2) %></span></span>
-                                  <% if (product.price) { %>
-                                  <span class="mb-2 text-xs"><span class="text-dark font-weight-bold ms-sm-2">₹<%= product.price %></span></span>
-                                  <% } %>
-                                  <div class="d-flex flex-row flex-wrap">
-                                      <% product.images.forEach(image => { %>
-                                      <img src="/<%= image %>" alt="<%= product.name %>" class="img-fluid mb-2 me-2" style="width: 50px;">
-                                      <% }); %>
+   
+              <table class="table table-striped table-dark">
+                  <thead>
+                      <tr>
+                          <th scope="col">Name</th>
+                          <th scope="col">Category</th>
+                          <th scope="col">Price</th>
+                          <th scope="col">Discount</th>
+                          <th scope="col">Selling Price</th>
+                          <th scope="col">Stock</th>
+                          <th scope="col">Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <% products.forEach(product => { %>
+                          <tr>
+                              <td>
+                                  <div>
+                                      <%= product.name %>
+                                      <div class="d-flex flex-row flex-wrap">
+                                          <% product.images.forEach(image => { %>
+                                              <img src="/<%= image %>" alt="<%= product.name %>" class="img-fluid mb-2 me-2" style="width: 20px;">
+                                          <% }); %>
+                                      </div>
+
                                   </div>
-                              </div>
-                              <div class="ms-auto text-end">
-                                  <a class="btn btn-link text-dark px-3 mb-0" href="/admin/products/<%= product._id %>/edit"><i class="material-icons text-sm me-2">edit</i>Edit</a>
+                              </td>
+                              <td><%= categories.productId %></td>
+                              <td>₹<%= product.price.toFixed(2) %></td>
+                              <td><%= product.discount %>%</td>
+                              <td>₹<%= product.sellingPrice.toFixed(2) %></td>
+                              <td><%= product.stock %></td>
+                              <td>
+                                  <a href="/admin/products/<%= product._id %>/edit" class="btn btn-link text-white px-3 mb-0">
+                                      <i class="material-icons text-sm me-2">edit</i>
+                                  </a>
                                   <form action="/admin/products/<%= product._id %>/delete" method="POST" style="display: inline;">
                                       <button type="submit" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="return confirm('Are you sure you want to delete this product?')">
-                                          <i class="material-icons text-sm me-2">delete</i>Delete
+                                          <i class="material-icons text-sm me-2">delete</i>
                                       </button>
                                   </form>
-                              </div>
-                          </li>
-                          <% }); %>
-                      </ul>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+                              </td>
+                          </tr>
+                      <% }); %>
+                  </tbody>
+              </table>
+        
   
+  
+        
   
   </main>
   <div class="fixed-plugin">

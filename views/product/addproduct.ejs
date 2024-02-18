@@ -27,6 +27,10 @@
                 <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" onchange="calculateSellingPrice()">
             </div>
             <!-- Removed the input field for discount price -->
+            <div class="form-group">
+                <label for="brand">Brand:</label>
+                <input type="text" class="form-control" id="brand" name="brand" required>
+            </div>
             
             <div class="form-group">
                 <label for="category">Category:</label>
@@ -49,6 +53,11 @@
             <div class="form-group">
                 <label for="images">Product Images:</label>
                 <input type="file" class="form-control-file" id="images" name="images" accept="image/*" multiple required>
+
+            </div>
+            <div id="image-previews" class="mt-3">
+                <p><strong>Image Previews:</strong></p>
+                <div id="image-preview-container" class="d-flex flex-wrap"></div>
             </div>
             <!-- Displaying selling price and discount percentage -->
             <h3 class="font-weight-semi-bold mb-4">
@@ -63,6 +72,24 @@
         </form>
     </div>
     <script>
+   // Preview images individually
+document.getElementById('images').addEventListener('change', function() {
+    const container = document.getElementById('image-preview-container');
+    
+    Array.from(this.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = document.createElement('img');
+            img.src = event.target.result;
+            img.classList.add('img-thumbnail', 'm-2');
+            img.style.width = '100px';
+            container.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+
         function calculateSellingPrice() {
             var price = parseFloat(document.getElementById("price").value);
             var discount = parseFloat(document.getElementById("discount").value);

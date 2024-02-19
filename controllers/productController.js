@@ -6,13 +6,19 @@ const path = require('path');
 // Function to list all products
 exports.listProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isDeleted: false });
+    const products = await Product.find({ isDeleted: false }).populate('category');
+    products.forEach(product => {
+      if (!product.category) {
+        console.log('Product without category:', product);
+      }
+    });
     res.render('product/productmanagement', { products });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
+
 
 exports.showAddProductForm = async (req, res) => {
   try {
@@ -23,10 +29,9 @@ exports.showAddProductForm = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
-
 exports.addProduct = async (req, res) => {
   try {
-    const { name, description, price, discount, category, stock, highlights } = req.body;
+    const { name, description, price, discount, category, stock, highlights, brand } = req.body;
 
     // Log the received files
     console.log('Received files:', req.files);
@@ -53,6 +58,7 @@ exports.addProduct = async (req, res) => {
       stock,
       highlights,
       images: images, // Store paths of uploaded images
+      brand, // Include the brand field
     });
 
     // Save the new product to the database
@@ -69,6 +75,7 @@ exports.addProduct = async (req, res) => {
     res.status(500).send('Error adding product: ' + error.message);
   }
 }
+
 
   // Function to show the edit product form
   exports.showEditProductForm = async (req, res) => {

@@ -11,6 +11,10 @@ const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const adminRoutes = require('./routes/admin.js');
+const cartRoutes = require('./routes/cart.js');
+const User = require('./models/user.js'); 
+const jwt = require('jsonwebtoken')
+const { verifyToken, isAdmin } = require('./middleware/authMiddleware.js');
 
 dotenv.config({ path: 'config.env' });
 const PORT = process.env.PORT || 8080;
@@ -44,17 +48,44 @@ passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: '/auth/google/callback'
-}, (accessToken, refreshToken, profile, done) => {
-  return done(null, profile);
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ email: profile.emails[0].value });
+    
+    if (!user) {
+      user = new User({
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        password: 'defaultPassword'
+      });
+      await user.save();
+    }
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    
+  console.log("haii",token)
+    done(null, { user, token });
+  } catch (error) {
+    done(error, null);
+  }
 }));
 
-// Serialize and deserialize user (required for session support)
+
 passport.serializeUser((user, done) => {
-  done(null, user);
+  const sessionUser = {
+    id: user._id,
+    name: user.name,
+    email: user.email
+  };
+  done(null, sessionUser);
 });
 
-passport.deserializeUser((obj, done) => {
-  done(null, obj);
+passport.deserializeUser(async (sessionUser, done) => {
+  try {
+    const user = await User.findById(sessionUser.id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
 });
 
 app.use(express.static('public'));
@@ -65,19 +96,22 @@ app.use('/lib', express.static(path.join(__dirname, 'lib')));
 
 app.use('/', homeRoutes);
 app.use('/api', authRoutes);
-app.use('/admin',adminRoutes)
+app.use('/admin', adminRoutes);
+app.use('/', cartRoutes);
 
 app.get('/adminlogin', (req, res) => {
   res.render('adminlogin'); 
 });
 
+
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/api/user/login' }), (req, res) => {
-    // Successful authentication, redirect home.
-    res.redirect('/');
+  // Successful authentication, set token in cookie and redirect home
+  const token = req.user.token; // Assuming the token is stored in req.user.token after successful authentication
+  res.cookie('token', token, { maxAge: 3600000 }); // Set token in cookie with an expiration time of 1 hour
+  res.redirect('/');
 });
-
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -1,26 +1,26 @@
 // authMiddleware.js
 const jwt = require('jsonwebtoken');
 
-const authenticateJWT = (req, res, next) => {
-    const token =  req.cookies.Authorization;
-    console.log('Received Authorization token:', token);
-
+const verifyToken = (req, res, next) => {
+    const token = req.cookies.token;
+  // console.log("cart",token)
     if (!token) {
-        return res.status(401).json({ message: 'Unauthorized' });
+      return res.redirect('/api/user/login')
     }
-
-    jwt.verify(token, `${process.env.JWT_SECRET}`, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: 'Forbidden' });
-        }
-        console.log("jwt verify user : ",user);
-        req.user = user;
-        next();
-    });
-};
+  
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log(decoded);
+      req.userId = decoded.userId;
+      // console.log(req.userId)
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+  };
 
 const isAdmin = (req, res, next) => {
-    const token = req.cookies.Authorization; // Check for token in cookies instead of headers
+    const token = req.cookies.Authorization;
     console.log('Received Authorization token:', token);
 
     if (!token) {
@@ -44,4 +44,4 @@ const isAdmin = (req, res, next) => {
 };
 
 
-module.exports = { authenticateJWT, isAdmin };
+module.exports = { verifyToken, isAdmin };

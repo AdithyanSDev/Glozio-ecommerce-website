@@ -11,7 +11,6 @@ const Review = require('../models/review');
 exports.renderHomePage = async (req, res) => {
   try {
     const products = await Product.find({ isDeleted: false });
-    
     // Fetch review counts for each product
     const productReviewCounts = await Promise.all(products.map(async product => {
       const reviewCount = await Review.countDocuments({ productId: product._id });
@@ -24,18 +23,15 @@ exports.renderHomePage = async (req, res) => {
       return map;
     }, {});
 
-    const categories = await Category.find({ isDeleted: false }).populate('products'); 
-    const token = req.session.token;  
-    console.log("token from:", token);
-    res.render('home', { products, token, categories, reviewCountMap }); 
+    const categories = await Category.find({ isDeleted: false }).populate('products');
+    const token = req.cookies.token; // Retrieve token from cookies
+    console.log("token from cookies:", token);
+    res.render('home', { products, token, categories, reviewCountMap });   
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
-
-
-
 
 // Redirect to user login page
 exports.redirectToUserLogin = (req, res) => {
@@ -43,7 +39,6 @@ exports.redirectToUserLogin = (req, res) => {
   res.redirect('/user/login');
 };
 
-// User authentication
 exports.userLogin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -58,20 +53,12 @@ exports.userLogin = async (req, res) => {
       if (await bcrypt.compare(password, user.password)) {
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // Set user session and token
-        req.session.user = user;
-        res.cookie('token', token);
-        req.session.token = token;
-
-        // Redirect to home page if token exists
-        if (req.session.token) {
-          console.log("user", req.session.token);
-          return res.redirect('/');
-        }
+        // Set token in a cookie with an expiration time of 1 hour
+        res.cookie('token', token, { maxAge: 3600000 });
+        return res.redirect(`/?userId=${user._id}`);
       }
     }
 
-   
     res.render('home', { error: 'Invalid email or password' });
   } catch (error) {
     console.error(error);
@@ -226,18 +213,11 @@ exports.resendOTP = async (req, res) => {
 };
 
 
-
 exports.logout = async (req, res) => {
   try {
-    req.session.destroy(err => {
-      if (err) {
-        console.error('Error destroying session:', err);
-        res.status(500).send('Internal Server Error');
-      } else {
-        console.log('Session destroyed successfully');
-        res.redirect('/');
-      }
-    });
+    // Clear the token cookie
+    res.clearCookie('token');
+    res.redirect('/');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -263,3 +243,41 @@ exports.productsByCategory = async (req, res) => {
   }
 };
 
+
+
+exports.renderUserprofile = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+    const products = await Product.find({ isDeleted: false });
+    const categories = await Category.find({ isDeleted: false }).populate('products'); 
+    const token = req.cookies.token; // Use req.cookies.token to access the token
+    console.log("token from:", token);
+    res.render('userprofile', { user, products, token, categories }); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+exports.getProfile = async (req, res) => {
+  try {
+    // Fetch the user's profile based on the user ID stored in req.user
+    const user = await User.findById(req.userId );
+    console.log("jasdhbsub", user);
+    if (!user) {
+      // If user is not found, respond with 404 Not Found
+      return res.status(404).send('User not found');
+    }
+
+    // Pass user data to the template for rendering the profile page
+    res.render('userprofile', { user });
+  } catch (error) {
+    // Handle internal server errors
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};

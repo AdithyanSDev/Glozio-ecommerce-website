@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { redirectToUserLogin, userLogin, registerUser, renderOTPPage, verifyOTP, resendOTP, logout  } = require('../controllers/authController');
-const { authenticateJWT } = require('../middleware/authMiddleware');
+const { redirectToUserLogin, userLogin, registerUser, renderOTPPage, verifyOTP, resendOTP, logout ,getProfile, renderUserprofile} = require('../controllers/authController');
+const { verifyToken } = require('../middleware/authMiddleware');
 
 
 
@@ -16,6 +16,8 @@ router.get('/otp', renderOTPPage);
 router.post('/otp', verifyOTP);
 router.post('/resend-otp',resendOTP );
 router.get('/user/logout',logout)
+router.get('/user/profile',verifyToken,renderUserprofile)
+router.get('/user/profile' ,verifyToken,getProfile);
 
 router.get('/admin/login', (req, res) => {
   res.render('adminlogin'); // Render the admin login page

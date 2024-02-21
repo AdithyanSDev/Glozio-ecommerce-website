@@ -44,13 +44,12 @@
                 <div class="d-inline-flex align-items-center">
                     <div class="btn-group">
                         <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
-                        <div class="dropdown-menu dropdown-menu-right">
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                             <% if (token !== undefined) { %>
-                                <!-- Provide absolute path for logout -->
-                                <button class="btn btn-sm " type="button" onclick="window.location.href='/api/user/logout'">Logout</button>
+                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/profile'">Profile</button>
+                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/logout'">Logout</button>
                             <% } else { %>
-                                <!-- Provide absolute path for sign-in -->
-                                <button class="btn btn-sm " type="button" onclick="window.location.href='/api/user/login'">Sign in</button>
+                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/login'">Sign in</button>
                             <% } %>
                         </div>
                     </div>
@@ -64,11 +63,11 @@
                             <i class="fas fa-heart text-dark"></i>
                             <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
                         </a>
-                        <a href="" class="btn px-0 ml-2">
+                        <a href="/cart" class="btn px-0 ml-2">
                             <i class="fas fa-shopping-cart text-dark"></i>
                             <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
                         </a>
-                    
+                   
                 </div>
                 
                 
@@ -153,7 +152,7 @@
                                     <i class="fas fa-heart text-primary"></i>
                                     <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom: 2px;">0</span>
                                 </a>
-                                <a href="" class="btn px-0 ml-3">
+                                <a href="/cart" class="btn px-0 ml-3">
                                     <i class="fas fa-shopping-cart text-primary"></i>
                                     <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom: 2px;">0</span>
                                 </a>
@@ -294,7 +293,7 @@
 
     
   <!-- Products Start -->
-<div class="container-fluid py-4">   
+  <div class="container-fluid py-4">   
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Featured Products</span></h2>
     <div class="row">
         <% products.forEach(product => { %>
@@ -306,7 +305,7 @@
                     <% } else { %>
                     <% } %>
                     <div class="product-action">
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
+                        <a class="btn btn-outline-dark btn-square" onclick="addToCart('<%= product._id %>')"><i class="fa fa-shopping-cart"></i></a>
                         <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
                     </div>
                 </div>
@@ -332,6 +331,7 @@
         <% }); %>
     </div>
 </div>
+<!-- Products End -->
 
 
   
@@ -409,6 +409,34 @@
 
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+   <!-- Inside home.ejs -->
+<script>
+    async function addToCart(productId) {
+        try {
+            const response = await fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + getToken()
+                },
+                body: JSON.stringify({ productId })
+            });
+
+            if (response.ok) {
+                // Product added to cart successfully, redirect to the cart page
+                window.location.href = '/cart';
+            } else {
+                console.error('Failed to add product to cart:', response.statusText);
+                // Optionally, display an error message to the user
+            }
+        } catch (error) {
+            console.error('Error adding product to cart:', error);
+            // Optionally, display an error message to the user
+        }
+    }
+</script>
+
 
 
     <!-- JavaScript Libraries -->

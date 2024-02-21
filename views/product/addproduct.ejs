@@ -5,10 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Product</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin-bottom: 50px;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .image-container {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .remove-button {
+            display: block;
+            margin-top: 5px;
+            cursor: pointer;
+            color: red;
+        }
+
+        .save-button {
+            display: block;
+            margin-top: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+        }
+
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .popup-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .btn-submit {
+            background-color: #28a745;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+
+        .error-message {
+            color: red;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center text-primary mt-5">Add New Product</h1>
+        <h1 class="text-center text-primary">Add New Product</h1>
         <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="name">Product Name:</label>
@@ -26,22 +108,19 @@
                 <label for="discount">Discount Percentage:</label>
                 <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" onchange="calculateSellingPrice()">
             </div>
-            <!-- Removed the input field for discount price -->
             <div class="form-group">
                 <label for="brand">Brand:</label>
                 <input type="text" class="form-control" id="brand" name="brand" required>
             </div>
-            
             <div class="form-group">
                 <label for="category">Category:</label>
                 <select class="form-control" id="category" name="category" required>
                     <option value="" disabled selected>Select a category</option>
                     <% categories.forEach(category => { %>
-                        <option value="<%= category._id %>"><%= category.name %></option>
+                    <option value="<%= category._id %>"><%= category.name %></option>
                     <% }); %>
                 </select>
             </div>
-            
             <div class="form-group">
                 <label for="stock">Stock:</label>
                 <input type="number" class="form-control" id="stock" name="stock" min="0" required>
@@ -53,51 +132,83 @@
             <div class="form-group">
                 <label for="images">Product Images:</label>
                 <input type="file" class="form-control-file" id="images" name="images" accept="image/*" multiple required>
-
             </div>
-            <div id="image-previews" class="mt-3">
-                <p><strong>Image Previews:</strong></p>
-                <div id="image-preview-container" class="d-flex flex-wrap"></div>
-            </div>
-            <!-- Displaying selling price and discount percentage -->
-            <h3 class="font-weight-semi-bold mb-4">
-                ₹<span id="selling_price">0.00</span> 
-                <small class="text-muted ml-2">
-                    <del>₹<span id="original_price">0.00</span></del> 
-                    (<span id="discount_percentage">0.00%</span>)
-                </small>
-            </h3>
-            
-            <button type="submit" class="btn btn-primary btn-block">Add Product</button>
+            <div id="image-container"></div>
+            <button type="submit" class="btn btn-primary btn-block btn-submit">Add Product</button>
         </form>
     </div>
+
+    <div class="popup-container" id="popup-container" style="display: none;">
+        <div class="popup-content">
+            <h2>Crop image</h2>
+            <div id="cropper-container"></div>
+            <button id="crop-btn" class="btn btn-submit">Crop</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
     <script>
-   // Preview images individually
-document.getElementById('images').addEventListener('change', function() {
-    const container = document.getElementById('image-preview-container');
+        document.getElementById('images').addEventListener('change', function() {
+            const container = document.getElementById('image-container');
     
-    Array.from(this.files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const img = document.createElement('img');
-            img.src = event.target.result;
-            img.classList.add('img-thumbnail', 'm-2');
-            img.style.width = '100px';
-            container.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    });
-});
-
-
-        function calculateSellingPrice() {
-            var price = parseFloat(document.getElementById("price").value);
-            var discount = parseFloat(document.getElementById("discount").value);
-            var sellingPrice = price * (1 - discount / 100);
-            document.getElementById("selling_price").innerText = sellingPrice.toFixed(2);
-            document.getElementById("original_price").innerText = price.toFixed(2);
-            var discountPercentage = ((price - sellingPrice) / price * 100).toFixed(2);
-            document.getElementById("discount_percentage").innerText = "(" + discountPercentage + "%)";
+            Array.from(this.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.classList.add('img-thumbnail', 'm-2');
+                    img.style.width = '100px';
+                    container.appendChild(img);
+    
+                    img.addEventListener('click', function() {
+                        openCropper(event.target.src, file);
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    
+        const cropperContainer = document.getElementById('cropper-container');
+    
+        function openCropper(imageSrc, file) {
+            cropperContainer.innerHTML = ''; // Clear any previous cropper
+    
+            const image = document.createElement('img');
+            image.src = imageSrc;
+            image.style.maxWidth = '100%';
+            cropperContainer.appendChild(image);
+    
+            const cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 2,
+            });
+    
+            document.getElementById('popup-container').style.display = 'flex';
+    
+            document.getElementById('crop-btn').onclick = function() {
+                const canvas = cropper.getCroppedCanvas();
+                const croppedImage = canvas.toDataURL('image/jpeg');
+    
+                // Create a new image element and set its source to the cropped image data
+                const croppedImageElement = document.createElement('img');
+                croppedImageElement.src = croppedImage;
+                croppedImageElement.classList.add('img-thumbnail', 'm-2');
+                croppedImageElement.style.width = '100px';
+    
+                // Add the new image element to the image-container element
+                const container = document.getElementById('image-container');
+                container.appendChild(croppedImageElement);
+    
+                // Add a click event listener to the new image element
+                croppedImageElement.addEventListener('click', function() {
+                    openCropper(croppedImage, file);
+                });
+    
+                document.getElementById('popup-container').style.display = 'none';
+            };
         }
     </script>
 </body>

@@ -102,61 +102,52 @@
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-            <div class="input-group input-group-outline">
-              <label class="form-label">Type here...</label>
-              <input type="text" class="form-control">
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                 <a class="button-1" type="submit" href="/admin/categories/add">Add Category</a>
             </div>
+          </div>
           </div>
          
         </div>
       </div>
     </nav>
     <!-- End Navbar -->
-    <div class="container-fluid py-4">
+   
      
-      <div class="row">
-       
-        
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-7 mt-4">
-           <div class="card">
-            <a class="button-1" type="submit" href="/admin/categories/add">Add Category</a>
-            <div class="card-header pb-0 px-3">
-              <h6 class="mb-0">Categories</h6>
-            </div>
-            <div class="card-body pt-4 p-3">
-              <ul class="list-group">
-                <li class="list-group-item border-0 d-flex p-4 mb-2 mt-3 bg-gray-100 border-radius-lg">
-                  <div class="d-flex flex-column">
-                       <ul class="list-group">
-                      <% categories.forEach(category => { %>
-            <li class="list-group-item border-0 d-flex p-4 mb-2 mt-3 bg-gray-100 border-radius-lg">
-                <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm"><%= category.name %></h6>
-                    <span class="mb-2 text-xs">Description: <span class="text-dark font-weight-bold ms-sm-2"><%= category.description %></span></span>
+               
+                <div class="card-body pt-4 p-3">
+                    <table class="table table-striped table-dark">
+                        <thead>
+                            <tr>
+                                <th scope="col">Category Name</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% categories.forEach(category => { %>
+                                <tr>
+                                    <td><%= category.name %></td>
+                                    <td><%= category.description %></td>
+                                    <td>
+                                        <a class="btn btn-link text-white px-3 mb-0" href="/admin/categories/<%= category._id %>/edit">
+                                            <i class="material-icons text-sm me-2">edit</i>
+                                        </a>
+                                        <form action="/admin/categories/<%= category._id %>/delete" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="return confirm('Are you sure you want to delete this category?')">
+                                                <i class="material-icons text-sm me-2">delete</i> 
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="ms-auto text-end">
-                    <a class="btn btn-link text-dark px-3 mb-0" href="/admin/categories/<%= category._id %>/edit" ><i class="material-icons text-sm me-2" >edit</i>Edit</a>
-                    <form  action="/admin/categories/<%= category._id %>/delete" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="return confirm('Are you sure you want to delete this category?')">
-                            <i class="material-icons text-sm me-2">delete</i>Delete
-                        </button>
-                    </form>
-                </div>
-            </li>
-        <% }); %>
-    </ul>
- </div>
-</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      
-      </div>
+           
+     
+  
+    
     
     </div>
   </main>

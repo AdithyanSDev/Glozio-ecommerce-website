@@ -27,6 +27,34 @@ exports.renderDetailPage = async (req, res) => {
   }
 };
 
+exports.reviewCount=async (req, res) => {
+  try {
+      const productId = req.params.productId;
+      const product = await Product.findById(productId);
+      const reviewCount = await Review.countDocuments({ productId }); // Count total reviews for the product
+      res.render('review', { product, reviewCount });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+  }
+}
+
+exports.reviewSave= async (req, res) => {
+  try {
+      const { productId, userId, rating, review } = req.body;
+      const newReview = new Review({
+          productId,
+          userId,
+          rating,
+          review
+      });
+      await newReview.save();
+      res.redirect(`/review/${productId}`);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+  }
+}
 
 exports.reviewSubmit = async (req, res) => {
   try {
@@ -52,6 +80,9 @@ exports.reviewSubmit = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+
+
 
 exports.getRelatedProducts = async (req, res) => {
   try {

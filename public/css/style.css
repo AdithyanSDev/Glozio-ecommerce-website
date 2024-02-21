@@ -257,7 +257,29 @@ html, body {
   max-width: 100%; /* Ensure images don't overflow parent container */
   height: auto; /* Maintain aspect ratio */
 }
+#img-container{
+	z-index: 1;
+	max-width: 500px;
+	position: relative;
+	overflow: hidden;
+}
 
+#lens{
+	z-index: 2;
+	position: absolute;
+	height: 0;
+	width: 0;
+	background-repeat: no-repeat;
+	cursor: none;
+
+}
+
+#img-container:hover #lens{
+	opacity: 1;
+	border:2px solid rgba(38, 38, 38, 0.685);
+	height: 125px;
+	width: 125px;
+}
 
 
 input,

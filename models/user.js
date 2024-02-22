@@ -15,8 +15,9 @@ const userSchema = new mongoose.Schema({
     default: null, // or provide a default password here
   },
   isBlocked:{
-    type:Boolean,
-    default:false
+    type:String,
+    default:"Unblocked",
+    enum: ["Unblocked","Blocked"]
   },
   
   addresses: [{

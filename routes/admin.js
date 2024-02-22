@@ -12,8 +12,7 @@ const { isAdmin } = require('../middleware/authMiddleware');
 router.post('/adminlogin',adminController.adminLogin)
 router.get('/adminhome',isAdmin,adminController.adminhome)
 router.get('/usermanagement',isAdmin, adminController.listUsers);
-router.post('/blockuser/:userId', adminController.blockUser);
-router.post('/unblockuser/:userId', adminController.unblockUser);
+router.get('/userstatus/:id',isAdmin,adminController.userstatus);
 router.get('/adminlogout',adminController.adminlogout)
 
 // Category routes

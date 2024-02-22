@@ -77,31 +77,23 @@ exports.listUsers = async (req, res) => {
   }
 };
 
-// Block user
-exports.blockUser = async (req, res) => {
-  const userId = req.params.userId;
-
-  try {
-    await User.findByIdAndUpdate(userId, { isBlocked: true });
-    res.redirect('/admin/usermanagement');
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+exports.userstatus = async (req, res) => {
+  try{
+    const id = req.params.id;
+    console.log(id)
+    const user = await User.findById(id)
+    if(user.isBlocked === "Unblocked"){
+      user.isBlocked = "Blocked";
+    }else{
+      user.isBlocked = "Unblocked";
+    }
+    await user.save();
+    res.status(200).json({ isBlocked: user.isBlocked }); 
+  }catch(e){
+    console.log(e);
+    res.send("Internal Error");
   }
-};
-
-// Unblock user
-exports.unblockUser = async (req, res) => {
-  const userId = req.params.userId;
-
-  try {
-    await User.findByIdAndUpdate(userId, { isBlocked: false });
-    res.redirect('/admin/usermanagement');
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-};
+}
 
 exports.adminlogout = async (req, res) => {
   try {

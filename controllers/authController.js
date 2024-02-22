@@ -44,9 +44,10 @@ exports.userLogin = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
+   
 
     if (user) {
-      if (user.isBlocked) {
+      if (user.isBlocked =="Blocked") {
         return res.render('userlogin', { error: 'Your account has been blocked. Please contact the administrator.' });
       }
 

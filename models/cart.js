@@ -4,12 +4,13 @@ const mongoose = require('mongoose');
 const cartSchema = new mongoose.Schema({
     userId: {
         type: ObjectId,
-        required: true
+        required: true,
+        unique:true
     },
     productId: {
         type: ObjectId,
         required: true
-    },
+    },  
     quantity: {
         type: Number,
         required: true

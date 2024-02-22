@@ -170,7 +170,7 @@
                                 </div>
                                 <div class="col-sm-9 text-secondary">
                                     <input type="text" class="form-control" value="<%= user.name %>">
-                                    <a href="#" class="edit-link">Edit</a>
+                                    
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -179,7 +179,7 @@
                                 </div>
                                 <div class="col-sm-9 text-secondary">
                                     <input type="text" class="form-control" value="<%= user.email %>">
-                                    <a href="#" class="edit-link">Edit</a>
+                                  
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -213,7 +213,9 @@
                                         </div>
                                         <div class="col-sm-9 text-secondary">
                                             <input type="text" class="form-control" value="<%= address.address %>, <%= address.locality %>, <%= address.city %>, <%= address.state %>, <%= address.pincode %>">
+                                            <a href="/api/user/address">Add address</a>
                                         </div>
+                                       
                                     </div>
                                 <% }); %>
                             <% } else { %>
@@ -221,6 +223,7 @@
                                     <div class="col-sm-12 text-secondary">
                                         No addresses found.
                                     </div>
+                                    <a href="/api/user/address">Add address</a>
                                 </div>
                             <% } %>
                             <div class="row">

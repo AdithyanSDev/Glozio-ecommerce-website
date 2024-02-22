@@ -39,12 +39,13 @@ exports.redirectToUserLogin = (req, res) => {
   res.redirect('/user/login');
 };
 
+
 exports.userLogin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
-   
+
 
     if (user) {
       if (user.isBlocked =="Blocked") {

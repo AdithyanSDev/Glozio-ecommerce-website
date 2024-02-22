@@ -8,5 +8,7 @@ const {verifyToken } = require('../middleware/authMiddleware');
 
 router.get('/cart',verifyToken, cartController.renderCartPage);
 router.post('/addcart',verifyToken, cartController.addToCart);
+router.put('/cart/:productId/increase', verifyToken, cartController.increaseQuantity);
+router.delete('/cart/:productId', verifyToken, cartController.removeFromCart);
 
 module.exports = router;

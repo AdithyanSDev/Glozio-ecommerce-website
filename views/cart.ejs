@@ -202,7 +202,7 @@
                                                 <i class="fa fa-minus"></i>
                                             </button>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value="<%= item.quantity %>">
+                                        <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center quantity-input" value="<%= item.quantity %>">
                                         <div class="input-group-btn">
                                             <button class="btn btn-sm btn-primary btn-plus">
                                                 <i class="fa fa-plus"></i>
@@ -210,10 +210,14 @@
                                         </div>
                                     </div>
                                 </td>
+                                
                                 <td class="align-middle">₹<%= item.quantity * item.product.sellingPrice %></td>
                                 <td class="align-middle">
-                                    <button class="btn btn-sm btn-danger"><i class="fa fa-times"></i></button>
+                                    <button class="btn btn-sm btn-danger remove-cart-product" data-product-id="<%= item.product._id %>">
+                                        <i class="fa fa-times"></i>
+                                    </button>
                                 </td>
+                                
                             </tr>
                         <% }); %>
                     </tbody>
@@ -261,10 +265,10 @@
         <div class="row px-xl-5 pt-5">
             <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
                 <h5 class="text-secondary text-uppercase mb-4">Get In Touch</h5>
-                <p class="mb-4">No dolore ipsum accusam no lorem. Invidunt sed clita kasd clita et et dolor sed dolor. Rebum tempor no vero est magna amet no</p>
-                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
-                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
-                <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
+                <p class="mb-4"></p>
+                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>Kazhakootam,TVM,Kerela</p>
+                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>adithyanshajilal@example.com</p>
+                <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+91 8943336298</p>
             </div>
             <div class="col-lg-8 col-md-12">
                 <div class="row">
@@ -291,8 +295,8 @@
                         </div>
                     </div>
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-secondary text-uppercase mb-4">Newsletter</h5>
-                        <p>Duo stet tempor ipsum sit amet magna ipsum tempor est</p>
+                        <h5 class="text-secondary text-uppercase mb-4">Feedbacks</h5>
+                        <p>Please send valuable feedbacks </p>
                         <form action="">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Your Email Address">
@@ -315,9 +319,9 @@
         <div class="row border-top mx-xl-5 py-4" style="border-color: rgba(256, 256, 256, .1) !important;">
             <div class="col-md-6 px-xl-0">
                 <p class="mb-md-0 text-center text-md-left text-secondary">
-                    &copy; <a class="text-primary" href="#">Domain</a>. All Rights Reserved. Designed
+                    &copy; <a class="text-primary" href="#">Glozio</a>. All Rights Reserved. Designed
                     by
-                    <a class="text-primary" href="https://htmlcodex.com">HTML Codex</a>
+                    <a class="text-primary" href="">Adithyan S Dev</a>
                 </p>
             </div>
             <div class="col-md-6 px-xl-0 text-center text-md-right">
@@ -331,6 +335,61 @@
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const removeButtons = document.querySelectorAll('.remove-cart-product');
+    removeButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const productId = button.getAttribute('data-product-id');
+            try {
+                const response = await fetch(`/cart/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to remove product from cart');
+                }
+                // Optionally, update the UI to reflect the removal of the product
+                button.closest('tr').remove(); // Remove the table row
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+});
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const plusButtons = document.querySelectorAll('.btn-plus');
+
+    plusButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const productId = button.getAttribute('data-product-id');
+
+            try {
+                const response = await fetch(`/cart/${productId}/increase`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to increase product quantity');
+                }
+                // Reload the page to reflect the updated quantity
+                window.location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    });
+});
+
+</script>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

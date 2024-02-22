@@ -15,10 +15,12 @@ const cartSchema = new mongoose.Schema({
         required: true
     },
     product: {
-        type: Object, // or adjust it to the schema of your Product model if available
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product', // Reference to the Product model
         required: true
     }
 });
+
 
 const Cart = mongoose.model('Cart', cartSchema);
 module.exports = Cart;

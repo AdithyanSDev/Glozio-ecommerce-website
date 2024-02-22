@@ -18,14 +18,11 @@ const userSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
-  otp: {
-    type: Number,
-    default: null,
-  },
-  otpExpiresAt: {
-    type: Date,
-    default: null,
-  }
+  
+  addresses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Address'
+}]
 });
 
 const User = mongoose.model('User', userSchema);

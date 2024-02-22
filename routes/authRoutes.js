@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { redirectToUserLogin, userLogin, registerUser, renderOTPPage, verifyOTP, resendOTP, logout ,getProfile, renderUserprofile} = require('../controllers/authController');
+const { redirectToUserLogin, userLogin, registerUser, renderOTPPage, verifyOTP, resendOTP, logout } = require('../controllers/authController');
+const{renderUserprofile,renderAddress,addAddress}=require('../controllers/profileController')
 const { verifyToken } = require('../middleware/authMiddleware');
-
-
 
 router.get('/signin', redirectToUserLogin);
 router.get('/user/login', (req, res) => {
@@ -16,8 +15,9 @@ router.get('/otp', renderOTPPage);
 router.post('/otp', verifyOTP);
 router.post('/resend-otp',resendOTP );
 router.get('/user/logout',logout)
-router.get('/user/profile',verifyToken,renderUserprofile)
-router.get('/user/profile' ,verifyToken,getProfile);
+router.get('/user/profile', verifyToken, renderUserprofile);
+router.get('/user/address', verifyToken, renderAddress); 
+router.post('/addaddress', verifyToken, addAddress);
 
 router.get('/admin/login', (req, res) => {
   res.render('adminlogin'); // Render the admin login page

@@ -55,7 +55,7 @@ exports.userLogin = async (req, res) => {
 
         // Set token in a cookie with an expiration time of 1 hour
         res.cookie('token', token, { maxAge: 3600000 });
-        return res.redirect(`/?userId=${user._id}`);
+        return res.redirect('/');
       }
     }
 
@@ -245,39 +245,3 @@ exports.productsByCategory = async (req, res) => {
 
 
 
-exports.renderUserprofile = async (req, res) => {
-  try {
-    const user = await User.findById(req.userId);
-    if (!user) {
-      return res.status(404).send('User not found');
-    }
-    const products = await Product.find({ isDeleted: false });
-    const categories = await Category.find({ isDeleted: false }).populate('products'); 
-    const token = req.cookies.token; // Use req.cookies.token to access the token
-    console.log("token from:", token);
-    res.render('userprofile', { user, products, token, categories }); 
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-};
-
-
-exports.getProfile = async (req, res) => {
-  try {
-    // Fetch the user's profile based on the user ID stored in req.user
-    const user = await User.findById(req.userId );
-    console.log("jasdhbsub", user);
-    if (!user) {
-      // If user is not found, respond with 404 Not Found
-      return res.status(404).send('User not found');
-    }
-
-    // Pass user data to the template for rendering the profile page
-    res.render('userprofile', { user });
-  } catch (error) {
-    // Handle internal server errors
-    console.error(error);
-    res.status(500).send('Internal Server Error');
-  }
-};

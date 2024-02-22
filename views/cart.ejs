@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>MultiShop - Online Shop Website Template</title>
+    <title>Glozio - Online Shopping site</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Free HTML Templates" name="keywords">
     <meta content="Free HTML Templates" name="description">
@@ -35,51 +35,49 @@
                     <a class="text-body mr-3" href="">About</a>
                     <a class="text-body mr-3" href="">Contact</a>
                     <a class="text-body mr-3" href="">Help</a>
-                    <a class="text-body mr-3" href="">FAQs</a>
+                    
                 </div>
             </div>
             <div class="col-lg-6 text-center text-lg-right">
                 <div class="d-inline-flex align-items-center">
                     <div class="btn-group">
                         <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <button class="dropdown-item" type="button">Sign in</button>
-                            <button class="dropdown-item" type="button">Sign up</button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            <% if (token !== undefined) { %>
+                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/profile'">Profile</button>
+                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/logout'">Logout</button>
+                            <% } else { %>
+                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/login'">Sign in</button>
+                            <% } %>
                         </div>
                     </div>
-                    <div class="btn-group mx-2">
-                        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">USD</button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <button class="dropdown-item" type="button">EUR</button>
-                            <button class="dropdown-item" type="button">GBP</button>
-                            <button class="dropdown-item" type="button">CAD</button>
-                        </div>
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">EN</button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <button class="dropdown-item" type="button">FR</button>
-                            <button class="dropdown-item" type="button">AR</button>
-                            <button class="dropdown-item" type="button">RU</button>
-                        </div>
-                    </div>
+                    
+                    
+                   
                 </div>
                 <div class="d-inline-flex align-items-center d-block d-lg-none">
-                    <a href="" class="btn px-0 ml-2">
-                        <i class="fas fa-heart text-dark"></i>
-                        <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
-                    </a>
-                    <a href="" class="btn px-0 ml-2">
-                        <i class="fas fa-shopping-cart text-dark"></i>
-                        <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
-                    </a>
+                   
+                        <a href="" class="btn px-0 ml-2">
+                            <i class="fas fa-heart text-dark"></i>
+                            <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
+                        </a>
+                        <a href="/cart" class="btn px-0 ml-2">
+                            <i class="fas fa-shopping-cart text-dark"></i>
+                            <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
+                        </a>
+                   
                 </div>
+                
+                
             </div>
         </div>
         <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
             <div class="col-lg-4">
-                <a href="" class="text-decoration-none">
-                    <span class="h1 text-uppercase text-dark  px-2 ml-n1">GLOZIO</span>
+                <a href="/" class="text-decoration-none">
+                    <span class="h1 text-uppercase text-black bg-white px-2">Glozio</span>
+
+
+                   
                 </a>
             </div>
             <div class="col-lg-4 col-6 text-left">
@@ -96,11 +94,12 @@
             </div>
             <div class="col-lg-4 col-6 text-right">
                 <p class="m-0">Customer Service</p>
-                <h5 class="m-0">+012 345 6789</h5>
+                <h5 class="m-0">+91 8943336298</h5>
             </div>
         </div>
     </div>
     <!-- Topbar End -->
+
 
 
     <!-- Navbar Start -->
@@ -113,23 +112,9 @@
                 </a>
                 <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light" id="navbar-vertical" style="width: calc(100% - 30px); z-index: 999;">
                     <div class="navbar-nav w-100">
-                        <div class="nav-item dropdown dropright">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Dresses <i class="fa fa-angle-right float-right mt-1"></i></a>
-                            <div class="dropdown-menu position-absolute rounded-0 border-0 m-0">
-                                <a href="" class="dropdown-item">Men's Dresses</a>
-                                <a href="" class="dropdown-item">Women's Dresses</a>
-                                <a href="" class="dropdown-item">Baby's Dresses</a>
-                            </div>
-                        </div>
-                        <a href="" class="nav-item nav-link">Shirts</a>
-                        <a href="" class="nav-item nav-link">Jeans</a>
-                        <a href="" class="nav-item nav-link">Swimwear</a>
-                        <a href="" class="nav-item nav-link">Sleepwear</a>
-                        <a href="" class="nav-item nav-link">Sportswear</a>
-                        <a href="" class="nav-item nav-link">Jumpsuits</a>
-                        <a href="" class="nav-item nav-link">Blazers</a>
-                        <a href="" class="nav-item nav-link">Jackets</a>
-                        <a href="" class="nav-item nav-link">Shoes</a>
+                        <% categories.forEach(category => { %>
+                            <a href="/category/:categoryId" class="nav-item nav-link category-link" data-id="<%= category._id %>"><%= category.name %></a>
+                        <% }); %>
                     </div>
                 </nav>
             </div>
@@ -207,14 +192,9 @@
                         <% usercart.forEach(item => { %>
                             <tr>
                                 <td class="align-middle">
-                                    <% if (item.productId && item.productId.product && item.productId.product.images && item.productId.product.images.length > 0) { %>
-                                        <img src="<%= item.productId.product.images[0] %>" alt="<%= item.productId.product.name %>" style="width: 50px;">
-                                    <% } else { %>
-                                        <img src="placeholder_image.jpg" alt="Placeholder" style="width: 50px;">
-                                    <% } %>
-                                    <%= item.productId.product.name %>
+                                    <img src="<%= item.product.images[0] %>" alt="" style="width: 50px;"> <%= item.product.name %>
                                 </td>
-                                <td class="align-middle">$<%= item.productId.product.sellingPrice.toFixed(2) %></td>
+                                <td class="align-middle">₹<%= item.product.price %></td>
                                 <td class="align-middle">
                                     <div class="input-group quantity mx-auto" style="width: 100px;">
                                         <div class="input-group-btn">
@@ -230,17 +210,15 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="align-middle">$<%= (item.productId.product.sellingPrice * item.quantity).toFixed(2) %></td>
+                                <td class="align-middle">₹<%= item.quantity * item.product.sellingPrice %></td>
                                 <td class="align-middle">
-                                    <form action="/removeFromCart" method="POST">
-                                        <input type="hidden" name="productId" value="<%= item.productId._id %>">
-                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></button>
-                                    </form>
+                                    <button class="btn btn-sm btn-danger"><i class="fa fa-times"></i></button>
                                 </td>
                             </tr>
                         <% }); %>
                     </tbody>
                 </table>
+                
                 
             </div>
             <div class="col-lg-4">
@@ -257,17 +235,17 @@
                     <div class="border-bottom pb-2">
                         <div class="d-flex justify-content-between mb-3">
                             <h6>Subtotal</h6>
-                            <h6>$150</h6>
+                            <h6>₹</h6>
                         </div>
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">$10</h6>
+                            <h6 class="font-weight-medium">₹40</h6>
                         </div>
                     </div>
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Total</h5>
-                            <h5>$160</h5>
+                            <h5>₹   </h5>
                         </div>
                         <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Proceed To Checkout</button>
                     </div>

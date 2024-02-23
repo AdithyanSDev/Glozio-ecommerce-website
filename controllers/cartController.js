@@ -12,10 +12,17 @@ exports.renderCartPage = async (req, res) => {
         if (!userId) {
           return res.redirect('/api/user/login');
         }
+       
         const usercart = await Cart.find({ user: userId }).populate('product.productId'); 
-  
+   // Calculate subtotal
+   let subtotal = 0;
+   usercart.forEach(cartItem => {
+       cartItem.product.forEach(product => {
+           subtotal += product.productId.sellingPrice * product.quantity;
+       });
+   });
         console.log(usercart);
-        res.render('cart', { usercart, categories, token });
+        res.render('cart', { usercart, categories, token ,subtotal});
       }
     } catch (error) {
       console.error(error);

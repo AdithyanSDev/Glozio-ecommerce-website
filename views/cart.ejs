@@ -189,36 +189,40 @@
                         </tr>
                     </thead>
                     <tbody class="align-middle">
-                        <% usercart.forEach(item => { %>
-                            <tr>
-                                <td class="align-middle">
-                                    <img src="<%= item.product.images[0] %>" alt="" style="width: 50px;"> <%= item.product.name %>
-                                </td>
-                                <td class="align-middle">₹<%= item.product.price %></td>
-                                <td class="align-middle">
-                                    <div class="input-group quantity mx-auto" style="width: 100px;">
-                                        <div class="input-group-btn">
-                                            <button class="btn btn-sm btn-primary btn-minus">
-                                                <i class="fa fa-minus"></i>
-                                            </button>
+                        <% usercart.forEach(cartItem => { %>
+                            <% cartItem.product.forEach(product => { %>
+                                <tr>
+                                    <td class="align-middle">
+                                        <img src="<%= product.productId.images[0] %>" alt="<%= product.productId.name %>" style="width: 50px;">
+                                        <%= product.productId.name %>
+                                    </td>
+                                    <td class="align-middle">₹<%= product.productId.price %></td>
+                                    <td class="align-middle">
+                                        <div class="input-group quantity mx-auto" style="width: 100px;">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-sm btn-primary btn-minus">
+                                                    <i class="fa fa-minus"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value="<%= product.quantity %>">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-sm btn-primary btn-plus">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center quantity-input" value="<%= item.quantity %>">
-                                        <div class="input-group-btn">
-                                            <button class="btn btn-sm btn-primary btn-plus">
-                                                <i class="fa fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </td>
-                                
-                                <td class="align-middle">₹<%= item.quantity * item.product.sellingPrice %></td>
-                                <td class="align-middle">
-                                    <button class="btn btn-sm btn-danger remove-cart-product" data-product-id="<%= item.product._id %>">
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                </td>
-                                
-                            </tr>
+                                    </td>
+                                    <td class="align-middle">₹<%= product.productId.sellingPrice * product.quantity %></td>
+                                    <td class="align-middle">
+                                       
+                                        <button class="btn btn-sm btn-danger remove-cart-product" data-product-id="<%= product.productId._id %>">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                        
+                                    
+                                    </td>
+                                </tr>
+                            <% }); %>
                         <% }); %>
                     </tbody>
                 </table>
@@ -335,33 +339,30 @@
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const removeButtons = document.querySelectorAll('.remove-cart-product');
-    removeButtons.forEach(button => {
-        button.addEventListener('click', async () => {
-            const productId = button.getAttribute('data-product-id');
-            try {
-                const response = await fetch(`/cart/${productId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.remove-cart-product').click(function() {
+                var productId = $(this).data('product-id');
+                var button = $(this);
+    
+                $.ajax({
+                    type: 'DELETE', // Change the request type to DELETE
+                    url: '/cart/remove/' + productId,
+                    success: function(data) {
+                        // Remove the closest <tr> element containing the button
+                        button.closest('tr').remove();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        // Handle error response if needed
                     }
                 });
-                if (!response.ok) {
-                    throw new Error('Failed to remove product from cart');
-                }
-                // Optionally, update the UI to reflect the removal of the product
-                button.closest('tr').remove(); // Remove the table row
-            } catch (error) {
-                console.error('Error:', error);
-            }
+            });
         });
-    });
-});
-
-</script>
-
+    </script>
+    
+   
 <script>
     document.addEventListener('DOMContentLoaded', () => {
     const plusButtons = document.querySelectorAll('.btn-plus');

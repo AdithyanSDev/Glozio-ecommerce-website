@@ -22,9 +22,7 @@
       
     </head>
     <style>
-        body{
-            background-color: rgb(241, 239, 239);
-        }
+       
        
     </style>
 <body>
@@ -124,22 +122,21 @@
         </div>
     </div>
     <!-- Navbar End -->
-    
-    <div class="container">
-		<div class="main-body">
-			<div class="row">
-				<div class="col-lg-4">
-					<div class="card">
-						<div class="card-body">
-							<div class="d-flex flex-column align-items-center text-center">
-								<img src="" alt="user" class="rounded-circle p-1 bg-primary" width="110">
-								<div class="mt-3">
-									<h4><%= user.name%></h4>
-									
-								</div>
-							</div>
-							<hr class="my-4">
-							<ul class="list-group list-group-flush">
+<!--     
+    <div class="container"> -->
+        <!-- <div class="main-body"> -->
+            <div class="row">
+                <div class="col-lg-3 ">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex row">
+                                <img src="/img/profile.jpg" alt="user" class="rounded-circle p-1 bg-primary" width="80">
+                                <div class=" mt-3 pl-3">
+                                    <span>Hello,</span><h5><%= user.name%></h5>
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                                     <a class="mb-0">Orders</a>
                                     <!-- Add any relevant icons or badges -->
@@ -157,12 +154,14 @@
                                     <!-- Add any relevant icons or badges -->
                                 </li>
                             </ul>
-                            
-						</div>
-					</div>
-				</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-lg-8">
+                    
                     <div class="card">
+                        <h4 class="text-primary mt-4 pl-3">Personal Information</h4>
+
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-sm-3">
@@ -170,7 +169,6 @@
                                 </div>
                                 <div class="col-sm-9 text-secondary">
                                     <input type="text" class="form-control" value="<%= user.name %>">
-                                    
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -179,53 +177,33 @@
                                 </div>
                                 <div class="col-sm-9 text-secondary">
                                     <input type="text" class="form-control" value="<%= user.email %>">
-                                  
                                 </div>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">Gender</h6>
-                                </div>
-                                <div class="col-sm-9 text-secondary">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="gender" id="male" value="male" <%= user.gender === 'male' ? 'checked' : '' %>>
-                                        <label class="form-check-label" for="male">Male</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="gender" id="female" value="female" <%= user.gender === 'female' ? 'checked' : '' %>>
-                                        <label class="form-check-label" for="female">Female</label>
-                                    </div>
-                                </div>
-                            </div>
+                           
                             <% if (user.addresses.length > 0) { %>
-                                <% user.addresses.forEach((address) => { %>
-                                    <div class="row mb-3">
-                                        <div class="col-sm-3">
-                                            <h6 class="mb-0">Mobile</h6>
-                                        </div>
-                                        <div class="col-sm-9 text-secondary">
-                                            <input type="text" class="form-control" value="<%= address.mobileNumber %>">
-                                        </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0">Select Address</h6>
                                     </div>
-                                    <div class="row mb-3">
-                                        <div class="col-sm-3">
-                                            <h6 class="mb-0">Address</h6>
-                                        </div>
-                                        <div class="col-sm-9 text-secondary">
-                                            <input type="text" class="form-control" value="<%= address.address %>, <%= address.locality %>, <%= address.city %>, <%= address.state %>, <%= address.pincode %>">
-                                            <a href="/api/user/address">Add address</a>
-                                        </div>
-                                       
+                                    <div class="col-sm-9 text-secondary">
+                                        <select class="form-control" id="addressDropdown">
+                                            <% user.addresses.forEach((address) => { %>
+                                                <option value="<%= address._id %>"><%= address.address %>, <%= address.locality %>, <%= address.city %>, <%= address.state %>, <%= address.pincode %> - <%= address.mobileNumber %></option>
+                                            <% }); %>
+                                        </select>
+                                        <a href="/api/user/address">Manage addreses</a>
                                     </div>
-                                <% }); %>
+                                </div>
                             <% } else { %>
                                 <div class="row mb-3">
                                     <div class="col-sm-12 text-secondary">
                                         No addresses found.
                                     </div>
-                                    <a href="/api/user/address">Add address</a>
+                                    <a href="/api/user/address">Manage addreses</a>
                                 </div>
                             <% } %>
+                          
                             <div class="row">
                                 <div class="col-sm-3"></div>
                                 <div class="col-sm-9 text-secondary">
@@ -235,12 +213,10 @@
                         </div>
                     </div>
                 </div>
-                
-                
-			</div>
-		</div>
-	</div>
-
+            </div>
+        <!-- </div> -->
+    <!-- </div>
+     -->
     
 
 

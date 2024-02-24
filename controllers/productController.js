@@ -118,9 +118,11 @@ exports.editProduct = async (req, res, next) => {
     }
 
     // Handle individual image upload
-    if (req.file) {
-      const newImage = req.file.path;
-      product.images.push(newImage);
+    if (req.files && req.files.length > 0) { // Check if files are uploaded
+      req.files.forEach((file) => {
+        const newImage = file.path;
+        product.images.push(newImage);
+      });
     }
 
     // Update the product with the new data
@@ -130,6 +132,7 @@ exports.editProduct = async (req, res, next) => {
     next(error);
   }
 };
+
 
 exports.deleteImage=async(req,res)=>{
   const { productId, imageIndex } = req.params;

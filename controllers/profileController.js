@@ -54,7 +54,7 @@ exports.renderUserprofile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         
-        res.render('address', { addresses: user.addresses,products,categories, token});
+        res.render('address', { addresses: user.addresses,products,categories, token,user});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
@@ -69,11 +69,11 @@ exports.renderUserprofile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         
-        const address = new Address({user:userId,...req.body}); // Create new address instance
-        await address.save(); // Save the address to the database
+        const address = new Address({user:userId,...req.body}); 
+        await address.save(); 
         
-        user.addresses.push(address); // Add address reference to user's addresses
-        await user.save(); // Save the user
+        user.addresses.push(address); 
+        await user.save(); 
         console.log(address)
         
         res.redirect('/api/user/profile')
@@ -83,4 +83,62 @@ exports.renderUserprofile = async (req, res) => {
     }
 };
 
-  
+exports.renderUpdateAddress = async (req, res) => {
+  try {
+      
+      const { id } = req.params;
+      const userId = req.userId; 
+      const user = await User.findById(userId).populate('addresses');
+      const products = await Product.find({ isDeleted: false });
+      const categories = await Category.find({ isDeleted: false }).populate('products'); 
+      const token = req.cookies.token;
+      
+      const address = await Address.findById(id);
+
+     
+      res.render('updateaddress', { address,products,categories, token,user });
+  } catch (error) {
+      console.error('Error rendering update address form:', error);
+      res.status(500).send('An unexpected error occurred');
+  }
+};
+
+exports.editAddress = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const { name, mobileNumber, pincode, locality, address, city, state, addressType } = req.body;
+      const existingAddress = await Address.findById(id);
+
+      if (!existingAddress) {
+          return res.status(404).json({ error: 'Address not found' });
+      }
+
+      existingAddress.name = name;
+      existingAddress.mobileNumber = mobileNumber;
+      existingAddress.pincode = pincode;
+      existingAddress.locality = locality;
+      existingAddress.address = address;
+      existingAddress.city = city;
+      existingAddress.state = state;
+      existingAddress.addressType = addressType;
+
+    
+      await existingAddress.save();
+
+      res.redirect('/api/user/address');
+  } catch (error) {
+      console.error('Error editing address:', error);
+      res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+};
+exports.deleteAddress = async (req, res) => {
+  console.log("dljfdk")
+  try {
+      const { id } = req.params;
+      await Address.findByIdAndDelete(id);
+      res.status(200).json({ message: 'Address deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting address:', error);
+      res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+};

@@ -94,10 +94,10 @@ app.use('/uploads', express.static('uploads'));
 app.use('/lib', express.static(path.join(__dirname, 'lib')));
 
 
-app.use('/', homeRoutes);
-app.use('/api', authRoutes);
-app.use('/admin', adminRoutes);
-app.use('/', cartRoutes);
+  app.use('/', homeRoutes);
+  app.use('/api', authRoutes);
+  app.use('/admin', adminRoutes);
+  app.use('/', cartRoutes);
 
 app.get('/adminlogin', (req, res) => {
   res.render('adminlogin'); 

@@ -179,7 +179,9 @@
     <div class="row px-xl-5">
         <div class="col-lg-8 table-responsive mb-5">
             <% if (usercart.length > 0) { %>
+                <!-- Start of table only when there are products -->
                 <table class="table table-light table-borderless table-hover text-center mb-0">
+                    <!-- Table header -->
                     <thead class="thead-dark">
                         <tr>
                             <th>Products</th>
@@ -189,10 +191,12 @@
                             <th>Remove</th>
                         </tr>
                     </thead>
+                    <!-- Table body -->
                     <tbody class="align-middle">
                         <% usercart.forEach(cartItem => { %>
                             <% cartItem.product.forEach(product => { %>
                                 <tr>
+                                    <!-- Product details -->
                                     <td class="align-middle">
                                         <img src="<%= product.productId.images[0] %>" alt="<%= product.productId.name %>" style="width: 50px;">
                                         <%= product.productId.name %>
@@ -214,6 +218,7 @@
                                         </div>
                                     </td>
                                     <td class="align-middle">₹<%= product.productId.sellingPrice * product.quantity %></td>
+                                    <!-- Remove button -->
                                     <td class="align-middle">
                                         <button class="btn btn-sm btn-danger remove-cart-product" data-product-id="<%= product.productId._id %>">
                                             <i class="fa fa-times"></i>
@@ -225,11 +230,13 @@
                     </tbody>
                 </table>
             <% } else { %>
+                <!-- No products message -->
                 <div class="text-center mt-5">
                     <p>No products in the cart</p>
                 </div>
             <% } %>
         </div>
+        
         <div class="col-lg-4">
             <% if (usercart.length > 0) { %>
                 <form class="mb-30" action="">
@@ -250,14 +257,14 @@
                         <% if (usercart.length > 0) { %>
                             <div class="d-flex justify-content-between">
                                 <h6 class="font-weight-medium">Shipping</h6>
-                                <h6 class="font-weight-medium">₹40</h6>
+                                <h6 class="font-weight-medium">Free</h6>
                             </div>
                         <% } %>
                     </div>
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Total</h5>
-                            <h5>₹<%= (subtotal + 40).toFixed(2) %>  </h5>
+                            <h5>₹<%= (subtotal).toFixed(2) %>  </h5>
                         </div>
                         <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Proceed To Checkout</button>
                     </div>

@@ -14,18 +14,19 @@ exports.renderDetailPage = async (req, res) => {
 
     // Fetch reviews count for the product
     const reviewCount = await Review.countDocuments({ productId });
-
-      // Fetch related products based on the current product's category
-      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
+    const token = req.cookies.token;
+    // Fetch related products based on the current product's category
+    const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
 
     // Render the detail page and pass the product object, reviews, and reviewCount
-    res.render('detail', { product, reviews, reviewCount,relatedProducts });
+    res.render('detail', { product, reviews, reviewCount, relatedProducts,token });
 
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
+
 
 exports.reviewCount=async (req, res) => {
   try {
@@ -83,18 +84,18 @@ exports.reviewSubmit = async (req, res) => {
 
 
 
-
 exports.getRelatedProducts = async (req, res) => {
   try {
       const productId = req.params.productId;
       const product = await Product.findById(productId);
       const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(5); 
 
-      res.render('relatedProducts', { relatedProducts });
+      res.render('detail', { relatedProducts });
   } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
   }
 };
+
 
 

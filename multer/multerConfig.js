@@ -1,23 +1,17 @@
 const multer = require('multer');
 const path = require('path');
 
-// Use a disk storage configuration that appends an index to filenames:
+// multer
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, 'uploads/')
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const fileExtension = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
   }
-});
-
-// Modify the upload configuration to handle multiple files correctly:
-const upload = multer({
-  storage: storage,
-  // No need for fileFilter as file types are already restricted in the form's accept attribute
-  limits: { fileSize: 5 * 1024 * 1024 } // Limit file size to 5 MB
-}).array('images', 3);
+})
+const upload = multer({ storage: storage }).array('img');
 
 module.exports = upload;

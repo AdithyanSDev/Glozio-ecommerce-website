@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Glozio - Online Shopping Website </title>
+    <title>MultiShop - Online Shop Website Template</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Free HTML Templates" name="keywords">
     <meta content="Free HTML Templates" name="description">
@@ -186,50 +186,145 @@
         <div class="row px-xl-5">
             <div class="col-lg-8">
                 <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
-                <select class="form-control mb-3">
-                    <option selected>Select Address</option>
-                    <% addresses.forEach(address => { %>
-                        <option value="<%= address._id %>">
-                            <%= address.addressType %>: <%= address.address %>, <%= address.city %>, <%= address.state %>, <%= address.pincode %>
-                        </option>
-                    <% }); %>
-                </select>
-                <!-- Add button to add a new address if needed -->
-                <a href="/api/user/address" class="btn btn-primary">Add New Address</a>
-                <a href="/api/user/addresses/:id" class="btn btn-primary">Change </a>
+                <div class="bg-light p-30 mb-5">
+                    <div class="row">
+                        <select class="form-control mb-3">
+                            <option selected>Select Address</option>
+                            <% addresses.forEach(address => { %>
+                                <option value="<%= address._id %>">
+                                    <%= address.addressType %>: <%= address.address %>, <%= address.city %>, <%= address.state %>, <%= address.pincode %>
+                                </option>
+                            <% }); %>
+                        </select>
+    
+                        <div class="col-md-12">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="shipto">
+                                <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Ship to different address</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="collapse mb-5" id="shipping-address">
+                    <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Shipping Address</span></h5>
+                    <div class="bg-light p-30">
+                        <div class="row">
+                            <form action="/api/addaddresscheckout" method="POST">
+                                <!-- Form fields -->
+                                <!-- Name and Mobile Number -->
+                                <div class="form-row">
+                                    <div class="col-md-6 form-group">
+                                        <label>Full Name</label>
+                                        <input class="form-control" type="text" placeholder="Enter name" name="name" required>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>Mobile No</label>
+                                        <input class="form-control" type="text" placeholder="Enter mobile number" name="mobileNumber" required>
+                                    </div>
+                                </div>
+                                <!-- Email and Mobile Number -->
+                                <div class="form-row">
+                                    <div class="col-md-6 form-group">
+                                        <label>Pincode</label>
+                                        <input class="form-control" type="text" placeholder="Enter pincode" name="pincode" required>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>Locality</label>
+                                        <input class="form-control" type="text" placeholder="Enter locality" name="locality" required>
+                                    </div>
+                                </div>
+                                <!-- Address Line 1  -->
+                                <div class="form-row">
+                                   
+                                    <div class="col-md-12 form-group">
+                                        <label>Address </label>
+                                        <input class="form-control" id="inputAddress" type="text" placeholder="Enter address" name="address" required>
+                                    </div>
+                                </div>
+                                <!-- City, State, and ZIP Code -->
+                                <div class="form-row">
+                                    <div class="col-md-6 form-group">
+                                        <label for="inputCity">District</label>
+                                        <select class="form-control" id="inputState" name="city" required>
+                                            <option>Select City</option>
+                                            <option>Thiruvananthapuram</option>
+                                            <option>Ernakulam</option>
+                                            <option>Mysore</option>
+                                            <option>New Delhi</option>
+                                            <option>Mumbai</option>
+                                            <option>Bangalore</option>
+                                            <option>Chennai</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>State</label>
+                                        <select class="form-control" id="inputState" name="state" required>
+                                            <option>Select state</option>
+                                            <option>Kerala</option>
+                                            <option>Karnataka</option>
+                                            <option>Tamil Nadu</option>
+                                            <option>Delhi</option>
+                                            <option>Maharashtra</option>
+                                        </select>
+                                    </div>
+                                   
+                                </div>
+                                
+                               
+                                <!-- Address Type -->
+                                <div class="form-group">
+                                    <fieldset>
+                                        <small>Address Type</small>
+                                        <div class="row">
+                                            <div class="form-check ml-3 mt-2">
+                                                <input class="form-check-input" type="radio" name="addressType" id="home" value="Home" required>
+                                                <label class="form-check-label " for="home">Home</label>
+                                            </div>
+                                            <div class="form-check ml-3 mt-2" >
+                                                <input class="form-check-input" type="radio" name="addressType" id="work" value="Work" required>
+                                                <label class="form-check-label " for="work">Work</label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <!-- Submit Button -->
+                                <div class="container justify-content-center align-items-center">
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                    <a class="btn btn-primary ml-3  pl-3" href="/checkout">Cancel</a>
+                                </div>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-4">
                 <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Order Total</span></h5>
                 <div class="bg-light p-30 mb-5">
                     <div class="border-bottom">
                         <h6 class="mb-3">Products</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Product Name 1</p>
-                            <p>$150</p>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <p>Product Name 2</p>
-                            <p>$150</p>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <p>Product Name 3</p>
-                            <p>$150</p>
-                        </div>
+                        <% productsInfo.forEach(product => { %>
+                            <div class="d-flex justify-content-between">
+                                <p><%= product.name %></p>
+                                <p>₹<%= product.price %></p>
+                            </div>
+                        <% }); %>
                     </div>
+                    
                     <div class="border-bottom pt-3 pb-2">
                         <div class="d-flex justify-content-between mb-3">
                             <h6>Subtotal</h6>
-                            <h6>$150</h6>
+                            <h6>₹<%= subtotal %></h6>
                         </div>
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">$10</h6>
+                            <h6 class="font-weight-medium">Free</h6>
                         </div>
                     </div>
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Total</h5>
-                            <h5>$160</h5>
+                            <h5>₹<%= subtotal %></h5>
                         </div>
                     </div>
                 </div>
@@ -238,22 +333,22 @@
                     <div class="bg-light p-30">
                         <div class="form-group">
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="paypal">
-                                <label class="custom-control-label" for="paypal">Paypal</label>
+                                <input type="radio" class="custom-control-input" name="cod" id="cod">
+                                <label class="custom-control-label" for="cod">Cash On Delivery</label>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" name="payment" id="directcheck">
                                 <label class="custom-control-label" for="directcheck">Direct Check</label>
                             </div>
-                        </div>
-                        <div class="form-group mb-4">
+                        </div> -->
+                        <!-- <div class="form-group mb-4">
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" name="payment" id="banktransfer">
                                 <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
                             </div>
-                        </div>
+                        </div> -->
                         <button class="btn btn-block btn-primary font-weight-bold py-3">Place Order</button>
                     </div>
                 </div>

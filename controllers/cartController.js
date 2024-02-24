@@ -37,7 +37,7 @@ exports.renderCartPage = async (req, res) => {
  
  
 
- exports.addToCart = async (req, res) => {
+  exports.addToCart = async (req, res) => {
     try {
         const { productId, quantity } = req.body;
         const userId = req.userId; 
@@ -70,12 +70,17 @@ exports.renderCartPage = async (req, res) => {
 
             cart.product[existingProductIndex].quantity += quantity || 1;
         } else {
-            cart.product.push({
-                productId: product._id,
-                name: product.name,
-                price: product.price,
-                quantity: quantity || 1,
-            });
+            // Only add the product to the cart if it has available stock
+            if (product.stock > 0) {
+                cart.product.push({
+                    productId: product._id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: quantity || 1,
+                });
+            } else {
+                return res.status(400).json({ message: 'Product out of stock' });
+            }
         }
 
         await cart.save();
@@ -143,20 +148,32 @@ exports.renderCheckout = async (req, res) => {
             if (!userId) {
                 return res.redirect('/api/user/login');
             }
+            
             const categories = await Category.find({ isDeleted: false });
             const user = await User.findById(userId); // Assuming you have a User model
-            const usercart = await Cart.find({ user: userId }).populate('product.productId');
+            let usercart = await Cart.find({ user: userId }).populate('product.productId');
             let subtotal = 0;
 
-            // Calculate subtotal
-            usercart.forEach(cartItem => {
+            // Filter out products that are out of stock and calculate subtotal
+            usercart = usercart.filter(cartItem => {
+                let cartItemValid = false;
                 cartItem.product.forEach(product => {
-                    subtotal += product.productId.sellingPrice * product.quantity;
+                    if (product.productId.stock > 0) {
+                        subtotal += product.productId.sellingPrice * product.quantity;
+                        cartItemValid = true;
+                    }
                 });
+                return cartItemValid;
             });
-            const addresses = await Address.find({ user: userId });
 
-            res.render('checkout', { user, usercart, subtotal,token,categories,addresses });
+            const productsInfo = usercart.map(cartItem => ({
+                name: cartItem.product.name,
+                price: subtotal
+            }));
+
+            const addresses = await Address.find({ user: userId });
+console.log("cart",usercart)
+            res.render('checkout', { user, usercart, subtotal, token, categories, addresses, productsInfo });
         }
     } catch (error) {
         console.error(error);

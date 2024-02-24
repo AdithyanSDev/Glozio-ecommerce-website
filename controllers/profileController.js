@@ -83,6 +83,28 @@ exports.renderUserprofile = async (req, res) => {
     }
 };
 
+exports.addAddressCheckOut=async (req,res)=>{
+  try {
+    const userId = req.userId; // Extract user ID from request
+    const user = await User.findById(userId);
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const address = new Address({user:userId,...req.body}); 
+    await address.save(); 
+    
+    user.addresses.push(address); 
+    await user.save(); 
+    console.log(address)
+    
+    res.redirect('/checkout')
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+}
+}
+
 exports.renderUpdateAddress = async (req, res) => {
   try {
       

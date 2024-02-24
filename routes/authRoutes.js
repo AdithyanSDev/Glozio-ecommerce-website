@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { redirectToUserLogin, userLogin, registerUser, renderOTPPage, verifyOTP, resendOTP, logout } = require('../controllers/authController');
-const{renderUserprofile,renderAddress,addAddress,renderUpdateAddress, editAddress,deleteAddress}=require('../controllers/profileController')
+const{renderUserprofile,renderAddress,addAddress,renderUpdateAddress, editAddress,deleteAddress,addAddressCheckOut}=require('../controllers/profileController')
 const { verifyToken } = require('../middleware/authMiddleware');
 
 router.get('/signin', redirectToUserLogin);
@@ -18,6 +18,7 @@ router.get('/user/logout',logout)
 router.get('/user/profile', verifyToken, renderUserprofile);
 router.get('/user/address', verifyToken, renderAddress); 
 router.post('/addaddress', verifyToken, addAddress);
+router.post('/addaddresscheckout',verifyToken,addAddressCheckOut);
 router.get('/addresses/:id',renderUpdateAddress);
 router.post('/addresses/:id', editAddress);
 router.delete('/user/address/:id',deleteAddress);

@@ -193,6 +193,7 @@
                     </thead>
                     <!-- Table body -->
                     <tbody class="align-middle">
+
                         <% usercart.forEach(cartItem => { %>
                             <% cartItem.product.forEach(product => { %>
                                 <tr>
@@ -203,19 +204,25 @@
                                     </td>
                                     <td class="align-middle">₹<%= product.productId.price %></td>
                                     <td class="align-middle">
-                                        <div class="input-group quantity mx-auto" style="width: 100px;">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-primary btn-minus">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-                                            </div>
-                                            <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value="<%= product.quantity %>">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-primary btn-plus">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                                       <% if (product.productId.stock > 0) { %>
+                                            <!-- If the product is in stock -->
+                                            <div class="input-group quantity mx-auto" style="width: 100px;">
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-sm btn-primary btn-minus">
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                                <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value="<%= product.quantity %>">
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-sm btn-primary btn-plus">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                     </div>
+                                        <% } else { %>
+                                            <!-- If the product is out of stock -->
+                                            <div class="text-danger">Out of Stock</div>
+                                        <% } %>
                                     </td>
                                     <td class="align-middle">₹<%= product.productId.sellingPrice * product.quantity %></td>
                                     <!-- Remove button -->
@@ -266,7 +273,7 @@
                             <h5>Total</h5>
                             <h5>₹<%= (subtotal).toFixed(2) %>  </h5>
                         </div>
-                        <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Proceed To Checkout</button>
+                        <a class="btn btn-block btn-primary font-weight-bold my-3 py-3" href="/checkout">Proceed To Checkout</a>
                     </div>
                 </div>
             <% } %>

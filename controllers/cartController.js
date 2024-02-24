@@ -1,7 +1,8 @@
 const Category = require('../models/category'); 
 const Product = require('../models/product')
 const Cart = require('../models/cart')
-
+const User = require('../models/user')
+const Address=require('../models/address')
 exports.renderCartPage = async (req, res) => {
     try {
       const token = req.cookies.token;
@@ -17,10 +18,13 @@ exports.renderCartPage = async (req, res) => {
    // Calculate subtotal
    let subtotal = 0;
    usercart.forEach(cartItem => {
-       cartItem.product.forEach(product => {
-           subtotal += product.productId.sellingPrice * product.quantity;
-       });
-   });
+    cartItem.product.forEach(product => {
+        // Check if the product is in stock
+        if (product.productId.stock > 0) {
+            subtotal += product.productId.sellingPrice * product.quantity;
+        }
+    });
+});
         console.log(usercart);
         res.render('cart', { usercart, categories, token ,subtotal});
       }
@@ -126,5 +130,36 @@ exports.removeFromCart = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+//checkout
+exports.renderCheckout = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if (token) {
+            const userId = req.userId;
+            if (!userId) {
+                return res.redirect('/api/user/login');
+            }
+            const categories = await Category.find({ isDeleted: false });
+            const user = await User.findById(userId); // Assuming you have a User model
+            const usercart = await Cart.find({ user: userId }).populate('product.productId');
+            let subtotal = 0;
+
+            // Calculate subtotal
+            usercart.forEach(cartItem => {
+                cartItem.product.forEach(product => {
+                    subtotal += product.productId.sellingPrice * product.quantity;
+                });
+            });
+            const addresses = await Address.find({ user: userId });
+
+            res.render('checkout', { user, usercart, subtotal,token,categories,addresses });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
     }
 };

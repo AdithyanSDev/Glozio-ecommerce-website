@@ -11,4 +11,7 @@ router.post('/addcart',verifyToken, cartController.addToCart);
 router.put('/cart/:productId/increase', verifyToken, cartController.increaseQuantity);
 router.delete('/cart/remove/:productId', verifyToken, cartController.removeFromCart);
 
+//checkout
+router.get("/checkout", verifyToken ,cartController.renderCheckout)
+
 module.exports = router;

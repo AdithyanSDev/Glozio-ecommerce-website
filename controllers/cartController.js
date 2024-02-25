@@ -3,6 +3,8 @@ const Product = require('../models/product')
 const Cart = require('../models/cart')
 const User = require('../models/user')
 const Address=require('../models/address')
+
+
 exports.renderCartPage = async (req, res) => {
     try {
       const token = req.cookies.token;
@@ -36,11 +38,11 @@ exports.renderCartPage = async (req, res) => {
   
  
  
-
-  exports.addToCart = async (req, res) => {
+// addToCart controller
+exports.addToCart = async (req, res) => {
     try {
         const { productId, quantity } = req.body;
-        const userId = req.userId; 
+        const userId = req.userId;
 
         const product = await Product.findById(productId);
 
@@ -75,7 +77,7 @@ exports.renderCartPage = async (req, res) => {
                 cart.product.push({
                     productId: product._id,
                     name: product.name,
-                    price: product.price,
+                    price: product.price, // Include the price of the product
                     quantity: quantity || 1,
                 });
             } else {
@@ -91,6 +93,7 @@ exports.renderCartPage = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 exports.increaseQuantity = async (req, res) => {
     try {
@@ -150,30 +153,30 @@ exports.renderCheckout = async (req, res) => {
             }
             
             const categories = await Category.find({ isDeleted: false });
-            const user = await User.findById(userId); // Assuming you have a User model
-            let usercart = await Cart.find({ user: userId }).populate('product.productId');
+            const user = await User.findById(userId);
+            let usercart = await Cart.findOneAndUpdate(
+                { user: userId },
+                { $pull: { 'product': { 'productId.stock': 0 } } }, // Remove products with zero stock
+                { new: true }
+            ).populate('product.productId');
+            
             let subtotal = 0;
 
-            // Filter out products that are out of stock and calculate subtotal
-            usercart = usercart.filter(cartItem => {
-                let cartItemValid = false;
-                cartItem.product.forEach(product => {
-                    if (product.productId.stock > 0) {
-                        subtotal += product.productId.sellingPrice * product.quantity;
-                        cartItemValid = true;
-                    }
-                });
-                return cartItemValid;
+            // Calculate subtotal
+            usercart.product.forEach(product => {
+                subtotal += product.productId.sellingPrice * product.quantity;
             });
 
-            const productsInfo = usercart.map(cartItem => ({
-                name: cartItem.product.name,
+            const productsInfo = usercart.product.map(cartItem => ({
+                name: cartItem.name,
                 price: subtotal
             }));
 
-            const addresses = await Address.find({ user: userId });
-console.log("cart",usercart)
-            res.render('checkout', { user, usercart, subtotal, token, categories, addresses, productsInfo });
+            const address = await Address.find({ user: userId });
+
+            console.log("cart", usercart);
+
+            res.render('checkout', { user, usercart, subtotal, token, categories, address, productsInfo });
         }
     } catch (error) {
         console.error(error);

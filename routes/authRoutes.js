@@ -23,6 +23,8 @@ router.get('/addresses/:id',renderUpdateAddress);
 router.post('/addresses/:id', editAddress);
 router.delete('/user/address/:id',deleteAddress);
 
+
+
 router.get('/admin/login', (req, res) => {
   res.render('adminlogin'); // Render the admin login page
 });

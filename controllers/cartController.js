@@ -167,6 +167,9 @@ exports.renderCheckout = async (req, res) => {
                 subtotal += product.productId.sellingPrice * product.quantity;
             });
 
+            // Filter out products with zero stock
+            usercart.product = usercart.product.filter(product => product.productId.stock > 0);
+
             const productsInfo = usercart.product.map(cartItem => ({
                 name: cartItem.name,
                 price: subtotal

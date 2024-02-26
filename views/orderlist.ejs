@@ -26,9 +26,7 @@
     <link href="css/style.css" rel="stylesheet">
 </head>
 <style>
-    body{
-        background-color: rgb(30, 134, 5);
-    }
+   
 </style>
 <body>
     <!-- Topbar Start -->
@@ -103,7 +101,7 @@
     </div>
     <!-- Topbar End -->
 
-
+ 
 
     <!-- Navbar Start -->
     <div class="container-fluid bg-dark mb-30">
@@ -136,7 +134,7 @@
                             <a href="shop.html" class="nav-item nav-link">Shop</a>
                             <a href="detail.html" class="nav-item nav-link">Shop Detail</a>
                             <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle active" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
+                                <a href="#" class="nav-link dropdown-toggle " data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
                                 <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
                                     <a href="cart.html" class="dropdown-item active">Shopping Cart</a>
                                     <a href="checkout.html" class="dropdown-item">Checkout</a>
@@ -160,45 +158,58 @@
         </div>
     </div>
     <!-- Navbar End -->
-
-    <div class="container" style="text-align: center; border-radius: 10px; border: 1px solid #ccc; padding: 50px; background-color: rgb(109, 189, 88); margin-top: 100px; margin-bottom: 100px;">
-        
-        <button class="order">
-            <!-- <span class="default">Complete Order</span> -->
-            <span class="success">Order Placed
-                <svg viewbox="0 0 12 10">
-                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                </svg>
-            </span>
-            <div class="box"></div>
-            <div class="truck">
-                <div class="back"></div>
-                <div class="front">
-                    <div class="window"></div>
-                </div>
-                <div class="light top"></div>
-                <div class="light bottom"></div>
-            </div>
-            <div class="lines"></div>
-        </button>
-        <h3 class="mt-3">Order confirmed!</h3>
-        <div class="row thanks " style="margin-top: 20px; margin-left:370px;">
-           
-                <p class="text-dark">Your order has been placed successfully.</p><a href="/orders">Order History</a>
-            
+<!-- Breadcrumb Start -->
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-12">
+            <nav class="breadcrumb bg-light mb-30">
+                <a class="breadcrumb-item text-dark" href="/">Home</a>
+                <a class="breadcrumb-item text-dark" href="/api/user/profile">Profile</a>
+                <span class="breadcrumb-item active">Orders</span>
+            </nav>
         </div>
-        <a class="btn btn-primary px-3" href="/">
-            <i class="fas fa-shopping-cart text-dark"></i>
-            Continue Shopping</a>
     </div>
+</div>
+<!-- Breadcrumb End -->
     
+<div class="container p-3 my-3 col-11 shadow-sm">
+    <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Product Name</th>
+            <th scope="col">Product Image</th>
+            <th scope="col">Total Amount</th>
+            <th scope="col">Order Date</th>
+            <th scope="col">Order Status</th>
+          </tr>
+        </thead>
+        <tbody>
+            <% orders.forEach((order, index) => { %>
+                <% order.orderedItems.forEach((item) => { %>
+                    <tr>
+                        <td><%= item.productId.name %></td>
+                        <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                        <td>₹<%= order.totalAmount %></td>
+                        <td><%= order.orderDate %></td>
+                        <td><%= order.orderStatus %></td>
+                        <td>
+                            <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% }); %>
+        </tbody>
+        
+        
+      </table>
+      
+
+</div>
    
 
 
 
-  
-
-
+    
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-secondary mt-5 pt-5 mb-0">
         <div class="row px-xl-5 pt-5">
@@ -291,24 +302,33 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
-    <script>
-        // When the document is ready
-        $(document).ready(function() {
-            // Trigger a click event on the button
-            $('.order').trigger('click');
-        });
+  <script>
+   $('.cancel-order-btn').click(function () {
+    const orderId = $(this).data('order-id');
+    const button = $(this);
 
-        // Add click event listener
-        $('.order').click(function (e) {
-            let button = $(this); 
-            if (!button.hasClass("animate")) {
-                button.addClass('animate');
-                setTimeout(() => {
-                    button.removeClass('animate');
-                }, 10000);
+    // Check if the order status is already "Cancelled"
+    const isCancelled = $(this).hasClass('cancelled');
+
+    if (!isCancelled) {
+        // Send AJAX request to cancel the order
+        $.ajax({
+            url: '/orders/cancel',
+            method: 'POST',
+            data: { orderId: orderId },
+            success: function (response) {
+                // Update button text and disable it
+                button.text('Cancelled').addClass('cancelled').prop('disabled', true);
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                // Handle error response from the server
             }
         });
-    </script>
+    }
+});
+  </script>
+
 </body>
 
 </html>

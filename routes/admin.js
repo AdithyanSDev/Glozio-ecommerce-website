@@ -3,6 +3,7 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const productController = require('../controllers/productController'); 
 const categoryController=require('../controllers/categoryController');
+const ordercontroller = require('../controllers/orderController')
 const upload=require('../multer/multerConfig')
 const { isAdmin } = require('../middleware/authMiddleware');
 
@@ -35,6 +36,11 @@ router.get('/products/:productId/edit',isAdmin, productController.showEditProduc
 router.post('/products/:productId/edit',isAdmin, upload, productController.editProduct);
 router.delete('/admin/products/:productId/delete-image/:imageIndex',isAdmin,productController.deleteImage)
 router.post('/products/:productId/delete', productController.deleteProduct);
+
+
+//order routes
+router.get('/orders',isAdmin,ordercontroller.adminOrders)
+router.put('/orders/:orderId/status', isAdmin, ordercontroller.updateOrderStatus);
 
 
 module.exports = router;

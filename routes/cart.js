@@ -19,5 +19,8 @@ router.get("/checkout", verifyToken ,cartController.renderCheckout)
 //order routes
 router.get('/orderpage',verifyToken,orderController.renderorderPage)
 router.post('/placeorder',verifyToken, orderController.placeOrder);
+router.get('/orders',verifyToken,orderController.renderOrderList)
+router.get('/orderlist',verifyToken,orderController.listUserOrders)
+router.post('/orders/cancel',verifyToken,orderController.cancelOrder)
 
 module.exports = router;

@@ -19,7 +19,7 @@ exports.renderUserprofile = async (req, res) => {
         res.render('userprofile', { user, products, addresses, token, categories }); 
     } catch (error) {
         console.error(error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).send('Internal Server Error');  
     }
 };
 
@@ -177,12 +177,14 @@ exports.editprofile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.render('userprofile',{ user: updatedUser });
+        // Redirect to the user profile page after updating the user
+        res.redirect('/api/user/profile');
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 
 exports.renderEdit = async (req, res) => {

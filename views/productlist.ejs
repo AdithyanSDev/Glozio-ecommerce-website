@@ -227,76 +227,66 @@
             <!-- Shop Sidebar End -->
 
 
-            <!-- Shop Product Start -->
-            <div class="col-lg-9 col-md-8">
-                <div class="row pb-3">
-                    <div class="col-12 pb-1">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                          
-                            <div class="ml-2">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Sorting</button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="#">Latest</a>
-                                        <a class="dropdown-item" href="#">Price--low-high</a>
-                                        <a class="dropdown-item" href="#">Price--high-low</a>
-                                        <a class="dropdown-item" href="#">A-Z</a>
-                                        <a class="dropdown-item" href="#">Z-A</a>
-                                        <a class="dropdown-item" href="#">Best Rating</a>
-                                    </div>
-                                </div>
-                                <div class="btn-group ml-2">
-                                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Showing</button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="#">10</a>
-                                        <a class="dropdown-item" href="#">20</a>
-                                        <a class="dropdown-item" href="#">30</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                   
-                  <!-- productlist.ejs -->
-
-<div class="container-fluid py-4">
-
-    <div class="row">
-       
-       <% products.forEach(product => { %>
-        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-            <div class="product-item bg-light mb-4"> <!-- Added the product-item class here -->
-                <div class="product-img position-relative overflow-hidden">
-                    <% if (product.images.length > 0) { %>
-                    <img class="img-fluid w-100 product-image" src="/<%= product.images[0] %>" alt="<%= product.name %>">
-                    <% } else { %>
-                    <img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">
-                    <% } %>
-                    <div class="product-action">
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                    </div>
-                </div>
-                <div class="text-center py-4">
-                    <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
-                    <div class="d-flex align-items-center justify-content-center mt-2">
-                        <h5>₹<%= product.sellingPrice.toFixed(2) %></h5>
-                        <h6 class="text-muted ml-2"><del>₹<%= product.price %></del></h6>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-center mb-1">
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small>(<%= reviewCount %>)</small>
+          <!-- Shop Product Start -->
+<div class="col-lg-9 col-md-8">
+    <div class="row pb-3">
+        <div class="col-12 pb-1">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="ml-2">
+                    <div class="btn-group">
+                        <select class="form-select" id="sortBySelect">
+                            <option value="newest-first">Newest</option>
+                            <option value="popularity">Popularity</option>
+                            <option value="price-low-to-high">Price - Low to High</option>
+                            <option value="price-high-to-low">Price - High to Low</option>
+                            <option value="a-to-z">A-Z</option>
+                            <option value="z-to-a">Z-A</option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
-        <% }); %>
+       
+        <!-- productlist.ejs -->
+        <div class="container-fluid py-4">
+            <div class="row" id="productList"> <!-- Added id attribute -->
+                <% products.forEach(product => { %>
+                <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                    <div class="product-item bg-light mb-4">
+                        <div class="product-img position-relative overflow-hidden">
+                            <% if (product.images.length > 0) { %>
+                            <img class="img-fluid w-100 product-image" src="/<%= product.images[0] %>" alt="<%= product.name %>">
+                            <% } else { %>
+                            <img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">
+                            <% } %>
+                            <div class="product-action">
+                                <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
+                                <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                            </div>
+                        </div>
+                        <div class="text-center py-4">
+                            <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
+                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                <h5>₹<%= product.sellingPrice.toFixed(2) %></h5>
+                                <h6 class="text-muted ml-2"><del>₹<%= product.price %></del></h6>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-center mb-1">
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small>(<%= reviewCount %>)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+        </div>
     </div>
 </div>
+
             <!-- Shop Product End -->
         </div>
     </div>
@@ -387,6 +377,65 @@
     <script src="lib/easing/easing.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const productList = document.getElementById('productList');
+        const sortBySelect = document.getElementById('sortBySelect');
+
+        sortBySelect.addEventListener('change', async () => {
+            const sortByValue = sortBySelect.value;
+            try {
+                const response = await fetch(`/sortProducts/${sortByValue}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const sortedProducts = await response.json();
+                renderProducts(sortedProducts);
+            } catch (error) {
+                console.error('Error fetching sorted products:', error);
+            }
+        });
+
+        // Function to render products
+        function renderProducts(products) {
+            productList.innerHTML = ''; // Clear existing products
+            products.forEach(product => {
+                // Create product HTML dynamically
+                const productHTML = `
+                    <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                        <div class="product-item bg-light mb-4">
+                            <div class="product-img position-relative overflow-hidden">
+                                ${product.images.length > 0 ? `<img class="img-fluid w-100 product-image" src="/${product.images[0]}" alt="${product.name}">` : `<img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">`}
+                                <div class="product-action">
+                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                                </div>
+                            </div>
+                            <div class="text-center py-4">
+                                <a class="h6 text-decoration-none text-truncate" href="/detail/${product._id}">${product.name}</a>
+                                <div class="d-flex align-items-center justify-content-center mt-2">
+                                    <h5>₹${product.sellingPrice.toFixed(2)}</h5>
+                                    <h6 class="text-muted ml-2"><del>₹${product.price}</del></h6>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center mb-1">
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small>(<!-- Calculate and add review count here -->)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                // Append product HTML to product list
+                productList.insertAdjacentHTML('beforeend', productHTML);
+            });
+        }
+    });
+</script>
+
     <!-- Contact Javascript File -->
     <script src="mail/jqBootstrapValidation.min.js"></script>
     <script src="mail/contact.js"></script>
@@ -420,6 +469,11 @@
     // Add click event listener to the "Apply" button
     document.getElementById('applyFilterBtn').addEventListener('click', applyFilter);
 </script>
+
+
+
+
+
 
 </body>
 

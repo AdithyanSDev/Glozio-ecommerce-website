@@ -16,8 +16,8 @@ router.post('/otp', verifyOTP);
 router.post('/resend-otp',resendOTP );
 router.get('/user/logout',logout)
 router.get('/user/profile', verifyToken, renderUserprofile);
-router.get('/edit',verifyToken,renderEdit)
-router.post('/user/edit',verifyToken,editprofile);
+  router.get('/edit',verifyToken,renderEdit)
+  router.post('/user/edit',verifyToken,editprofile);
 router.get('/user/address', verifyToken, renderAddress); 
 router.post('/addaddress', verifyToken, addAddress);
 router.post('/addaddresscheckout',verifyToken,addAddressCheckOut);

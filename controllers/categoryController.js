@@ -9,7 +9,7 @@ exports.listCategories = async (req, res) => {
     res.render('category/list', { categories });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.render('404page')
   }
 };
 
@@ -30,7 +30,7 @@ exports.addCategory = async (req, res) => {
     res.redirect('/admin/categories');
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.render('404page')
   }
 };
 
@@ -41,7 +41,7 @@ exports.showEditCategoryForm = async (req, res) => {
     res.render('category/edit', { Category }); 
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.render('404page')
   }
 };
 
@@ -52,7 +52,7 @@ exports.editCategory = async (req, res) => {
     res.render('category/edit', { category }); // This line renders the edit.ejs template with the category data
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.render('404page')
   }
 };
 
@@ -64,7 +64,7 @@ exports.updateCategory = async (req, res) => {
     res.redirect('/admin/categories'); // Redirect to the categories list after updating
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.render('404page') 
   }
 };
 
@@ -77,7 +77,7 @@ exports.softDeleteCategory = async (req, res) => {
     res.redirect('/admin/categories');
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.render('404page')
   }
 };
 
@@ -88,6 +88,6 @@ exports.listProductsByCategory = async (req, res) => {
     res.render('category/products', { category });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.render('404page')
   }
 };

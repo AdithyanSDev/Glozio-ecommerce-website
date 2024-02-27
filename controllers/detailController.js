@@ -23,7 +23,7 @@ exports.renderDetailPage = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+   res.render('404page')
   }
 };
 
@@ -36,7 +36,7 @@ exports.reviewCount=async (req, res) => {
       res.render('review', { product, reviewCount });
   } catch (error) {
       console.error(error);
-      res.status(500).send('Server Error');
+      res.render('404page')
   }
 }
 
@@ -53,7 +53,7 @@ exports.reviewSave= async (req, res) => {
       res.redirect(`/review/${productId}`);
   } catch (error) {
       console.error(error);
-      res.status(500).send('Server Error');
+      res.render('404page')
   }
 }
 
@@ -78,7 +78,7 @@ exports.reviewSubmit = async (req, res) => {
   } catch (error) {
     // Handle errors
     console.error("Error submitting review:", error);
-    res.status(500).send("Internal Server Error");
+    res.render('404page')
   }
 };
 
@@ -93,7 +93,7 @@ exports.getRelatedProducts = async (req, res) => {
       res.render('detail', { relatedProducts });
   } catch (error) {
       console.error(error);
-      res.status(500).send('Internal Server Error');
+      res.render('404page')
   }
 };
 

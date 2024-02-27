@@ -1,6 +1,7 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
 const Review = require('../models/product')
+const User=require('../models/user')
 const fs = require('fs');
 const path = require('path');
 
@@ -165,3 +166,43 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
+exports.getSortedProducts = async (req, res) => {
+  const { categoryId } = req.params;
+    const { sortBy } = req.query;
+  
+
+
+  try {
+      let sortedProducts;
+      const categories = await Category.find();
+      const user = await User.findOne({ email: req.session.email });
+
+      switch (sortBy) {
+          case 'popularity':
+              sortedProducts = await Product.find().sort({_id:1});
+              break;
+          case 'price-low-to-high':
+              sortedProducts = await Product.find().sort({ total_price: 1 });
+              break;
+          case 'price-high-to-low':
+              sortedProducts = await Product.find().sort({ total_price: -1 });
+              break;
+          case 'a-to-z':
+              sortedProducts = await Product.find().sort({ product_name: 1 });
+              break;
+          case 'z-to-a':
+              sortedProducts = await Product.find().sort({ product_name: -1 });
+              break;
+          case 'newest-first':
+              sortedProducts = await Product.find().sort({ _id: -1 });
+              break;
+          default:
+              sortedProducts = await Product.find();
+      }
+
+      res.json(sortedProducts);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error'});
+}
+};

@@ -238,7 +238,7 @@ exports.productsByCategory = async (req, res) => {
     const products = await Product.find({ _id: { $in: productIds } });
     const reviews = await Review.find({ productIds });
     const reviewCount = await Review.countDocuments({ productIds });
-    res.render('productlist', { category, products,reviewCount });
+    res.render('productlist', { category, products,reviewCount,categoryId });
   } catch (err) {
     console.error(err);
     res.status(500).send('Internal Server Error');

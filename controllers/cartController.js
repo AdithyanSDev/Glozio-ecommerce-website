@@ -32,7 +32,7 @@ exports.renderCartPage = async (req, res) => {
       }
     } catch (error) {
       console.error(error);
-      res.status(500).send('Internal Server Error');
+      res.render('404page')
     }
   };
   
@@ -90,7 +90,7 @@ exports.addToCart = async (req, res) => {
         res.redirect('/cart')
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.render('404page')
     }
 };
 
@@ -183,6 +183,6 @@ exports.renderCheckout = async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).send('Internal Server Error');
+        res.render('404page')
     }
 };

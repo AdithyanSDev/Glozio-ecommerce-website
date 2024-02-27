@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>Error</title>
 
 
        <!-- Google Web Fonts -->
@@ -22,7 +22,9 @@
       
     </head>
     <style>
-       
+       body{
+        background-color: rgb(3, 41, 51);
+       }
        
     </style>
 <body>
@@ -68,13 +70,7 @@
                     <h6 class="text-dark m-0"><i class="fa fa-bars mr-2"></i>Categories</h6>
                     <i class="fa fa-angle-down text-dark"></i>
                 </a>
-                <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light" id="navbar-vertical" style="width: calc(100% - 30px); z-index: 999;">
-                    <div class="navbar-nav w-100">
-                        <% categories.forEach(category => { %>
-                            <a href="/category/:categoryId" class="nav-item nav-link category-link" data-id="<%= category._id %>"><%= category.name %></a>
-                        <% }); %>
-                    </div>
-                </nav>
+               
                 
                 
                 </nav>
@@ -90,7 +86,7 @@
                     </button>
                     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                         <div class="navbar-nav mr-auto py-0">
-                            <a href="" class="nav-item nav-link">Home</a>
+                            <a href="/" class="nav-item nav-link">Home</a>
                             <a href="" class="nav-item nav-link">Shop</a>
                             <a href="" class="nav-item nav-link">Shop Detail</a>
                             <div class="nav-item dropdown">
@@ -122,79 +118,20 @@
         </div>
     </div>
     <!-- Navbar End -->
-<!--     
-    <div class="container"> -->
-        <!-- <div class="main-body"> -->
-            <div class="row">
-                <div class="col-lg-3 ">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex row">
-                                <img src="/img/profile.jpg" alt="user" class="rounded-circle p-1 bg-primary" width="80">
-                                <div class=" mt-3 pl-3">
-                                    <span>Hello,</span><h5><%= user.name%></h5>
-                                </div>
-                            </div>
-                            <hr class="my-4">
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                    <a class="mb-0" href="/orders">Orders</a>
-                                    <!-- Add any relevant icons or badges -->
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                    <a class="mb-0">Wishlist</a>
-                                    <!-- Add any relevant icons or badges -->
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                    <a class="mb-0">Coupons</a>
-                                    <!-- Add any relevant icons or badges -->
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                    <a class="mb-0" href="/api/user/logout">Logout</a>
-                                    <!-- Add any relevant icons or badges -->
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-8">
-                    
-                    <div class="card">
-                        <h4 class="text-primary mt-4 pl-3">Personal Information</h4>
 
-                        <form id="editProfileForm" action="/api/user/edit" method="POST">
-                            <div class="row mb-3">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">Full Name</h6>
-                                </div>
-                                <div class="col-sm-9 text-secondary">
-                                    <input type="text" class="form-control" name="name" value="<%= user.name %>">
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">Email</h6>
-                                </div>
-                                <div class="col-sm-9 text-secondary">
-                                    <input type="email" class="form-control" name="email" value="<%= user.email %>" disabled>
-                                </div>
-                            </div>
-                            <!-- Other fields to edit -->
-                            <div class="row">
-                                <div class="col-sm-3"></div>
-                                <div class="col-sm-9 text-secondary">
-                                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
-                                </div>
-                            </div>
-                        </form>
-                        
-                    </div>
-                </div>
-            </div>
-        <!-- </div> -->
-    <!-- </div>
-     -->
-    
+    <div class="container" style="text-align: center; border-radius: 10px; border: 1px solid #ccc; padding: 50px; background-color: rgb(92, 146, 184);">
+        
+       
+           
+        <h1 class="mt-3" style="font-size: 4em; color: #9a2c13; text-align: center; text-transform: uppercase; font-family: Arial, sans-serif; margin-top: 50px; letter-spacing: 5px;">404!</h1>
+        <div class="row thanks " style="margin-top: 20px; margin-left:370px;">
+            <h2 class="text-dark " style="font-size: 2em; color: #ffffff; text-align: center; font-family: Arial, sans-serif; margin-left: 110px; margin-bottom: 30px;">Error</h2>
+   
+        </div>
+        <a class="btn btn-primary px-3" href="/">
+            <i class="fas fa-shopping-cart text-dark"></i>
+            Go To Home</a>
+    </div>
 
 
 
@@ -277,7 +214,6 @@
 
 
 
-
      <!-- JavaScript Libraries -->
      <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script> 
@@ -290,7 +226,5 @@
  
      <!-- Template Javascript -->
      <script src="js/main.js"></script>
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-     
 </html>

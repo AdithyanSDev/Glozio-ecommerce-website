@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { renderHomePage,productsByCategory} = require('../controllers/authController');
 const { renderDetailPage, reviewSubmit ,getRelatedProducts, reviewCount, reviewSave } = require('../controllers/detailController'); 
+const productController=require("../controllers/productController");
 const { verifyToken } = require('../middleware/authMiddleware');
 
 
@@ -16,6 +17,6 @@ router.post('/submit-review', reviewSubmit);
 router.get('/category/:categoryId',verifyToken, productsByCategory);
 
 
-
+router.get('/sortProducts/:sortBy' , productController.getSortedProducts ) ;
 
 module.exports = router;

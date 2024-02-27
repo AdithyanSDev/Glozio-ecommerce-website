@@ -164,3 +164,39 @@ exports.deleteAddress = async (req, res) => {
       res.status(500).json({ error: 'An unexpected error occurred' });
   }
 };
+
+exports.editprofile = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const userId = req.userId;
+
+        // Update user information in the database using async/await
+        const updatedUser = await User.findByIdAndUpdate(userId, { name, email }, { new: true });
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.render('userprofile',{ user: updatedUser });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
+exports.renderEdit = async (req, res) => {
+    try {
+        // Fetch user data from the database based on the user ID
+        const user = await User.findById(req.userId);
+        const addresses = user.addresses;
+        const products = await Product.find({ isDeleted: false });
+        const categories = await Category.find({ isDeleted: false }).populate('products'); 
+        const token = req.cookies.token;
+        // Render the updateprofile.ejs view and pass the user data to it
+        res.render('updateprofile', { user: user ,addresses,products,categories,token});
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};

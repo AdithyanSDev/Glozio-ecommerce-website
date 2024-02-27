@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { redirectToUserLogin, userLogin, registerUser, renderOTPPage, verifyOTP, resendOTP, logout } = require('../controllers/authController');
-const{renderUserprofile,renderAddress,addAddress,renderUpdateAddress, editAddress,deleteAddress,addAddressCheckOut}=require('../controllers/profileController')
+const{renderUserprofile,renderAddress,addAddress,renderUpdateAddress,renderEdit, editAddress,deleteAddress,addAddressCheckOut, editprofile}=require('../controllers/profileController')
 const { verifyToken } = require('../middleware/authMiddleware');
 
 router.get('/signin', redirectToUserLogin);
@@ -16,6 +16,8 @@ router.post('/otp', verifyOTP);
 router.post('/resend-otp',resendOTP );
 router.get('/user/logout',logout)
 router.get('/user/profile', verifyToken, renderUserprofile);
+router.get('/edit',verifyToken,renderEdit)
+router.post('/user/edit',verifyToken,editprofile);
 router.get('/user/address', verifyToken, renderAddress); 
 router.post('/addaddress', verifyToken, addAddress);
 router.post('/addaddresscheckout',verifyToken,addAddressCheckOut);

@@ -183,7 +183,13 @@
                             <label class="custom-control-label" for="price-all">All Price</label>
                             <span class="badge border font-weight-normal"><%= products.length %></span>
                         </div>
-                        <% const priceRanges = [{ min: 0, max: 100 }, { min: 100, max: 200 }, { min: 200, max: 300 }, { min: 300, max: 400 }, { min: 400, max: 500 }]; %>
+                        <% const priceRanges = [
+                        { min: 500, max:2000 }, 
+                        { min: 2000, max: 10000 }, 
+                        { min: 10000, max: 50000 }, 
+                        { min: 50000, max: 1000000 } 
+                    ]; %>
+                    
                         <% priceRanges.forEach((range, index) => { %>
                             <% const filteredProducts = products.filter(product => product.price >= range.min && product.price <= range.max); %>
                             <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
@@ -192,12 +198,30 @@
                                 <span class="badge border font-weight-normal"><%= filteredProducts.length %></span>
                             </div>
                         <% }); %>
-                        <button type="button" class="btn btn-primary" onclick="applyFilter()">Apply</button>
+                        <button type="button" class="btn btn-primary" id="applyFilterBtn">Apply</button>
                     </form>
                     
                     
                 </div>
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by Brand</span></h5>
+                <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                    <input type="checkbox" class="custom-control-input" checked id="brand-all">
+                    <label class="custom-control-label" for="brand-all">All Brands</label>
+                    <span class="badge border font-weight-normal"><%= products.length %></span>
+                </div>
+                <% const uniqueBrands = new Set(); %>
+                <% products.forEach(product => uniqueBrands.add(product.brand)); %>
+                <% Array.from(uniqueBrands).forEach((brand, index) => { %>
+                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                        <input type="checkbox" class="custom-control-input" id="brand-<%= index + 1 %>" data-brand="<%= brand %>">
+                        <label class="custom-control-label" for="brand-<%= index + 1 %>"><%= brand %></label>
+                        <span class="badge border font-weight-normal"><%= uniqueBrands.length %></span>
+                        <!-- Here, you can count the number of products for each brand if needed -->
+                    </div>
+                <% }); %>
+                <button type="button" class="btn btn-primary" id="applyBrandBtn">Apply</button>
                 <!-- Price End -->
+
                 
             </div>
             <!-- Shop Sidebar End -->
@@ -214,7 +238,10 @@
                                     <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Sorting</button>
                                     <div class="dropdown-menu dropdown-menu-right">
                                         <a class="dropdown-item" href="#">Latest</a>
+                                        <a class="dropdown-item" href="#">Price--low-high</a>
+                                        <a class="dropdown-item" href="#">Price--high-low</a>
                                         <a class="dropdown-item" href="#">A-Z</a>
+                                        <a class="dropdown-item" href="#">Z-A</a>
                                         <a class="dropdown-item" href="#">Best Rating</a>
                                     </div>
                                 </div>
@@ -233,10 +260,10 @@
                   <!-- productlist.ejs -->
 
 <div class="container-fluid py-4">
-    <!-- <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3"><%= category.name %> Products</span></h2> -->
+
     <div class="row">
        
-        <% products.forEach(product => { %>
+       <% products.forEach(product => { %>
         <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
             <div class="product-item bg-light mb-4"> <!-- Added the product-item class here -->
                 <div class="product-img position-relative overflow-hidden">
@@ -366,76 +393,32 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
-    <script>
-        
+    
+<script>
+    // Function to apply filter when "Apply" button is clicked
     function applyFilter() {
-        // Get the selected price range checkboxes
-        const selectedRanges = [];
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked && checkbox.id !== 'price-all') {
-                const range = checkbox.id.split('-').pop();
-                selectedRanges.push(parseInt(range));
-            }
+        // Get all checked checkboxes
+        const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+        // Get the selected price ranges
+        const selectedRanges = Array.from(checkedCheckboxes).map(checkbox => {
+            return {
+                min: parseInt(checkbox.dataset.min),
+                max: parseInt(checkbox.dataset.max)
+            };
         });
 
-        // Filter products based on selected ranges
-        const productsContainer = document.querySelector('.row');
-        productsContainer.innerHTML = ''; // Clear existing products
+        // Filter products based on selected price ranges
+        const filteredProducts = selectedRanges.reduce((result, range) => {
+            return result.concat(products.filter(product => product.price >= range.min && product.price <= range.max));
+        }, []);
 
-        if (selectedRanges.length > 0) {
-            products.forEach(product => {
-                const price = product.price;
-                const isInRange = selectedRanges.some(range => {
-                    const min = (range - 1) * 100;
-                    const max = range * 100;
-                    return price >= min && price <= max;
-                });
-                if (isInRange) {
-                    renderProduct(product);
-                }
-            });
-        } else {
-            // If no range selected, display all products
-            products.forEach(product => {
-                renderProduct(product);
-            });
-        }
+        // Display the filtered products (You can replace this part with your logic to display the products)
+        console.log(filteredProducts);
     }
 
-    function renderProduct(product) {
-        const productHtml = `
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        ${product.images.length > 0 ? `<img class="img-fluid w-100 product-image" src="${product.images[0]}" alt="${product.name}">` : `<img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">`}
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="/detail/${product._id}">${product.name}</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$${product.price}</h5>
-                            <h6 class="text-muted ml-2"><del>$${product.discount}</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        const productElement = document.createElement('div');
-        productElement.innerHTML = productHtml;
-        document.querySelector('.row').appendChild(productElement.firstChild);
-    }
+    // Add click event listener to the "Apply" button
+    document.getElementById('applyFilterBtn').addEventListener('click', applyFilter);
 </script>
 
 </body>

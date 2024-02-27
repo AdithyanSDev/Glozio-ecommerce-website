@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
+const Review = require('../models/product')
 const fs = require('fs');
 const path = require('path');
 
@@ -163,3 +164,4 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+

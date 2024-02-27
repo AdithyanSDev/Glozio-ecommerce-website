@@ -3,7 +3,7 @@ const Address = require('../models/address');
 const Order = require('../models/order');
 const Category = require('../models/category')
 const Cart = require('../models/cart')
-
+const Product = require('../models/product')
 
 exports.renderorderPage=async(req,res)=>{
     try {
@@ -17,7 +17,6 @@ exports.renderorderPage=async(req,res)=>{
         res.status(500).send('Internal Server Error');
     }
 }
-
 
 exports.placeOrder = async (req, res) => {
     try {
@@ -57,6 +56,12 @@ exports.placeOrder = async (req, res) => {
             { $pull: { product: { productId: { $in: usercart.product.map(item => item.productId) } } } },
             { new: true }
         );
+
+        // Reduce the stock of ordered products
+        usercart.product.forEach(async (product) => {
+            
+            await Product.findByIdAndUpdate(product.productId, { $inc: { stock: -product.quantity } });
+        });
 
         res.redirect('/orderpage');
     } catch (error) {

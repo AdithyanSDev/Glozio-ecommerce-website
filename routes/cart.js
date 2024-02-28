@@ -9,7 +9,7 @@ const {verifyToken } = require('../middleware/authMiddleware');
 
 router.get('/cart',verifyToken, cartController.renderCartPage);
 router.post('/addcart',verifyToken, cartController.addToCart);
-router.put('/cart/:productId/increase', verifyToken, cartController.increaseQuantity);
+router.put('/api/cart/:productId', verifyToken, cartController.updateCartQuantity);
 router.delete('/cart/remove/:productId', verifyToken, cartController.removeFromCart);
 
 //checkout

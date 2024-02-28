@@ -95,30 +95,32 @@ exports.addToCart = async (req, res) => {
 };
 
 
-exports.increaseQuantity = async (req, res) => {
+exports.updateCartQuantity = async (req, res) => {
+    
     try {
         const productId = req.params.productId;
-        const userId = req.userId;
+        const newQuantity = parseInt(req.body.quantity);
         
-        let cart = await Cart.findOne({ user: userId });
-
-        if (cart) {
-            const cartItem = cart.product.find(item => item.productId.equals(productId));
-            if (cartItem) {
-                cartItem.quantity += 1;
-                await cart.save();
-                res.status(200).json({ message: 'Quantity increased successfully', cart });
-            } else {
-                res.status(404).json({ message: 'Cart item not found' });
-            }
-        } else {
-            res.status(404).json({ message: 'Cart not found' });
+       
+        // Update the quantity of the specified product in the cart
+        const updatedCart = await Cart.findOneAndUpdate(
+            { "product.productId": productId }, // Find the cart item by product ID
+            { $set: { "product.$.quantity": newQuantity } }, // Update the quantity of the matched product
+            { new: true }
+        );
+        console.log("usgda ")
+        if (!updatedCart) {
+            return res.status(404).json({ message: `Cart item with product ID ${productId} not found.` });
         }
+
+        // Respond with success message
+        res.status(200).json({ message: "Cart quantity updated successfully." });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: "Internal server error." });
     }
 };
+
 exports.removeFromCart = async (req, res) => {
     try {
         const productId = req.params.productId;

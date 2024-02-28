@@ -193,10 +193,9 @@
                     </thead>
                     <!-- Table body -->
                     <tbody class="align-middle">
-
                         <% usercart.forEach(cartItem => { %>
                             <% cartItem.product.forEach(product => { %>
-                                <tr>
+                                <tr class="product" data-product-id="<%= product.productId._id %>">
                                     <!-- Product details -->
                                     <td class="align-middle">
                                         <img src="<%= product.productId.images[0] %>" alt="<%= product.productId.name %>" style="width: 50px;">
@@ -204,21 +203,23 @@
                                     </td>
                                     <td class="align-middle">₹<%= product.productId.price %></td>
                                     <td class="align-middle">
-                                       <% if (product.productId.stock > 0) { %>
+                                        <% if (product.productId.stock > 0) { %>
                                             <!-- If the product is in stock -->
-                                            <div class="input-group quantity mx-auto" style="width: 100px;">
-                                                <div class="input-group-btn">
-                                                    <button class="btn btn-sm btn-primary btn-minus">
-                                                        <i class="fa fa-minus"></i>
-                                                    </button>
+                                            <div class="d-flex flex-row">
+                                                <div class="input-group quantity mb-1 row" style="width: 180px;">
+                                                    <div class="input-group-btn col">
+                                                        <button class="btn btn-sm btn-minus btn-primary" style="margin-left: 20px;">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+                                                    </div>
+                                                    <input type="number" class="col form-control form-control-sm add text-center border-0" value="<%= product.quantity %>" min="1" max="<%= product.productId.stock %>" id="quantityInput" name="quantity" data-id="<%= product.productId._id %>" >
+                                                    <div class="input-group-btn col">
+                                                        <button class="btn btn-sm btn-plus btn-primary">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value="<%= product.quantity %>">
-                                                <div class="input-group-btn">
-                                                    <button class="btn btn-sm btn-primary btn-plus">
-                                                        <i class="fa fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                     </div>
+                                            </div>
                                         <% } else { %>
                                             <!-- If the product is out of stock -->
                                             <div class="text-danger">Out of Stock</div>
@@ -235,6 +236,7 @@
                             <% }); %>
                         <% }); %>
                     </tbody>
+                    
                 </table>
             <% } else { %>
                 <!-- No products message -->
@@ -377,6 +379,64 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        //update quantity
+        
+     // Function to update cart item quantity via AJAX
+     function updateCartQuantity(productId, newQuantity) {
+     
+         $.ajax({
+             url: `/api/cart/${productId}`,
+             method: "PUT",
+             data: { quantity: newQuantity },
+             success: function(response) {
+                 console.log("Cart item quantity updated successfully");
+                 // Reload the page to reflect the updated cart
+                 location.reload();
+             },
+             error: function(xhr, status, error) {
+                 console.error("Error updating cart item quantity:", xhr.responseText);
+                 // Handle error here, if needed
+             }
+         });
+     }
+ 
+     // Event listener for decrement button
+     $(document).on('click', '.btn-minus', function() {
+         var quantityInput = $(this).closest('.quantity').find('input');
+         var currentQuantity = parseInt(quantityInput.val());
+         if (currentQuantity > 1) {
+             currentQuantity -= 1;
+             quantityInput.val(currentQuantity);
+             var productId = quantityInput.attr('data-id');
+             updateCartQuantity(productId, currentQuantity);
+         }
+     });
+ 
+     // Event listener for increment button
+     $(document).on('click', '.btn-plus', function() {
+         var quantityInput = $(this).closest('.quantity').find('input');
+         var currentQuantity = parseInt(quantityInput.val());
+         var maxQuantity = parseInt(quantityInput.attr('max'));
+         if (currentQuantity < maxQuantity) {
+             currentQuantity += 1;
+             quantityInput.val(currentQuantity);
+             var productId = quantityInput.attr('data-id');
+             updateCartQuantity(productId, currentQuantity);
+         } else {
+             // Handle maximum quantity reached
+             alert("You have reached the maximum quantity allowed.");
+         }
+     });
+ 
+     // Event listener for quantity input field
+     $(document).on('change', '.quantity input', function() {
+         var productId = $(this).attr('data-id');
+         var newQuantity = parseInt($(this).val());
+         updateCartQuantity(productId, newQuantity);
+     });
+
+     //remove from cart
+
         $(document).ready(function() {
             $('.remove-cart-product').click(function() {
                 var productId = $(this).data('product-id');
@@ -397,8 +457,11 @@
             });
         });
     </script>
-    
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
  
+ </script>
+ 
+    
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -413,34 +476,7 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
       
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const plusButtons = document.querySelectorAll('.btn-plus');
-
-    plusButtons.forEach(button => {
-        button.addEventListener('click', async () => {
-            const productId = button.getAttribute('data-product-id');
-
-            try {
-                const response = await fetch(`/cart/${productId}/increase`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to increase product quantity');
-                }
-                // Reload the page to reflect the updated quantity
-                window.location.reload();
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        });
-    });
-});
-
-</script>   
+  
 </body>
 
 </html>

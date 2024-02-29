@@ -46,7 +46,12 @@ exports.showEditCategoryForm = async (req, res) => {
 };
 
 exports.editCategory = async (req, res) => {
+  const { name} = req.body;
   try {
+    const existingCategory = await Category.findOne({ name });
+    if (existingCategory) {
+      return res.status(400).send('Category already exists');
+    }
     const categoryId = req.params.categoryId;
     const category = await Category.findById(categoryId);
     res.render('category/edit', { category }); // This line renders the edit.ejs template with the category data

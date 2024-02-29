@@ -4,6 +4,7 @@ const router = express.Router();
 const users = require('../models/user')
 const cartController = require('../controllers/cartController');
 const orderController = require('../controllers/orderController');
+const wishlistController = require('../controllers/wishlistController');
 const {verifyToken } = require('../middleware/authMiddleware');
 
 
@@ -22,5 +23,12 @@ router.post('/placeorder',verifyToken, orderController.placeOrder);
 router.get('/orders',verifyToken,orderController.renderOrderList)
 router.get('/orderlist',verifyToken,orderController.listUserOrders)
 router.post('/orders/cancel',verifyToken,orderController.cancelOrder)
+
+// wishlist routes
+router.get('/wishlist', verifyToken,wishlistController.getWishlist);
+router.post('/wishlist/add',verifyToken, wishlistController.addToWishlist);
+router.get('/wishlistremove/:productid',verifyToken, wishlistController.removeFromWishlist);
+
+
 
 module.exports = router;

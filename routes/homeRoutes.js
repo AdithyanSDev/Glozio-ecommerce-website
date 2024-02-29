@@ -15,7 +15,7 @@ router.get('/review/:productId',reviewCount );
 router.post('/review/:productId',reviewSave);
 router.post('/submit-review', reviewSubmit); 
 router.get('/category/:categoryId',verifyToken, productsByCategory);
-
+router.get('/shop',verifyToken, productController.getAllProducts);
 
 router.get('/sortProducts/:sortBy' , productController.getSortedProducts ) ;
 

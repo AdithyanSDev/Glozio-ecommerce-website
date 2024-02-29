@@ -34,7 +34,11 @@ exports.showAddProductForm = async (req, res) => {
 exports.addProduct = async (req, res) => {
   try {
     const { name, description, price, discount, category, stock, highlights, brand } = req.body;
-
+    
+    const existingProduct = await Product.findOne({ name });
+    if (existingProduct) {
+      return res.status(400).send('Product already exists');
+    }
     // Log the received files
     console.log('Received files:', req.files);
 
@@ -94,7 +98,6 @@ exports.addProduct = async (req, res) => {
 
 
 // editProduct controller method
-
 exports.editProduct = async (req, res, next) => {
   try {
     const productId = req.params.productId;
@@ -102,6 +105,12 @@ exports.editProduct = async (req, res, next) => {
     const product = await Product.findById(productId); // Fetch the product
     if (!product) {
       return res.status(404).send('Product not found');
+    }
+
+    // Check if there are other products with the same name
+    const existingProduct = await Product.findOne({ name: updates.name, _id: { $ne: productId } });
+    if (existingProduct) {
+      return res.status(400).send('Another product with the same name already exists');
     }
 
     // Handle image deletion
@@ -206,3 +215,26 @@ exports.getSortedProducts = async (req, res) => {
       res.status(500).json({ message: 'Internal server error'});
 }
 };
+
+exports.getAllProducts = async (req, res) => {
+  try {
+      const products = await Product.find({ isDeleted: false });
+      // Fetch review counts for each product
+      const productReviewCounts = await Promise.all(products.map(async product => {
+          const reviewCount = await Review.countDocuments({ productId: product._id });
+          return { productId: product._id, reviewCount };
+      }));
+
+      // Create a map of product IDs to review counts for easy access
+      const reviewCountMap = productReviewCounts.reduce((map, obj) => {
+          map[obj.productId] = obj.reviewCount;
+          return map;
+      }, {});
+
+      // Pass the reviewCountMap to the template
+      res.render('shop', { products, reviewCountMap }); // Include reviewCountMap here
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+}

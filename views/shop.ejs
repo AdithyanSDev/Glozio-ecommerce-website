@@ -301,24 +301,38 @@
     <script src="lib/easing/easing.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const productList = document.getElementById('productList');
-        const sortBySelect = document.getElementById('sortBySelect');
+   
+    <!-- Contact Javascript File -->
+    <script src="mail/jqBootstrapValidation.min.js"></script>
+    <script src="mail/contact.js"></script>
 
-        sortBySelect.addEventListener('change', async () => {
-            const sortByValue = sortBySelect.value;
-            try {
-                const response = await fetch(`/sortProducts/${sortByValue}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const sortedProducts = await response.json();
-                renderProducts(sortedProducts);
-            } catch (error) {
-                console.error('Error fetching sorted products:', error);
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const productList = document.getElementById('productList');
+    const sortBySelect = document.getElementById('sortBySelect');
+
+    // Ensure that the event listener is properly attached
+    sortBySelect.addEventListener('change', async () => {
+        // Retrieve the selected value from the dropdown
+        const sortByValue = sortBySelect.value;
+        console.log(sortByValue); // Check if the value is correctly retrieved
+
+        try {
+            // Make sure the endpoint matches the one you've set up in your backend
+            const response = await fetch(`/sortProducts/${sortByValue}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-        });
+            const sortedProducts = await response.json();
+            renderProducts(sortedProducts);
+        } catch (error) {
+            console.error('Error fetching sorted products:', error);
+        }
+    });
 
         // Function to render products
         function renderProducts(products) {
@@ -326,7 +340,7 @@
             products.forEach(product => {
                 // Create product HTML dynamically
                 const productHTML = `
-                    <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                    <div class="col-lg-2 col-md-3 col-sm-5 pb-1">
                         <div class="product-item bg-light mb-4">
                             <div class="product-img position-relative overflow-hidden">
                                 ${product.images.length > 0 ? `<img class="img-fluid w-100 product-image" src="/${product.images[0]}" alt="${product.name}">` : `<img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">`}
@@ -359,43 +373,6 @@
         }
     });
 </script>
-
-    <!-- Contact Javascript File -->
-    <script src="mail/jqBootstrapValidation.min.js"></script>
-    <script src="mail/contact.js"></script>
-
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
-    
-<script>
-    // Function to apply filter when "Apply" button is clicked
-    function applyFilter() {
-        // Get all checked checkboxes
-        const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-
-        // Get the selected price ranges
-        const selectedRanges = Array.from(checkedCheckboxes).map(checkbox => {
-            return {
-                min: parseInt(checkbox.dataset.min),
-                max: parseInt(checkbox.dataset.max)
-            };
-        });
-
-        // Filter products based on selected price ranges
-        const filteredProducts = selectedRanges.reduce((result, range) => {
-            return result.concat(products.filter(product => product.price >= range.min && product.price <= range.max));
-        }, []);
-
-        // Display the filtered products (You can replace this part with your logic to display the products)
-        console.log(filteredProducts);
-    }
-
-    // Add click event listener to the "Apply" button
-    document.getElementById('applyFilterBtn').addEventListener('click', applyFilter);
-</script>
-
-
-
 
 
 

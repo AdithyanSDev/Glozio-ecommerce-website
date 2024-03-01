@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Coupon = require('../models/coupen');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
@@ -103,5 +104,16 @@ exports.adminlogout = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal server error');
+  }
+};
+
+
+exports.createCoupon = async (req, res) => {
+  try {
+    const coupon = await Coupon.create(req.body);
+    res.status(201).json(coupon);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };

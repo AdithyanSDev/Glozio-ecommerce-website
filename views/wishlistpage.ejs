@@ -182,12 +182,12 @@
                                     </div>
                                     <div class="col-md-12 d-flex justify-content-center justify-content-md-end">
                                         <a href="/wishlistremove/<%= item.product.id %>" class="btn btn-danger btn-sm">
-                                            <i class="fa-solid fa-trash"></i> Remove
+                                            <i class="fa-solid fa-trash"></i>
                                         </a>
                                         
                                     </div>
                                     
-                                    <p>Selling Price: ₹<%= item.product.sellingPrice.toFixed(2) %> <small class="text-muted ml-2"><del>₹<%= item.product.price %></del> <span><!-- Insert discount here --></span></small></p>
+                                    <p><strong>₹<%= item.product.sellingPrice.toFixed(2) %></strong>  <span class="text-muted ml-2"><del>₹<%= item.product.price %></del> <span class="text-success"><%= item.product.discount%>% off</span></span></p>
                                    
                                 </div>
                             </div>

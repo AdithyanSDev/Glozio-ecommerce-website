@@ -378,23 +378,24 @@
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const productList = document.getElementById('productList');
-        const sortBySelect = document.getElementById('sortBySelect');
-
-        sortBySelect.addEventListener('change', async () => {
-            const sortByValue = sortBySelect.value;
-            try {
-                const response = await fetch(`/sortProducts/${sortByValue}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const sortedProducts = await response.json();
-                renderProducts(sortedProducts);
-            } catch (error) {
-                console.error('Error fetching sorted products:', error);
+   document.addEventListener('DOMContentLoaded', () => {
+    const productList = document.getElementById('productList');
+    const sortBySelect = document.getElementById('sortBySelect');
+    const categoryId = "<%= categoryId %>"; // Fetch the category ID from your server-side data
+console.log(categoryId,"dkfudou")
+    sortBySelect.addEventListener('change', async () => {
+        const sortByValue = sortBySelect.value;
+        try {
+            const response = await fetch(`/sortProductsCategory/${categoryId}/${sortByValue}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-        });
+            const sortedProducts = await response.json();
+            renderProducts(sortedProducts);
+        } catch (error) {
+            console.error('Error fetching sorted products:', error);
+        }
+    });
 
         // Function to render products
         function renderProducts(products) {

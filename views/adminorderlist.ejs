@@ -137,13 +137,13 @@
                   <td><%= order.orderDate.toDateString() %></td>
                   <td>₹<%= item.productId.price %></td>
                   <td>
-                    <select class="form-select" id="orderStatus<%= index %>" name="orderStatus" onchange="updateOrderStatus('<%= order._id %>', this.value)">
-                      <option value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                      <option value="Processing" <%= order.orderStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
-                      <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                      <option value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                      <option value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                      <option value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                    <select class="form-select" id="orderStatus<%= index %>" name="orderStatus" onchange="updateOrderStatus('<%= order._id %>', this.value)" style="color: cornsilk;">
+                      <option class="text-dark" value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                      <option class="text-dark value="Processing" <%= order.orderStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
+                      <option class="text-dark value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                      <option class="text-dark value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                      <option class="text-dark value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                      <option class="text-dark value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
                     </select>
                   </td>
                   <td><%= order.paymentMethod %></td>

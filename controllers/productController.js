@@ -177,9 +177,9 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getSortedProducts = async (req, res) => {
   const { categoryId } = req.params;
-    const { sortBy } = req.query;
+    const  sortBy  = req.params.sortId;
   
-
+console.log(sortBy);
 
   try {
       let sortedProducts;
@@ -191,16 +191,16 @@ exports.getSortedProducts = async (req, res) => {
               sortedProducts = await Product.find().sort({_id:1});
               break;
           case 'price-low-to-high':
-              sortedProducts = await Product.find().sort({ total_price: 1 });
+              sortedProducts = await Product.find().sort({ sellingPrice: 1 });
               break;
           case 'price-high-to-low':
-              sortedProducts = await Product.find().sort({ total_price: -1 });
+              sortedProducts = await Product.find().sort({ sellingPrice: -1 });
               break;
           case 'a-to-z':
-              sortedProducts = await Product.find().sort({ product_name: 1 });
+              sortedProducts = await Product.find().sort({ name: 1 });
               break;
           case 'z-to-a':
-              sortedProducts = await Product.find().sort({ product_name: -1 });
+              sortedProducts = await Product.find().sort({ name: -1 });
               break;
           case 'newest-first':
               sortedProducts = await Product.find().sort({ _id: -1 });
@@ -208,7 +208,7 @@ exports.getSortedProducts = async (req, res) => {
           default:
               sortedProducts = await Product.find();
       }
-
+console.log(sortedProducts)
       res.json(sortedProducts);
   } catch (error) {
       console.error(error);
@@ -238,3 +238,42 @@ exports.getAllProducts = async (req, res) => {
       res.status(500).send('Internal Server Error');
   }
 }
+// Get sorted products by category
+exports.getSortProductsCategory = async (req, res) => {
+  const categoryId = req.params.categoryId;
+  const sortBy = req.params.sortByValue;
+
+  console.log(categoryId);
+  console.log(sortBy);
+
+  try {
+    let sortedProducts;
+    switch (sortBy) {
+      case 'popularity':
+        sortedProducts = await Product.find({ category: categoryId }).sort({ _id: 1 });
+        break;
+      case 'price-low-to-high':
+        sortedProducts = await Product.find({ category: categoryId }).sort({ sellingPrice: 1 });
+        break;
+      case 'price-high-to-low':
+        sortedProducts = await Product.find({ category: categoryId }).sort({ sellingPrice: -1 });
+        break;
+      case 'a-to-z':
+        sortedProducts = await Product.find({ category: categoryId }).sort({ name: 1 });
+        break;
+      case 'z-to-a':
+        sortedProducts = await Product.find({ category: categoryId }).sort({ name: -1 });
+        break;
+      case 'newest-first':
+        sortedProducts = await Product.find({ category: categoryId }).sort({ _id: -1 });
+        break;
+      default:
+        sortedProducts = await Product.find({ category: categoryId });
+    }
+    console.log(sortedProducts);
+    res.json(sortedProducts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

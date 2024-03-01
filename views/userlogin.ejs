@@ -6,6 +6,7 @@
     <title>GLOZIO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.0/dist/sweetalert2.all.min.js"></script>
 </head>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -306,7 +307,7 @@
                   <span>or use your email password</span>
                   <input type="email" placeholder="Email" name="email">
                   <input type="password" placeholder="Password" name="password">
-                  <!-- <a href="#">Forget Your Password?</a> -->
+                  <!-- <a href="/api/forgot-password">Forget Your Password?</a> -->
                   <button type="submit">Sign In</button>
               </form>
           </div>
@@ -314,7 +315,7 @@
               <div class="toggle">
                   <div class="toggle-panel toggle-left">
                       <h1>Welcome to Glozio</h1>
-                      <p>Enter your personal details </p>
+                      <p>Enter your personal    details </p>
                       <button class="hidden" id="login">Sign In</button>
                   </div>
                   <div class="toggle-panel toggle-right">
@@ -325,6 +326,22 @@
               </div>
           </div>
       </div>
+
+      <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('error'); // Change 'message' to 'msg'
+        if (typeof message !== 'undefined') {
+            if (message.includes('passw')) {
+                Swal.fire({
+                    icon: "failure",
+                    title: "Password Wrong",
+                    confirmButtonText: "Ok",
+                });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    </script>
+    
       
       <script>
         const container = document.getElementById('container');

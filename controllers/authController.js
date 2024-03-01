@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer')
 const Product = require('../models/product');
 const Category= require('../models/category')
 const Review = require('../models/review');
+const Coupon = require('../models/coupen');
 
 
 
@@ -61,7 +62,7 @@ exports.userLogin = async (req, res) => {
       }
     }
 
-    res.render('home', { error: 'Invalid email or password' });
+    res.redirect('/api/user/login?error=passw');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -245,5 +246,94 @@ exports.productsByCategory = async (req, res) => {
   }
 };
 
+exports.renderChangePasswordPage = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const products = await Product.find({ isDeleted: false });
+    const categories = await Category.find({ isDeleted: false }).populate('products'); 
+    const token = req.cookies.token;
+    res.render('changepassword',{token,categories,user});
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 
+
+// Change password route handler
+exports.changePassword = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { currentPassword, newPassword } = req.body;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    // Verify if the current password matches the user's password
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!passwordMatch) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password in the database
+    user.password = hashedPassword;
+    await user.save();
+
+    res.redirect('/api/user/profile')
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.renderForgotPasswordPage = async (req, res) => {
+  try {
+    res.render('forgotpassword');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+// Function to handle sending password reset email
+exports.sendPasswordResetEmail = async (req, res) => {
+  try {
+      const { email } = req.body;
+      // Check if the user with the provided email exists
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      // Generate a unique token for password reset
+      const resetToken = generateUniqueToken(); // Implement this function
+      // Set the token and expiry time in the user document
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+      await user.save();
+      // Send password reset email
+      await sendPasswordResetEmail(user.email, resetToken); // Implement this function
+      res.status(200).json({ message: 'Password reset email sent successfully' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+exports.applyCoupon = async (req, res) => {
+  try {
+    const { code } = req.body;
+    const coupon = await Coupon.findOne({ code });
+    // Validate coupon and apply discount to order total
+    res.status(200).json({ message: 'Coupon applied successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

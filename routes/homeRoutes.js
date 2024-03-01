@@ -17,6 +17,8 @@ router.post('/submit-review', reviewSubmit);
 router.get('/category/:categoryId',verifyToken, productsByCategory);
 router.get('/shop',verifyToken, productController.getAllProducts);
 
-router.get('/sortProducts/:sortBy' , productController.getSortedProducts ) ;
+router.get('/sortProducts/:sortId' , productController.getSortedProducts ) ;
+router.get('/sortProductsCategory/:categoryId/:sortByValue', productController.getSortProductsCategory);
+
 
 module.exports = router;

@@ -194,15 +194,18 @@
                         <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
                         <td>₹<%= order.totalAmount %></td>
                         <td><%= item.quantity %></td>
-                        <td><%=  order.orderDate.toDateString() %></td>
+                        <td><%= order.orderDate.toDateString() %></td>
                         <td><%= order.orderStatus %></td>
                         <td>
-                            <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
+                            <% if (order.orderStatus !== 'Cancelled') { %>
+                                <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
+                            <% } %>
                         </td>
                     </tr>
                 <% }); %>
             <% }); %>
         </tbody>
+        
         
         
       </table>

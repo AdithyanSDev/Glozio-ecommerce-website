@@ -10,7 +10,7 @@ router.get('/', renderHomePage);
 router.get('/detail', (req, res) => {
     res.render('detail'); 
 });
-router.get('/detail/:productId', renderDetailPage);
+router.get('/detail/:productId',verifyToken, renderDetailPage);
 router.get('/review/:productId',reviewCount );
 router.post('/review/:productId',reviewSave);
 router.post('/submit-review', reviewSubmit); 

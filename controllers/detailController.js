@@ -1,29 +1,35 @@
 // detailController.js
-
 const Product = require('../models/product');
 const Review = require('../models/review');
 const Category = require('../models/category');
+const Cart = require('../models/cart');
+
+
 
 exports.renderDetailPage = async (req, res) => {
   try {
-    const productId = req.params.productId;
-    const product = await Product.findById(productId);
-    console.log("hehe",product)
-    // Fetch reviews for the product
-    const reviews = await Review.find({ productId });
+      const productId = req.params.productId;
+      const product = await Product.findById(productId);
+      // Fetch reviews for the product
+      const reviews = await Review.find({ productId });
 
-    // Fetch reviews count for the product
-    const reviewCount = await Review.countDocuments({ productId });
-    const token = req.cookies.token;
-    // Fetch related products based on the current product's category
-    const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
+      // Fetch reviews count for the product
+      const reviewCount = await Review.countDocuments({ productId });
+      const token = req.cookies.token;
+      const userId = req.userId; 
 
-    // Render the detail page and pass the product object, reviews, and reviewCount
-    res.render('detail', { product, reviews, reviewCount, relatedProducts,token });
+      // Fetch related products based on the current product's category
+      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
+
+      // Fetch user's cart
+      const usercart = await Cart.find({ user: userId }).populate('product.productId');
+      res.render('detail', { product, reviews, reviewCount, relatedProducts, token, usercart});
+
+
 
   } catch (error) {
-    console.error(error);
-   res.render('404page')
+      console.error(error);
+      res.render('404page');
   }
 };
 

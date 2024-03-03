@@ -137,9 +137,9 @@
                                     </div>
                                 </td>
                                 <td><%= product.category ? product.category.name : 'Uncategorized' %></td>
-                                <td>₹<%= product.price.toFixed(2) %></td>
+                                <td>₹<%= Math.round(product.price) %></td>
                                 <td><%= product.discount %>%</td>
-                                <td>₹<%= product.sellingPrice.toFixed(2) %></td>
+                                <td>₹<%= Math.round(product.sellingPrice) %> </td>
                                 <td><%= product.stock %></td>
                                 <td>
                                     <a href="/admin/products/<%= product._id %>/edit" class="btn btn-link text-white px-3 mb-0">

@@ -216,12 +216,14 @@
                         <small class="pt-1"><%= reviewCount %></small>
                     </div>
                     <h3 class="font-weight-semi-bold mb-4">
-                        ₹<%= product.sellingPrice.toFixed(2) %> 
-                        <small class="text-muted ml-2">
-                            <del>₹<%= product.price %></del> 
-                          
-                        </small>
+                        ₹<%= Math.round(product.sellingPrice) %> 
+                        <% if (product.discount > 0) { %>
+                            <small class="text-muted ml-2">
+                                <del>₹<%= Math.round(product.price) %></del> 
+                            </small>
+                        <% } %>
                     </h3>
+                    
                     
                     
                     <p class="font-weight-bold mb-2 <%= product.stock === 0 ? 'text-danger' : 'text-success' %>">

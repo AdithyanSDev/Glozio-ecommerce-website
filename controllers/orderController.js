@@ -157,3 +157,24 @@ exports.updateOrderStatus = async (req, res) => {
     }
   };
 
+       exports.orderdetails = async (req, res) => {
+    try {
+        const { orderId, productId } = req.params;
+        const userId = req.userId; 
+        const categories = await Category.find({ isDeleted: false }).populate('products');
+        const token = req.cookies.token;
+
+        // Fetch order details including the address information
+        const order = await Order.findById(orderId).populate('shippingAddress');
+
+        // Fetch product details
+        const product = await Product.findById(productId); // Assuming you have a Product model
+        
+        res.render('orderdetails', { orderId, productId, categories, token, order, product });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+

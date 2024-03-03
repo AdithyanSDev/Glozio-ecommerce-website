@@ -155,7 +155,7 @@
      <div class="container mt-5">
         <h2>Edit Address</h2>
         <!-- Address Form -->
-        <form action="/api/addresses/<%= address._id %>" method="POST">
+        <form action="/api/addresses/<%= address._id %>" method="POST" id="updateAddressForm">
             <!-- Name and Mobile Number -->
             <div class="form-group">
                 <label for="name">Name</label>
@@ -201,6 +201,7 @@
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary">Update Address</button>
         </form>
+        
     </div>
  
   <!-- Footer Start -->
@@ -301,8 +302,38 @@
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const updateAddressForm = document.getElementById('updateAddressForm');
+        const formInputs = updateAddressForm.querySelectorAll('input, select');
+
+        updateAddressForm.addEventListener('submit', function (event) {
+            // Loop through each form input and trim white spaces
+            formInputs.forEach(input => {
+                if (input.value.trim() !== input.value) {
+                    // Update input value with trimmed value
+                    input.value = input.value.trim();
+                }
+            });
+
+            // Optional: Perform additional form validation here
+            
+            // Example: Check if mobile number is valid
+            const mobileNumberInput = document.getElementById('mobileNumber');
+            const mobileNumber = mobileNumberInput.value;
+            const mobileNumberRegex = /^[0-9]{10}$/;
+            if (!mobileNumberRegex.test(mobileNumber)) {
+                event.preventDefault(); // Prevent form submission
+                alert('Please enter a valid mobile number.');
+                return; // Stop further execution
+            }
+
+            // Example: Add more validation checks for other fields if needed
+        });
+    });
+</script>
+
 </body>
 
 </html>
-</body>
-</html>
+

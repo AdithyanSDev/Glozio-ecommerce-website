@@ -9,6 +9,7 @@ const Coupon = require('../models/coupen');
 
 
 
+
 exports.renderHomePage = async (req, res) => {
   try {
     const products = await Product.find({ isDeleted: false });

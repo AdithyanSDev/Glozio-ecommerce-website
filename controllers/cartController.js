@@ -3,6 +3,7 @@ const Product = require('../models/product')
 const Cart = require('../models/cart')
 const User = require('../models/user')
 const Address=require('../models/address')
+const Wallet=require('../models/wallet')
 
 
 exports.renderCartPage = async (req, res) => {
@@ -178,10 +179,10 @@ exports.renderCheckout = async (req, res) => {
             }));
 
             const address = await Address.find({ user: userId });
-
+            const wallet = await Wallet.findOne({ userId });
             console.log("cart", usercart);
 
-            res.render('checkout', { user, usercart, subtotal, token, categories, address, productsInfo });
+            res.render('checkout', { user, usercart, subtotal, token, categories, address, productsInfo,wallet });
         }
     } catch (error) {
         console.error(error);

@@ -32,51 +32,10 @@
 
     <!-- Topbar Start -->
     <div class="container-fluid">
-        <div class="row bg-secondary py-1 px-xl-5">
-            <div class="col-lg-6 d-none d-lg-block">
-                <div class="d-inline-flex align-items-center h-100">
-                    <a class="text-body mr-3" href="">About</a>
-                    <a class="text-body mr-3" href="">Contact</a>
-                    <a class="text-body mr-3" href="">Help</a>
-                    
-                </div>
-            </div>
-            <div class="col-lg-6 text-center text-lg-right">
-                <div class="d-inline-flex align-items-center">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                            <% if (token !== undefined) { %>
-                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/profile'">Profile</button>
-                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/logout'">Logout</button>
-                            <% } else { %>
-                                <button class="dropdown-item" type="button" onclick="window.location.href='/api/user/login'">Sign in</button>
-                            <% } %>
-                        </div>
-                    </div>
-                    
-                    
-                   
-                </div>
-                <div class="d-inline-flex align-items-center d-block d-lg-none">
-                   
-                        <a href="" class="btn px-0 ml-2">
-                            <i class="fas fa-heart text-dark"></i>
-                            <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
-                        </a>
-                        <a href="/cart" class="btn px-0 ml-2">
-                            <i class="fas fa-shopping-cart text-dark"></i>
-                            <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
-                        </a>
-                   
-                </div>
-                
-                
-            </div>
-        </div>
+     
         <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
             <div class="col-lg-4">
-                <a href="" class="text-decoration-none">
+                <a href="/" class="text-decoration-none">
                     <span class="h1 text-uppercase text-black bg-white px-2">Glozio</span>
 
 
@@ -173,56 +132,116 @@
             <nav class="breadcrumb bg-light mb-30">
                 <a class="breadcrumb-item text-dark" href="/">Home</a>
                 <a class="breadcrumb-item text-dark" href="/api/user/profile">Profile</a>
-                <span class="breadcrumb-item active">OrderDetail</span>
+                <span class="breadcrumb-item active">Wallet</span>
             </nav>
         </div>
     </div>
 </div>
 <!-- Breadcrumb End -->
-<div class="container p-3 my-3 col-8 shadow-sm">
-    <h5>Delivery Address:</h5>
-    <div class="address-type">
-        <span class="address-type-badge bg-secondary text-dark px-2 py-1 rounded"><%= order.shippingAddress.addressType %></span>
-    </div>
-    <div class="address-details">
-        <div class=" row name-phone mt-2">
-            <strong class="ml-3"> <%= order.shippingAddress.name %></strong>
-            <strong class="ml-3"> <%= order.shippingAddress.mobileNumber %></strong>
+<div class="row">
+    <div class="col-lg-3 ">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex row">
+                    <img src="/img/profile.jpg" alt="user" class="rounded-circle p-1 bg-primary" width="80">
+                    <div class=" mt-3 pl-3">
+                        <span>Hello,</span><h5><%= user.name%></h5>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap active">
+                        <a class="mb-0 text-dark" href="/wallet">Wallet</a>
+                        <!-- Add any relevant icons or badges -->
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <a class="mb-0" href="/orders">Orders</a>
+                        <!-- Add any relevant icons or badges -->
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <a href="/wishlist" class="mb-0">Wishlist</a>
+                        <!-- Add any relevant icons or badges -->
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <a class="mb-0">Coupons</a>
+                        <!-- Add any relevant icons or badges -->
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap dropdown">
+                        <a class="mb-0 dropdown-toggle" href="#" role="button" id="additionalSettingsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Additional settings</a>
+                        <!-- Add any relevant icons or badges -->
+                        <div class="dropdown-menu" aria-labelledby="additionalSettingsDropdown">
+                            <a class="dropdown-item" href="/api/user/resetpassword">Password settings</a>
+                            <!-- Add other dropdown items here if needed -->
+                        </div>
+                    </li>
+                    
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <a class="mb-0" href="/api/user/logout">Logout</a>
+                        <!-- Add any relevant icons or badges -->
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="full-address">
-            <%= order.shippingAddress.address %>, <%= order.shippingAddress.locality %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %>, <%= order.shippingAddress.pincode %>
-        </div>
     </div>
-    <!-- Other order details -->
-</div>
-
-
-<div class="container p-3 my-3 col-8 shadow-sm">
-    <!-- Product Details -->
-  
-    <div class="product-details d-flex justify-content-start align-items-center mb-3">
-        <!-- Product Image -->
-        <img src="/<%= product.images[0] %>" alt="<%= product.name %>" class="mr-3" style="width: 100px; height: 100px;">
-        <!-- Product Name -->
-        <div>
-            <h5 class="mb-1"><%= product.name %></h5>
-            <p class="mb-1">Brand:  <%=product.brand %></p>
+    <div class="col-lg-8">
+        <div class="card">
+            <h4 class="text-primary mt-4 pl-3">Your Wallet</h4>
+            <!-- Wallet Balance -->
+            <div class="col-4 mx-auto">
+                <div style="background-color: green; padding: 10px; text-align: center;">
+                    <h2 style="color: white;">₹<%= wallet.balance %></h2>
+                    <p style="color: white;">Available balance</p>
+                </div>
+            </div>
+            <!-- Latest Transactions -->
+            <div class="mt-4">
+                <h5 class="text-primary">Latest Transactions</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">Order ID</th>
+                                <th scope="col">Product</th>
+                                <th scope="col">Status</th>
+                                <!-- Add more table headers as needed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.forEach(order => { %>
+                                <% if (order.paymentMethod === 'Wallet') { %>
+                                    <tr>
+                                        <td><%= order._id %></td>
+                                        <td><%= order.orderedItems[0].productId.name %></td>
+                                        <td>
+                                            <% if (order.orderStatus === 'Cancelled') { %>
+                                               
+                                                    <span class="text-success">+ ₹<%=  Math.round(order.totalAmount) %></span>
+                                                
+                                                
+                                            <% } else { %>
+                                               
+                                                    <span class="text-danger">- ₹<%= Math.round(order.totalAmount) %></span>
+                                               
+                                              
+                                            <% } %>
+                                        </td>
+                                        
+                                        
+                                    </tr>
+                                <% } %>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             
-            <strong class="text-dark "> ₹<%= Math.round (product.sellingPrice) %></strong> <p></p>
-        </div>
-        <div class="order-status text-center p-3">
-            <h5 class="ml-4">Order Status: <%= order.orderStatus %></h5>
-            <!-- You can add additional status-related information here -->
+            
         </div>
     </div>
- 
-    <!-- Order Status -->
-   
+    
+    
 </div>
-
-
-
-
+    
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-secondary mt-5 pt-5 mb-0">
         <div class="row px-xl-5 pt-5">
@@ -316,7 +335,6 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
     
-  
     
 
 </body>

@@ -2,8 +2,8 @@ const Address = require('../models/address');
 const User = require('../models/user');
 const Product=require('../models/product')
 const Category=require('../models/category')
-
-
+const Wallet=require( '../models/wallet')
+const Order=require('../models/order')
 
 exports.renderUserprofile = async (req, res) => {
     try {
@@ -200,5 +200,23 @@ exports.renderEdit = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
+    }
+};
+
+exports.walletShow = async (req, res) => {
+    try {
+        const categories = await Category.find({ isDeleted: false }).populate('products');
+        const user = await User.findById(req.userId);
+        const token = req.cookies.token;
+        const userId = req.userId; 
+        const wallet = await Wallet.findOne({ userId });
+        const orders = await Order.find({ userId: userId }).populate({
+            path: 'orderedItems.productId',
+            select: 'name' // Populate only the name field of the product
+        });
+        res.render('wallet', { wallet, token, categories, user, orders });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 };

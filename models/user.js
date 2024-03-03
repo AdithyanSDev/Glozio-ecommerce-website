@@ -14,16 +14,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null, // or provide a default password here
   },
-  isBlocked:{
-    type:String,
-    default:"Unblocked",
-    enum: ["Unblocked","Blocked"]
+  isBlocked: {
+    type: String,
+    default: "Unblocked",
+    enum: ["Unblocked", "Blocked"]
   },
-  
   addresses: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Address'
-}]
+  }],
+  wallet: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Wallet'
+  }
 });
 
 const User = mongoose.model('User', userSchema);

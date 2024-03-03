@@ -4,14 +4,17 @@ const Order = require('../models/order');
 const Category = require('../models/category')
 const Cart = require('../models/cart')
 const Product = require('../models/product')
+const Wallet = require('../models/wallet');
+const User =require( '../models/user');
 
 exports.renderorderPage=async(req,res)=>{
     try {
         const userId = req.userId; 
+        
         const categories = await Category.find({ isDeleted: false }).populate('products');
         const token = req.cookies.token;
         const orders = await Order.find({ userId: userId }).sort({ orderDate: -1 }); 
-        res.render('ordersuccess', { orders: orders,token,categories });
+        res.render('ordersuccess', { orders: orders,token,categories});
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -46,9 +49,9 @@ exports.placeOrder = async (req, res) => {
             shippingAddress: addressId,
             paymentMethod: paymentMethod 
         });
-
-        // Save the order to the database
+        
         await order.save();
+        
 
         // Remove ordered products from the cart
         await Cart.findOneAndUpdate(
@@ -62,6 +65,17 @@ exports.placeOrder = async (req, res) => {
             
             await Product.findByIdAndUpdate(product.productId, { $inc: { stock: -product.quantity } });
         });
+        if (paymentMethod === 'Wallet') {
+            let wallet = await Wallet.findOne({ userId });
+            if (!wallet) {
+                return res.status(400).json({ message: 'Wallet not found' });
+            } else if (wallet.balance < totalAmount) {
+                return res.status(400).json({ message: 'Insufficient wallet balance' });
+            } else {
+                wallet.balance -= totalAmount;
+                await wallet.save();
+            }
+        }
 
         res.redirect('/orderpage');
     } catch (error) {
@@ -77,9 +91,9 @@ exports.renderOrderList = async (req, res) => {
         const orders = await Order.find({ userId: req.userId }).populate('orderedItems.productId').sort({ orderDate: -1 });
         const categories = await Category.find({ isDeleted: false }).populate('products');
         const token = req.cookies.token;
-
+        const user = await User.findById(req.userId)
         // Render the order list page and pass the orders and categories data to the view
-        res.render('orderlist', { orders: orders, categories: categories, token: token });
+        res.render('orderlist', { orders: orders, categories: categories, token: token ,user:user});
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -102,23 +116,47 @@ exports.listUserOrders = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-exports.cancelOrder= async (req, res) => {
+
+exports.cancelOrder = async (req, res) => {
     try {
-        const orderId = req.body.orderId; // Get the order ID from the request body
+        const orderId = req.body.orderId;
+        console.log(orderId);
+        const order = await Order.findById(orderId);
+        console.log(order,"dkjd");
 
-        // Find the order by ID and update its status to "Cancelled"
-        const order = await Order.findByIdAndUpdate(orderId, { orderStatus: 'Cancelled' }, { new: true });
-
+        // Check if order exists
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        // Add the price of cancelled products to the user's wallet
+        const totalPrice = order.totalAmount;
+        const userId = order.userId;
+
+        // Find the wallet associated with the user
+        let wallet = await Wallet.findOne({ userId });
+
+        // If wallet does not exist, create a new wallet
+        if (!wallet) {
+            wallet = new Wallet({ userId, balance: totalPrice });
+            await wallet.save();
+        } else {
+            // Update wallet balance
+            wallet.balance += totalPrice;
+            await wallet.save();
+        }
+
+        // Update order status
+        order.orderStatus = 'Cancelled';
+        await order.save();
+
         res.status(200).json({ message: 'Order cancelled successfully' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 
 //admin orders
 exports.adminOrders = async (req, res) => {

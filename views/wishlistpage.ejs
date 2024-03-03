@@ -29,10 +29,7 @@
 <body>
     <!-- Topbar Start -->
     <div class="container-fluid">
-        <div class="row bg-secondary py-1 px-xl-5">
-          
         
-        </div>
         <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
             <div class="col-lg-4">
                 <a href="/" class="text-decoration-none">
@@ -123,6 +120,19 @@
         </div>
     </div>
     <!-- Navbar End -->
+    <!-- Breadcrumb Start -->
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-12">
+            <nav class="breadcrumb bg-light mb-30">
+                <a class="breadcrumb-item text-dark" href="/">Home</a>
+                <a class="breadcrumb-item text-dark" href="/api/user/profile">Profile</a>
+                <span class="breadcrumb-item active">Wishlist</span>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
 <!--     
     <div class="container"> -->
         <!-- <div class="main-body"> -->
@@ -138,18 +148,31 @@
                             </div>
                             <hr class="my-4">
                             <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap ">
+                                    <a class="mb-0 " href="/wallet">Wallet</a>
+                                    <!-- Add any relevant icons or badges -->
+                                </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                                     <a class="mb-0" href="/orders">Orders</a>
                                     <!-- Add any relevant icons or badges -->
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                    <a class="mb-0">Wishlist</a>
+                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap active">
+                                    <a href="/wishlist" class="mb-0 text-dark">Wishlist</a>
                                     <!-- Add any relevant icons or badges -->
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                                     <a class="mb-0">Coupons</a>
                                     <!-- Add any relevant icons or badges -->
                                 </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap dropdown">
+                                    <a class="mb-0 dropdown-toggle" href="#" role="button" id="additionalSettingsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Additional settings</a>
+                                    <!-- Add any relevant icons or badges -->
+                                    <div class="dropdown-menu" aria-labelledby="additionalSettingsDropdown">
+                                        <a class="dropdown-item" href="/api/user/resetpassword">Password settings</a>
+                                        <!-- Add other dropdown items here if needed -->
+                                    </div>
+                                </li>
+                                
                                 <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                                     <a class="mb-0" href="/api/user/logout">Logout</a>
                                     <!-- Add any relevant icons or badges -->
@@ -158,6 +181,7 @@
                         </div>
                     </div>
                 </div>
+            
                 <div class="col-lg-8">
                     <div class="card">
                         <h4 class="text-primary mt-4 pl-3">Wishlist</h4>

@@ -213,7 +213,7 @@ exports.walletShow = async (req, res) => {
         const orders = await Order.find({ userId: userId }).populate({
             path: 'orderedItems.productId',
             select: 'name' // Populate only the name field of the product
-        });
+        }).sort({orderDate:-1});
         res.render('wallet', { wallet, token, categories, user, orders });
     } catch (error) {
         console.error(error);

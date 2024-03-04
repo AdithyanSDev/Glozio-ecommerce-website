@@ -37,8 +37,9 @@
     <hr class="horizontal light mt-0 mb-2">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
+        
         <li class="nav-item">
-          <a class="nav-link text-white active bg-gradient-primary" href="../pages/dashboard.html">
+          <a class="nav-link text-white active bg-gradient-primary" href="/admin/adminhome">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">dashboard</i>
             </div>
@@ -70,14 +71,24 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="/admin/orders">
+          <a class="nav-link text-white  " href="/admin/orders">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">assignment</i>
             </div>
             <span class="nav-link-text ms-1">Orders</span>
           </a>
         </li>
-        <li class="nav-item">
+    
+     
+      <li class="nav-item">
+        <a class="nav-link text-white " href="/admin/coupon">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">format_textdirection_r_to_l</i>
+          </div>
+          <span class="nav-link-text ms-1">Coupens</span>
+        </a>
+      </li>
+      <li class="nav-item">
           <a class="nav-link text-white " href="/admin/adminlogout">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">login</i>
@@ -110,7 +121,66 @@
       </div>
     </nav>
     <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">weekend</i>
+              </div>
+              <div class="text-end pt-1">
+                <p class="text-sm mb-0 text-capitalize">Sales</p>
+                <h4 class="mb-0">₹<%= Math.round(totalSales) %></h4>
+              </div>
+            </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <!-- You can add additional information or formatting here if needed -->
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">weekend</i>
+              </div>
+              <div class="text-end pt-1">
+                <p class="text-sm mb-0 text-capitalize">Order Amount</p>
+                <h4 class="mb-0">₹<%= totalOrderAmountValue %></h4>
+              </div>
+            </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <!-- You can add additional information or formatting here if needed -->
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">weekend</i>
+              </div>
+              <div class="text-end pt-1">
+                <p class="text-sm mb-0 text-capitalize">Overall Discount</p>
+                <h4 class="mb-0"><%= totalDiscount %></h4>
+              </div>
+            </div>
+            <hr class="dark horizontal my-0">
+            <div class="card-footer p-3">
+              <!-- You can add additional information or formatting here if needed -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
   </main>
+
+
+  
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
       <i class="material-icons py-2">settings</i>

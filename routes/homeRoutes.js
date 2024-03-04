@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { renderHomePage,productsByCategory} = require('../controllers/authController');
-const { renderDetailPage, reviewSubmit ,getRelatedProducts, reviewCount, reviewSave } = require('../controllers/detailController'); 
+const { renderDetailPage, reviewSubmit ,getRelatedProducts, reviewCount, reviewSave,searchProducts } = require('../controllers/detailController'); 
 const productController=require("../controllers/productController");
 const profileController =require( "../controllers/profileController")
 const { verifyToken } = require('../middleware/authMiddleware');
@@ -23,5 +23,7 @@ router.get('/sortProductsCategory/:categoryId/:sortByValue', productController.g
 
 
 router.get('/wallet',verifyToken,profileController.walletShow);
+
+router.get('/search',verifyToken, searchProducts);
 
 module.exports = router;

@@ -4,6 +4,7 @@ const adminController = require('../controllers/adminController');
 const productController = require('../controllers/productController'); 
 const categoryController=require('../controllers/categoryController');
 const ordercontroller = require('../controllers/orderController')
+const couponController =require( '../controllers/couponController' )
 const upload=require('../multer/multerConfig')
 const { isAdmin } = require('../middleware/authMiddleware');
 
@@ -43,4 +44,9 @@ router.get('/orders',isAdmin,ordercontroller.adminOrders)
 router.put('/orders/:orderId/status', isAdmin, ordercontroller.updateOrderStatus);
 
 
+//coupon routes
+router.get('/coupon',isAdmin,couponController.renderCoupon)
+router.get('/addcoupon',isAdmin,couponController.renderAddcoupon)
+router.post('/createcoupon',isAdmin,couponController.createCoupon)
+router.post('/deletecoupon',isAdmin, couponController.removeCoupon)
 module.exports = router;

@@ -1,5 +1,6 @@
 const User = require('../models/user');
-const Coupon = require('../models/coupen');
+const Coupon = require('../models/coupon');
+const Order = require('../models/order');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
@@ -46,17 +47,46 @@ exports.adminLogin = async (req, res) => {
 };
 
 
-// admin home
 exports.adminhome = async (req, res) => {
   try {
     const token = req.cookies.Authorization;
     console.log("login token", token);
     if (token) {
-      // Token exists, render admin home page
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '-1');
-      res.render('adminhome');
+      // Fetch data for overall sales, discount, and order amount from the database
+      const overallSales = await Order.aggregate([
+        { $match: { orderStatus: "Delivered" } }, // Assuming "Delivered" status indicates a successful sale
+        { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } }
+      ]);
+
+      const overallDiscount = await Order.aggregate([
+        { $match: { orderStatus: "Delivered" } },
+        { $group: { _id: null, totalDiscount: { $sum: "$coupons" } } }
+      ]);
+
+      const totalOrderAmount = await Order.aggregate([
+        { $match: { orderStatus: "Delivered" } },
+        { $unwind: "$orderedItems" },
+        {
+          $lookup: {
+            from: "products",
+            localField: "orderedItems.productId",
+            foreignField: "_id",
+            as: "productDetails"
+          }
+        },
+        { $unwind: "$productDetails" },
+        { $group: { _id: null, totalAmount: { $sum: "$productDetails.price" } } }
+      ]);
+
+      // Extract the total order amount from the result
+      const totalOrderAmountValue = totalOrderAmount.length > 0 ? totalOrderAmount[0].totalAmount : 0;
+
+      // Extract calculated values from aggregation results
+      const totalSales = overallSales.length > 0 ? overallSales[0].totalAmount : 0;
+      const totalDiscount = overallDiscount.length > 0 ? overallDiscount[0].totalDiscount : 0;
+
+      // Render admin home page with calculated values
+      res.render('adminhome', { totalSales, totalDiscount,totalOrderAmountValue });
     } else {
       // Token doesn't exist, render admin login page
       res.render('adminlogin');

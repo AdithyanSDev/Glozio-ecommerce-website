@@ -4,39 +4,62 @@ const Cart = require('../models/cart')
 const User = require('../models/user')
 const Address=require('../models/address')
 const Wallet=require('../models/wallet')
+const Coupon =require('../models/coupon')
+
 
 
 exports.renderCartPage = async (req, res) => {
     try {
-      const token = req.cookies.token;
-      if (token) {
-        const categories = await Category.find({ isDeleted: false });
-        const userId = req.userId;
-        console.log("userId:", userId);
-        if (!userId) {
-          return res.redirect('/api/user/login');
+        const token = req.cookies.token;
+        if (token) {
+            const categories = await Category.find({ isDeleted: false });
+            const userId = req.userId;
+            console.log("userId:", userId);
+            if (!userId) {
+                return res.redirect('/api/user/login');
+            }
+
+            // Retrieve user's cart
+            const usercart = await Cart.find({ user: userId }).populate('product.productId');
+
+            // Calculate subtotal
+            let subtotal = 0;
+            usercart.forEach(cartItem => {
+                cartItem.product.forEach(product => {
+                    // Check if the product is in stock
+                    if (product.productId.stock > 0) {
+                        subtotal += product.productId.sellingPrice * product.quantity;
+                    }
+                });
+            });
+
+            // Retrieve available coupons
+            const availableCoupons = await Coupon.find({});
+
+            // Check if any coupon should be automatically applied
+            const automaticallyAppliedCoupons = availableCoupons.filter(coupon => subtotal >= coupon.minimumPurchaseAmount);
+
+            // Calculate discountedSubtotal
+            let discountedSubtotal = subtotal;
+            if (req.session.discountedSubtotal) {
+                discountedSubtotal = req.session.discountedSubtotal;
+                delete req.session.discountedSubtotal;
+            }
+
+            // Pass original subtotal to the view
+            const originalSubtotal = subtotal;
+
+            console.log(usercart);
+            res.render('cart', { usercart, categories, token: req.cookies.token, subtotal: discountedSubtotal, automaticallyAppliedCoupons, availableCoupons, originalSubtotal });
+
         }
-       
-        const usercart = await Cart.find({ user: userId }).populate('product.productId'); 
-   // Calculate subtotal
-   let subtotal = 0;
-   usercart.forEach(cartItem => {
-    cartItem.product.forEach(product => {
-        // Check if the product is in stock
-        if (product.productId.stock > 0) {
-            subtotal += product.productId.sellingPrice * product.quantity;
-        }
-    });
-});
-        console.log(usercart);
-        res.render('cart', { usercart, categories, token ,subtotal});
-      }
     } catch (error) {
-      console.error(error);
-      res.render('404page')
+        console.error(error);
+        res.render('404page');
     }
-  };
-  
+};
+
+
  
  
 // addToCart controller
@@ -55,11 +78,10 @@ exports.addToCart = async (req, res) => {
             return res.status(400).json({ message: 'Insufficient stock available' });
         }
 
-        const maxQuantityPerPerson = 5;
         let cart = await Cart.findOne({ user: userId });
 
         if (!cart) {
-            cart = new Cart({ user: userId, product: [] });
+            cart = new Cart({ user: userId, product: [], subtotal: 0 });
         }
 
         const existingProductIndex = cart.product.findIndex(item => item.productId.equals(productId));
@@ -67,18 +89,17 @@ exports.addToCart = async (req, res) => {
         if (existingProductIndex !== -1) {
             const totalQuantity = cart.product[existingProductIndex].quantity + quantity;
 
-            if (totalQuantity > maxQuantityPerPerson) {
-                return res.status(400).json({ message: `Maximum ${maxQuantityPerPerson} quantity allowed per person` });
+            if (totalQuantity > product.maxQuantityPerPerson) {
+                return res.status(400).json({ message: `Maximum ${product.maxQuantityPerPerson} quantity allowed per person` });
             }
 
             cart.product[existingProductIndex].quantity += quantity || 1;
         } else {
-            // Only add the product to the cart if it has available stock
             if (product.stock > 0) {
                 cart.product.push({
                     productId: product._id,
                     name: product.name,
-                    price: product.price, // Include the price of the product
+                    price: product.price,
                     quantity: quantity || 1,
                 });
             } else {
@@ -86,14 +107,29 @@ exports.addToCart = async (req, res) => {
             }
         }
 
+        // Recalculate the subtotal
+        let subtotal = 0;
+        cart.product.forEach(item => {
+            // Check if price or quantity is not a valid number
+            if (typeof item.price !== 'number' || Number(item.price) ||
+                typeof item.quantity !== 'number' || Number(item.quantity)) {
+                console.error('Invalid price or quantity:', item);
+                return;
+            }
+        
+            subtotal += item.price * item.quantity;
+        });
+        console.log(subtotal, "subtotal");
+        console.log(typeof(subtotal));
         await cart.save();
-        console.log(cart)
-        res.redirect('/cart')
+
+        res.redirect('/cart');
     } catch (error) {
         console.error(error);
-        res.render('404page')
+        res.render('404page');
     }
 };
+
 
 
 exports.updateCartQuantity = async (req, res) => {
@@ -145,8 +181,8 @@ exports.removeFromCart = async (req, res) => {
 };
 
 
-//checkout
 exports.renderCheckout = async (req, res) => {
+    const { couponCode } = req.body;
     try {
         const token = req.cookies.token;
         if (token) {
@@ -177,15 +213,80 @@ exports.renderCheckout = async (req, res) => {
                 name: cartItem.name,
                 price: subtotal
             }));
+            
+            // Retrieve coupon information
+            const coupon = await Coupon.findOne({ code:couponCode });
+
+            let discountedSubtotal = subtotal; // Initialize discountedSubtotal with subtotal
+            
+            // Apply coupon discount if applicable
+            if (coupon && subtotal >= coupon.minimumPurchaseAmount) {
+                discountedSubtotal -= coupon.discountAmount;
+            }
 
             const address = await Address.find({ user: userId });
             const wallet = await Wallet.findOne({ userId });
-            console.log("cart", usercart);
 
-            res.render('checkout', { user, usercart, subtotal, token, categories, address, productsInfo,wallet });
+            // Pass discountedSubtotal to the checkout page
+            res.render('checkout', { user, usercart, subtotal, discountedSubtotal, token, categories, address, productsInfo, wallet });
         }
     } catch (error) {
         console.error(error);
-        res.render('404page')
+        res.render('404page');
     }
 };
+
+
+
+//apply coupon
+exports.applyCoupon = async (req, res) => {
+    try {
+        const { couponCode } = req.body;
+        console.log(couponCode);
+
+        // Find the coupon with the given code
+        const coupon = await Coupon.findOne({ code: couponCode });
+        if (!coupon) {
+            return res.status(404).send('Coupon not found');
+        }
+
+        // Retrieve the user's cart
+        const userId = req.userId; // Assuming you have the user ID in the request
+        const usercart = await Cart.find({ user: userId }).populate('product.productId');
+
+        // Check if cart exists
+        if (!usercart || usercart.length === 0) {
+            return res.status(404).send('Cart not found');
+        }
+
+        // Calculate subtotal
+        let subtotal = 0;
+        usercart.forEach(cartItem => {
+            cartItem.product.forEach(product => {
+                // Check if the product is in stock
+                if (product.productId.stock > 0) {
+                    subtotal += product.productId.sellingPrice * product.quantity;
+                }
+            });
+        });
+
+        // Apply the coupon discount to the subtotal if applicable
+        let discountedSubtotal = subtotal;
+        if (subtotal >= coupon.minimumPurchaseAmount) {
+            discountedSubtotal -= coupon.discountAmount;
+        }
+
+        // Render the cart page with the updated subtotal and coupon information
+        const categories = await Category.find({ isDeleted: false });
+        const automaticallyAppliedCoupons = [];
+        const availableCoupons = await Coupon.find({});
+        const originalSubtotal = subtotal;
+
+        // Pass discountedSubtotal to the checkout page
+        res.render('cart', { usercart, categories, token: req.cookies.token, subtotal: discountedSubtotal, automaticallyAppliedCoupons, availableCoupons, originalSubtotal });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+};
+

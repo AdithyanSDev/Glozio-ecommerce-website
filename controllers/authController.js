@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer')
 const Product = require('../models/product');
 const Category= require('../models/category')
 const Review = require('../models/review');
-const Coupon = require('../models/coupen');
+const Coupon = require('../models/coupon');
 
 
 

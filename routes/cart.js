@@ -30,6 +30,8 @@ router.get('/wishlist', verifyToken,wishlistController.getWishlist);
 router.post('/wishlist/add',verifyToken, wishlistController.addToWishlist);
 router.get('/wishlistremove/:productid',verifyToken, wishlistController.removeFromWishlist);
 
+//coupen apply route
+router.post('/applycoupon',verifyToken, cartController.applyCoupon);
 
 
 module.exports = router;

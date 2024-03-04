@@ -104,4 +104,20 @@ exports.getRelatedProducts = async (req, res) => {
 };
 
 
+exports.searchProducts = async (req, res) => {
+  try {
+      const query = req.query.q;
+      const regex = new RegExp(query, 'i'); // 'i' for case-insensitive search
+      const products = await Product.find({ name: { $regex: regex } });
+
+      // Fetch categories
+      const categories = await Category.find({ isDeleted: false });
+
+      // Pass token, categories, products, and query to the searchResults page
+      res.render('searchResults', { products, query, token: req.cookies.token, categories });
+  } catch (error) {
+      console.error(error);
+      res.render('404page');
+  }
+};
 

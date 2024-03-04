@@ -5,9 +5,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+ 
   <title>
-    Categories
+    Glozio
   </title>
   <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
@@ -37,67 +37,68 @@
     <hr class="horizontal light mt-0 mb-2">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
-         
+      
         <li class="nav-item">
-          <a class="nav-link text-white " href="/admin/adminhome">
+            <a class="nav-link text-white " href="/admin/adminhome">
+              <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="material-icons opacity-10">dashboard</i>
+              </div>
+              <span class="nav-link-text ms-1">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white " href="/admin/usermanagement">
+              <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="material-icons opacity-10">person</i>
+              </div>
+              <span class="nav-link-text ms-1">User management</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white " href="/admin/categories">
+              <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="material-icons opacity-10">table_view</i>
+              </div>
+              <span class="nav-link-text ms-1">Category</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white " href="/admin/products">
+              <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="material-icons opacity-10">view_in_ar</i>
+              </div>
+              <span class="nav-link-text ms-1">Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white  " href="/admin/orders">
+              <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="material-icons opacity-10">assignment</i>
+              </div>
+              <span class="nav-link-text ms-1">Orders</span>
+            </a>
+          </li>
+      
+       
+        <li class="nav-item">
+          <a class="nav-link text-white active bg-gradient-primary" href="/admin/coupon">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">dashboard</i>
+              <i class="material-icons opacity-10">format_textdirection_r_to_l</i>
             </div>
-            <span class="nav-link-text ms-1">Dashboard</span>
+            <span class="nav-link-text ms-1">Coupens</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="/admin/usermanagement">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">person</i>
-            </div>
-            <span class="nav-link-text ms-1">User management</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white active bg-gradient-primary" href="/admin/categories">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">table_view</i>
-            </div>
-            <span class="nav-link-text ms-1">Category</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="/admin/products">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">view_in_ar</i>
-            </div>
-            <span class="nav-link-text ms-1">Products</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white " href="/admin/orders">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">assignment</i>
-            </div>
-            <span class="nav-link-text ms-1">Orders</span>
-          </a>
-        </li>
-    
-     
-      <li class="nav-item">
-        <a class="nav-link text-white " href="/admin/coupon">
-          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="material-icons opacity-10">format_textdirection_r_to_l</i>
-          </div>
-          <span class="nav-link-text ms-1">Coupens</span>
-        </a>
-      </li>
-      <li class="nav-item">
-          <a class="nav-link text-white " href="/admin/adminlogout">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">login</i>
-            </div>
-            <span class="nav-link-text ms-1">Logout</span>
-          </a>
-        </li>
+            <a class="nav-link text-white " href="/admin/adminlogout">
+              <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="material-icons opacity-10">login</i>
+              </div>
+              <span class="nav-link-text ms-1">Logout</span>
+            </a>
+          </li>
       </ul>
     </div>
+  
   </aside>
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
     <!-- Navbar -->
@@ -106,60 +107,61 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
             <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
-            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">categories</li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Coupen</li>
           </ol>
-          <h6 class="font-weight-bolder mb-0">Categories</h6>
+          <h6 class="font-weight-bolder mb-0">Coupens</h6>
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
             <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                 <a class="button-1" type="submit" href="/admin/categories/add">Add Category</a>
+                 <a class="button-1" type="submit" href="/admin/addcoupon">Add Coupon</a>
             </div>
           </div>
           </div>
-         
-        </div>
       </div>
     </nav>
     <!-- End Navbar -->
-   
-     
-               
-                <div class="card-body pt-4 p-3">
-                    <table class="table table-striped table-dark">
-                        <thead>
-                            <tr>
-                                <th scope="col">Category Name</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% categories.forEach(category => { %>
-                                <tr>
-                                    <td><%= category.name %></td>
-                                    <td><%= category.description %></td>
-                                    <td>
-                                        <a class="btn btn-link text-white px-3 mb-0" href="/admin/categories/<%= category._id %>/edit">
-                                            <i class="material-icons text-sm me-2">edit</i>
-                                        </a>
-                                        <form action="/admin/categories/<%= category._id %>/delete" method="POST" style="display: inline;">
-                                            <button type="submit" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="return confirm('Are you sure you want to delete this category?')">
-                                                <i class="material-icons text-sm me-2">delete</i> 
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
-                </div>
-           
-     
   
-    
-    
-    </div>
+
+    <div class="container">
+      <div class="row justify-content-center">
+          <div class="col-md-10">
+              <h4 class="text-center">Coupons</h4>
+              <table class="table">
+                  <thead class="thead-dark">
+                      <tr>
+                          <th scope="col">Code</th>
+                          <th scope="col">Discount Amount</th>
+                          <th scope="col">Minimum Purchase Amount</th>
+                          <th scope="col">Expiry Date</th>
+                          <th scope="col">Actions</th> <!-- New column for delete action -->
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <% coupons.forEach(coupon => { %>
+                          <tr>
+                              <td><%= coupon.code %></td>
+                              <td><%= coupon.discountAmount %></td>
+                              <td><%= coupon.minimumPurchaseAmount %></td>
+                              <td><%= coupon.expiryDate.toDateString() %></td>
+                              <td>
+                                  <!-- Delete button with form for each coupon -->
+                                  <form action="/admin/deletecoupon" method="POST" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
+                                      <input type="hidden" name="couponId" value="<%= coupon._id %>">
+                                      <button type="submit" class="btn btn-sm btn-danger"><i class="material-icons text-sm me-2">delete</i></button>
+                                  </form>
+                              </td>
+                          </tr>
+                      <% }); %>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+  
+
+
+
   </main>
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
@@ -219,8 +221,7 @@
             <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
           </div>
         </div>
-       
-        </div>
+        
       </div>
     </div>
   </div>

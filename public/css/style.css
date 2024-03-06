@@ -638,7 +638,10 @@ html, body {
 		opacity: 0;
 	}
 }
-
+.table td,
+.table th {
+    padding: 10px; /* Adjust spacing as needed */
+}
 
 
 input,

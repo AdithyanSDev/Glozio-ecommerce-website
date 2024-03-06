@@ -132,98 +132,233 @@
 </div>
 <!-- Breadcrumb End -->
 <div class="row">
-    <div class="col-lg-3 ">
+    <div class="col-lg-3">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex row">
                     <img src="/img/profile.jpg" alt="user" class="rounded-circle p-1 bg-primary" width="80">
-                    <div class=" mt-3 pl-3">
+                    <div class="mt-3 pl-3">
                         <span>Hello,</span><h5><%= user.name%></h5>
                     </div>
                 </div>
                 <hr class="my-4">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                        <a class="mb-0 " href="/wallet">Wallet</a>
-                        <!-- Add any relevant icons or badges -->
+                        <a class="mb-0" href="/wallet">Wallet</a>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap active">
                         <a class="mb-0 text-dark" href="/orders">Orders</a>
-                        <!-- Add any relevant icons or badges -->
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                         <a href="/wishlist" class="mb-0">Wishlist</a>
-                        <!-- Add any relevant icons or badges -->
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                         <a class="mb-0">Coupons</a>
-                        <!-- Add any relevant icons or badges -->
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap dropdown">
                         <a class="mb-0 dropdown-toggle" href="#" role="button" id="additionalSettingsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Additional settings</a>
-                        <!-- Add any relevant icons or badges -->
                         <div class="dropdown-menu" aria-labelledby="additionalSettingsDropdown">
                             <a class="dropdown-item" href="/api/user/resetpassword">Password settings</a>
-                            <!-- Add other dropdown items here if needed -->
                         </div>
                     </li>
-                    
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                         <a class="mb-0" href="/api/user/logout">Logout</a>
-                        <!-- Add any relevant icons or badges -->
                     </li>
                 </ul>
             </div>
         </div>
     </div>
-    
-        
-    <div class=" col-lg-8 shadow-sm">
-        <table class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col">Product Name</th>
-                <th scope="col">Product Image</th>
-                <th scope="col">Total Amount</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Order Date</th>
-                <th scope="col">Order Status</th>
-                <th scope="col">Action</th>
-    
-              </tr>
-            </thead>
-            <tbody>
-                <% orders.forEach((order, index) => { %>
-                    <% order.orderedItems.forEach((item) => { %>
-                        <tr>
-                            <td>
-                                <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
-                            </td>
-                            <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
-                            <td>₹<%= order.totalAmount %></td>
-                            <td><%= item.quantity %></td>
-                            <td><%= order.orderDate.toDateString() %></td>
-                            <td><%= order.orderStatus %></td>
-                            <td>
-                                <% if (order.orderStatus !== 'Cancelled') { %>
-                                    <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
-                                <% } %>
-                            </td>
-                            
-                        </tr>
-                    <% }); %>
-                <% }); %>
-            </tbody>
-            
-            
-            
-          </table>
-          
-    
-    </div>
-       
+    <!-- orderStatus.ejs -->
+    <div class=" col-9">
+        <div class="col border">
+            <div class="bg-light p-30">
+                <div class="nav nav-tabs mb-4" role="tablist">
+                    <a class="nav-item nav-link text-dark active" data-toggle="tab" href="#nav-pending">Orders</a>
+                    <a class="nav-item nav-link text-dark" data-toggle="tab" href="#nav-delivered">Delivered</a>
+                    <a class="nav-item nav-link text-dark" data-toggle="tab" href="#nav-cancelled">Cancelled</a>
+                    <a class="nav-item nav-link text-dark" data-toggle="tab" href="#nav-returned">Returned</a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="nav-pending">
+                        <table class="table table-hover col-12">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Product Image</th>
+                                    <th scope="col">Total Amount</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Order Date</th>
+                                    <th scope="col">Order Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach((order) => { %>
+                                    <% if (order.orderStatus === 'Pending') { %>
+                                        <% order.orderedItems.forEach((item) => { %>
+                                            <tr>
+                                                <td>
+                                                    <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
+                                                </td>
+                                                <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                                                <td>₹<%= order.totalAmount %></td>
+                                                <td><%= item.quantity %></td>
+                                                <td><%= order.orderDate.toDateString() %></td>
+                                                <td><%= order.orderStatus %></td>
+                                                <td>
+                                                    <% if (order.orderStatus !== 'Cancelled') { %>
+                                                        <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } %>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="nav-delivered">
+                        <table class="table table-hover col-12">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Product Image</th>
+                                    <th scope="col">Total Amount</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Order Date</th>
+                                    <th scope="col">Order Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach((order) => { %>
+                                    <% if (order.orderStatus === 'Delivered' || order.orderStatus === 'ReturnRequested') { %>
+                                        <% order.orderedItems.forEach((item) => { %>
+                                            <tr>
+                                                <td>
+                                                    <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
+                                                </td>
+                                                <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                                                <td>₹<%= order.totalAmount %></td>
+                                                <td><%= item.quantity %></td>
+                                                <td><%= order.orderDate.toDateString() %></td>
+                                                <td><%= order.orderStatus %></td>
+                                                <td>
+                                                    <% if (order.orderStatus !== 'ReturnRequested') { %>
+                                                        <button class="btn btn-danger" onclick="requestReturn('<%= order._id %>')">Return</button>
+                                                    <% } %>
+                                                </td>
+                                                
+                                               
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } %>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="nav-cancelled">
+                        <table class="table table-hover col-12">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col"></th> 
+                                    <th scope="col">Product Image</th>
+                                    <th scope="col">Total Amount</th>
+                                    <th scope="col"></th> <!-- Empty column for spacing -->
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col"></th> 
+                                    <th scope="col">Order Date</th>
+                                    <th scope="col"></th> 
+                                    <th scope="col">Cancelled Date</th> <!-- Added column for Cancelled Date -->
+                                </tr>
+                            </thead>
+                            <!-- Rest of the table content -->
+                        
+                        
+                            <tbody>
+                                <% orders.forEach((order) => { %>
+                                    <% if (order.orderStatus === 'Cancelled') { %>
+                                        <% order.orderedItems.forEach((item) => { %>
+                                            <tr>
+                                                <td>
+                                                    <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
+                                                </td>
+                                                <td></td>
+                                                <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                                                <td>₹<%= order.totalAmount %></td>
+                                                <td></td>
+                                               
+                                                <td><%= item.quantity %></td>
+                                                <td></td>
 
+                                                <td><%= order.orderDate.toDateString() %></td>
+                                                <td></td>
+
+                                                <td>
+                                                    <% if (order.cancelledDate) { %>
+                                                        <%= order.cancelledDate.toDateString() %>
+                                                    <% } else { %>
+                                                        N/A
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } %>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                    <div class="tab-pane fade" id="nav-returned">
+                        <table class="table table-hover col-12">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col"></th> 
+                                    <th scope="col">Product Image</th>
+                                    <th scope="col">Total Amount</th>
+                                    <th scope="col"></th> 
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col"></th> 
+                                    <th scope="col">Order Date</th>
+                                    <th scope="col"></th> 
+                                    <th scope="col">Order Status</th>
+                               
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach((order) => { %>
+                                    <% if (order.orderStatus === 'Returned') { %>
+                                        <% order.orderedItems.forEach((item) => { %>
+                                            <tr>
+                                                <td>
+                                                    <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
+                                                </td>
+                                                <td></td>
+                                                <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                                                <td>₹<%= order.totalAmount %></td>
+                                                <td></td>
+                                                <td><%= item.quantity %></td>
+                                                <td></td>
+                                                <td><%= order.orderDate.toDateString() %></td>
+                                                <td></td>
+                                                <td><%= order.orderStatus %></td>
+                                              
+                                            </tr>
+                                        <% }); %>
+                                    <% } %>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 
 
@@ -355,6 +490,36 @@
             }
         });
         </script>
+       <script>
+        function requestReturn(orderId) {
+            // Display confirmation dialog
+            const confirmReturn = confirm("Are you sure you want to request a return for this order?");
+            
+            if (confirmReturn) {
+                // Send AJAX request to update the order status to "ReturnRequested"
+                $.ajax({
+                    url: '/orders/return', // Update URL to match the route in your backend
+                    method: 'POST',
+                    data: { orderId: orderId }, // Send orderId in the request body
+                    success: function (response) {
+                    // Show a custom alert to indicate that the return request has been sent
+                    alert("Return request sent to admin");
+                        // Change button text to "Return Requested"
+                        $(`button[data-order-id="${orderId}"]`).text('Return Requested').prop('disabled', true);
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                        // Handle error response from the server
+                    }
+                });
+            }
+        }
+    </script>
+    
+        
+     
+   
         
 
 </body>

@@ -244,22 +244,18 @@ exports.applyCoupon = async (req, res) => {
         const { couponCode } = req.body;
         console.log(couponCode);
 
-        // Find the coupon with the given code
         const coupon = await Coupon.findOne({ code: couponCode });
         if (!coupon) {
             return res.status(404).send('Coupon not found');
         }
 
-        // Retrieve the user's cart
-        const userId = req.userId; // Assuming you have the user ID in the request
+        const userId = req.userId; 
         const usercart = await Cart.find({ user: userId }).populate('product.productId');
 
-        // Check if cart exists
         if (!usercart || usercart.length === 0) {
             return res.status(404).send('Cart not found');
         }
 
-        // Calculate subtotal
         let subtotal = 0;
         usercart.forEach(cartItem => {
             cartItem.product.forEach(product => {
@@ -270,19 +266,19 @@ exports.applyCoupon = async (req, res) => {
             });
         });
 
-        // Apply the coupon discount to the subtotal if applicable
+       
         let discountedSubtotal = subtotal;
         if (subtotal >= coupon.minimumPurchaseAmount) {
             discountedSubtotal -= coupon.discountAmount;
         }
 
-        // Render the cart page with the updated subtotal and coupon information
+        
         const categories = await Category.find({ isDeleted: false });
         const automaticallyAppliedCoupons = [];
         const availableCoupons = await Coupon.find({});
         const originalSubtotal = subtotal;
 
-        // Pass discountedSubtotal to the checkout page
+      
         res.render('cart', { usercart, categories, token: req.cookies.token, subtotal: discountedSubtotal, automaticallyAppliedCoupons, availableCoupons, originalSubtotal });
     } catch (error) {
         console.error(error);

@@ -87,13 +87,15 @@ exports.placeOrder = async (req, res) => {
 
 exports.renderOrderList = async (req, res) => {
     try {
-        // Fetch orders and categories from the database
+        // Fetch orders, categories, and user from the database
         const orders = await Order.find({ userId: req.userId }).populate('orderedItems.productId').sort({ orderDate: -1 });
         const categories = await Category.find({ isDeleted: false }).populate('products');
-        const token = req.cookies.token;
-        const user = await User.findById(req.userId)
-        // Render the order list page and pass the orders and categories data to the view
-        res.render('orderlist', { orders: orders, categories: categories, token: token ,user:user});
+        const user = await User.findById(req.userId);
+
+        
+
+        // Render the order list page and pass the orders, categories, user, and cancelledProducts data to the view
+        res.render('orderlist', { orders, categories, user});
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -216,3 +218,27 @@ exports.updateOrderStatus = async (req, res) => {
     }
 }
 
+exports.processReturn=async(req,res)=>{
+    try {
+        const { orderId } = req.body;
+
+        // Fetch the order from the database
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Update the order status to "ReturnRequested"
+        order.orderStatus = 'ReturnRequested';
+
+        // Save the updated order
+        await order.save();
+
+        // Send a success response
+        res.render('orderlist')
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};

@@ -24,6 +24,38 @@
   <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
 </head>
+<style>
+    #reportType {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  padding: 10px;
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  appearance: none; /* Remove default arrow */
+  -webkit-appearance: none; /* Remove default arrow for Safari */
+  background-color: #f2f2f2;
+}
+
+#reportType option {
+  background-color: #fff;
+  color: #333;
+}
+
+#reportType option:first-child {
+  color: #999; /* Change color of default option */
+}
+
+#reportType:hover {
+  background-color: #eaeaea; /* Change background color on hover */
+}
+
+#reportType:focus {
+  outline: none; /* Remove outline on focus */
+  border-color: #007bff; /* Change border color on focus */
+}
+
+</style>
 
 <body class="g-sidenav-show  bg-gray-200">
   <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
@@ -89,14 +121,6 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link text-white  " href="/admin/offer">
-          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="material-icons ">payments</i>
-          </div>
-          <span class="nav-link-text ms-1">Offers</span>
-        </a>
-      </li>
-      <li class="nav-item">
           <a class="nav-link text-white " href="/admin/adminlogout">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">login</i>
@@ -119,69 +143,66 @@
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                 <a class="button-1" type="submit" href="/admin/salesreport">Sales Report</a>
+            <div class="input-group input-group-outline">
+              <label class="form-label">Type here...</label>
+              <input type="text" class="form-control">
             </div>
           </div>
-          </div>
+          <!--  -->
+        </div>
       </div>
     </nav>
     <!-- End Navbar -->
-    <div class="container-fluid py-4">
-      <div class="row">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
-            <div class="card-header p-3 pt-2">
-              <div class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
-                <i class="material-icons opacity-10">weekend</i>
-              </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Sales</p>
-                <h4 class="mb-0">₹<%= Math.round(totalSales) %></h4>
-              </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <!-- You can add additional information or formatting here if needed -->
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
-            <div class="card-header p-3 pt-2">
-              <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                <i class="material-icons opacity-10">weekend</i>
-              </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Order Amount</p>
-                <h4 class="mb-0">₹<%= totalOrderAmountValue %></h4>
-              </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <!-- You can add additional information or formatting here if needed -->
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
-            <div class="card-header p-3 pt-2">
-              <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
-                <i class="material-icons opacity-10">weekend</i>
-              </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Overall Discount</p>
-                <h4 class="mb-0"><%= totalDiscount %></h4>
-              </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <!-- You can add additional information or formatting here if needed -->
-            </div>
-          </div>
-        </div>
-      </div>
+  
+
+<!-- Sales Report Selection -->
+<select id="reportType" class="mb-3">
+    <option value="">Fliter</option>
+    <option value="daily">Daily</option>
+    <option value="weekly">Weekly</option>
+    <option value="yearly">Yearly</option>
+    <option value="custom">Custom Date</option>
+</select>
+
+<!-- Daily Sales Report -->
+<div id="dailySalesReport" style="display: none;">
+    <h5>Daily Sales Report</h5>
+    <div>
+        <% dailySalesData.forEach(item => { %>
+            <p><%= item.date %>: <%= item.quantity %> units sold</p>
+        <% }); %>
     </div>
+</div>
+
+<!-- Weekly Sales Report -->
+<div id="weeklySalesReport" style="display: none;">
+    <h5>Weekly Sales Report</h5>
+    <div>
+        <% weeklySalesData.forEach(item => { %>
+            <p><%= item.week %>: <%= item.quantity %> units sold</p>
+        <% }); %>
+    </div>
+</div>
+
+<!-- Yearly Sales Report -->
+<div id="yearlySalesReport" style="display: none;">
+    <h5>Yearly Sales Report</h5>
+    <div>
+        <% yearlySalesData.forEach(item => { %>
+            <p><%= item.year %>: <%= item.quantity %> units sold</p>
+        <% }); %>
+    </div>
+</div>
+
+<!-- Custom Date Sales Report -->
+<div id="customDateSalesReport" style="display: none;">
+    <h5>Custom Date Sales Report</h5>
+    <div>
+        <% customDateSalesData.forEach(item => { %>
+            <p><%= item.startDate %> to <%= item.endDate %>: <%= item.quantity %> units sold</p>
+        <% }); %>
+    </div>
+</div>
     
   </main>
 
@@ -256,6 +277,21 @@
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
+  <script>
+    document.getElementById('reportType').addEventListener('change', function() {
+        var reportType = this.value;
+        var reports = ['daily', 'weekly', 'yearly', 'custom'];
+        
+        reports.forEach(function(report) {
+            var element = document.getElementById(report + 'SalesReport');
+            if (report === reportType) {
+                element.style.display = 'block';
+            } else {
+                element.style.display = 'none';
+            }
+        });
+    });
+</script>
   <script>
     var ctx = document.getElementById("chart-bars").getContext("2d");
 

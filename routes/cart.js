@@ -23,7 +23,10 @@ router.post('/placeorder',verifyToken, orderController.placeOrder);
 router.get('/orders',verifyToken,orderController.renderOrderList)
 router.get('/orderlist',verifyToken,orderController.listUserOrders)
 router.post('/orders/cancel',verifyToken,orderController.cancelOrder)
+router.post('/orders/return',verifyToken,orderController.processReturn)
 router.get('/orderdetails/:orderId/:productId',verifyToken,orderController.orderdetails)
+
+
 
 // wishlist routes
 router.get('/wishlist', verifyToken,wishlistController.getWishlist);

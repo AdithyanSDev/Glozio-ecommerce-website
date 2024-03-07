@@ -1,12 +1,14 @@
-// controllers/salesReportsController.js
 
+const { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } = require('date-fns');
+
+const PDFDocument = require('pdfkit');
 const Order = require('../models/order');
 
 
 exports.renderSalesreport = async (req, res) => {
     try {
         res.render('adminsalesreport', {
-            dailySalesData: [], // Initialize empty array to avoid error if data not found
+            dailySalesData: [],
             weeklySalesData: [],
             yearlySalesData: [],
             customDateSalesData: []
@@ -16,115 +18,137 @@ exports.renderSalesreport = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 };
-// Get daily sales report
-exports.getDailySalesReport = async (req, res) => {
+
+
+exports.generateReport = async (req, res) => {
     try {
-        // Query database for daily sales data
-        const dailySalesData = await Order.aggregate([
-            {
-                $match: {
-                    orderDate: {
-                        $gte: new Date(new Date().setHours(00, 00, 00)),
-                        $lt: new Date(new Date().setHours(23, 59, 59))
-                    },
-                    orderStatus: "Delivered"
+        const { filterType, startDate, endDate } = req.query;
+
+        let salesData;
+        let reportTitle;
+
+        switch (filterType) {
+            case 'daily':
+                salesData = await getDailySales();
+                reportTitle = 'Today';
+                break;
+            case 'weekly':
+                salesData = await getWeeklySales();
+                reportTitle = 'This Week';
+                break;
+            case 'monthly':
+                salesData = await getMonthlySales();
+                reportTitle = 'This Month';
+                break;
+            case 'yearly':
+                salesData = await getYearlySales();
+                reportTitle = 'This Year';
+                break;
+            case 'custom':
+                if (!startDate || !endDate) {
+                    throw new Error('Custom date range requires both start date and end date.');
                 }
-            },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
-                    quantity: { $sum: "$totalAmount" }
-                }
-            }
-        ]);
-        res.render('adminsalesreport', { dailySalesData });
+                salesData = await getCustomRangeSales(startDate, endDate);
+                reportTitle = `${startDate} to ${endDate}`;
+                break;
+            default:
+                throw new Error('Invalid filter type.');
+        }
+
+        const doc = new PDFDocument();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
+        doc.pipe(res);
+
+        doc.image('public/img/Gloziologo.png', {
+            width: 25,
+            align: 'center'
+        }).moveDown(0.5); // Move down a bit to create space between the logo and the text
+        doc.fontSize(20).text('GLOZIO', { align: 'left' });
+    // Report title
+    doc.fontSize(18).text('Sales report', { align: 'center' });
+    doc.moveDown();
+
+    // Sales data
+    salesData.forEach(({ date, totalSales, totalOrderAmount, totalDiscount, totalCouponDiscount }) => {
+        doc.fontSize(14).text(`Date: ${date}`);
+        doc.fontSize(12).text(`Total Sales: ${totalSales}`);
+        doc.fontSize(12).text(`Total Order Amount: Rs.${totalOrderAmount}`);
+        doc.fontSize(12).text(`Total Discount: Rs.${totalDiscount}`);
+        doc.fontSize(12).text(`Total Coupon Discount: Rs.${totalCouponDiscount}`);
+        doc.moveDown();
+    });
+       
+
+        doc.end();
     } catch (error) {
         console.error(error);
-        res.status(500).send('Internal server error');
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
 
-// Get weekly sales report
-exports.getWeeklySalesReport = async (req, res) => {
-    try {
-        // Query database for weekly sales data
-        const weeklySalesData = await Order.aggregate([
-            {
-                $match: {
-                    orderDate: {
-                        $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
-                        $lt: new Date()
-                    },
-                    orderStatus: "Delivered"
-                }
-            },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%W", date: "$orderDate" } },
-                    quantity: { $sum: "$totalAmount" }
-                }
-            }
-        ]);
-        res.render('adminsalesreport', { weeklySalesData });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal server error');
-    }
-};
+async function getDailySales() {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    return await getOrderData(startOfDay, endOfDay);
+}
 
-// Get yearly sales report
-exports.getYearlySalesReport = async (req, res) => {
-    try {
-        // Query database for yearly sales data
-        const yearlySalesData = await Order.aggregate([
-            {
-                $match: {
-                    orderDate: {
-                        $gte: new Date(new Date().getFullYear(), 0, 1),
-                        $lt: new Date(new Date().getFullYear() + 1, 0, 1)
-                    },
-                    orderStatus: "Delivered"
-                }
-            },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y", date: "$orderDate" } },
-                    quantity: { $sum: "$totalAmount" }
-                }
-            }
-        ]);
-        res.render('adminsalesreport', { yearlySalesData });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal server error');
-    }
-};
+async function getWeeklySales() {
+    const today = new Date();
+    const startOfWeekDate = startOfWeek(today, { weekStartsOn: 1 });
+    const endOfWeekDate = endOfWeek(today, { weekStartsOn: 1 });
+    return await getOrderData(startOfWeekDate, endOfWeekDate);
+}
 
-// Get custom date sales report
-exports.getCustomDateSalesReport = async (req, res) => {
+async function getMonthlySales() {
+    const today = new Date();
+    const startOfMonthDate = startOfMonth(today);
+    const endOfMonthDate = endOfMonth(today);
+    return await getOrderData(startOfMonthDate, endOfMonthDate);
+}
+
+async function getYearlySales() {
+    const today = new Date();
+    const startOfYearDate = startOfYear(today);
+    const endOfYearDate = endOfYear(today);
+    return await getOrderData(startOfYearDate, endOfYearDate);
+}
+
+async function getCustomRangeSales(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return await getOrderData(start, end);
+}
+
+async function getOrderData(startDate, endDate) {
     try {
-        const { startDate, endDate } = req.query;
-        // Query database for sales data within the custom date range
-        const customDateSalesData = await Order.aggregate([
-            {
-                $match: {
-                    orderDate: {
-                        $gte: new Date(startDate),
-                        $lt: new Date(endDate)
-                    },
-                    orderStatus: "Delivered"
-                }
-            },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$orderDate" } },
-                    quantity: { $sum: "$totalAmount" }
-                }
-            }
-        ]);
-        res.render('adminsalesreport', { customDateSalesData });
+        const orders = await Order.find({
+            orderDate: { $gte: startDate, $lte: endDate },
+        });
+
+        let totalSales = 0;
+        let totalOrderAmount = 0;
+        let totalDiscount = 0;
+        let totalCouponDiscount = 0;
+
+        orders.forEach(order => {
+            // Calculate total sales by summing up the quantity of ordered items
+            totalSales += order.orderedItems.reduce((acc, item) => acc + item.quantity, 0);
+            totalOrderAmount += order.totalAmount;
+            totalDiscount += order.totalDiscount || 0;
+            totalCouponDiscount += order.couponDiscount || 0;
+        });
+
+        return [{
+            date: startDate,
+            totalSales,
+            totalOrderAmount,
+            totalDiscount,
+            totalCouponDiscount
+        }];
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal server error');
+        console.error("Error in getOrderData:", error);
+        throw error; // Throw the error to be caught in the calling function
     }
-};
+}

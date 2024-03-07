@@ -54,11 +54,7 @@ router.post('/deletecoupon',isAdmin, couponController.removeCoupon)
 
 //sales routes
 router.get('/salesreport',isAdmin,salesController.renderSalesreport)
-router.get('/daily',isAdmin, salesController.getDailySalesReport);
-router.get('/weekly',isAdmin, salesController.getWeeklySalesReport);
-router.get('/yearly',isAdmin, salesController.getYearlySalesReport);
-router.get('/custom',isAdmin, salesController.getCustomDateSalesReport);
-
+router.get('/generateReport', salesController.generateReport);
 
 //offer routes
 router.get('/offer',isAdmin,offerController.renderOffer)

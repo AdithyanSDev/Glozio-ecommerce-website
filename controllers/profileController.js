@@ -5,6 +5,7 @@ const Category=require('../models/category')
 const Wallet=require( '../models/wallet')
 const Order=require('../models/order')
 
+
 exports.renderUserprofile = async (req, res) => {
     try {
         const user = await User.findById(req.userId).populate('addresses');

@@ -26,6 +26,8 @@ router.post('/orders/cancel',verifyToken,orderController.cancelOrder)
 router.post('/orders/return',verifyToken,orderController.processReturn)
 router.get('/orderdetails/:orderId/:productId',verifyToken,orderController.orderdetails)
 
+router.get('/razorpaypage/:orderId', verifyToken,orderController.renderRazorpayPage);
+router.post('/razorpay/pay/:orderId',verifyToken,orderController.razorsuccess)
 
 
 // wishlist routes

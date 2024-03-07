@@ -235,14 +235,14 @@
                 <% productsInfo.forEach(product => { %>
                     <div class="d-flex justify-content-between">
                         <p><%= product.name %></p>
-                        <p>₹<%= product.price %></p>
+                        <p>₹<%= product.price.toFixed(2) %></p> <!-- Update product price display -->
                     </div>
                 <% }); %>
-                
+                            
                 <div class="border-bottom pt-3 pb-2">
                     <div class="d-flex justify-content-between mb-3">
                         <h6>Subtotal</h6>
-                        <h6>₹<%= subtotal.toFixed(2) %></h6>
+                        <h6>₹<%= subtotal.toFixed(2) %></h6> <!-- Display dynamic subtotal -->
                     </div>
                     <% if (discountedSubtotal && subtotal !== discountedSubtotal) { %>
                         <div class="bg-success text-white p-2 mb-2">Coupon Applied: Save ₹<%= (subtotal - discountedSubtotal).toFixed(2) %> </div>
@@ -255,15 +255,14 @@
                 <div class="pt-2">
                     <div class="d-flex justify-content-between mt-2">
                         <h5>Total</h5>
-                        <h5>₹<%= discountedSubtotal.toFixed(2) %></h5>
+                        <h5>₹<%= discountedSubtotal.toFixed(2) %></h5> <!-- Display dynamic discounted subtotal -->
                     </div>
                 </div>
-                
-                
+                            
+                            
                 <div class="mb-5">
                     <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Payment</span></h5>
                     <div class="bg-light p-30">
-                       
                         <div class="form-group">
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" name="paymentMethod" id="cod" value="Cash On Delivery">
@@ -278,14 +277,15 @@
                         </div>
                         <div class="form-group mb-4">
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="paymentmethod" id="razorpay" value="Razorpay">
+                                <input type="radio" class="custom-control-input" name="paymentMethod" id="razorpay" value="Razorpay">
                                 <label class="custom-control-label" for="razorpay">Razorpay</label>
                             </div>
                         </div>
-                       
+                        
                     </div>
                 </div>
             </div>
+            
         </div>
         <button type="submit" class="btn btn-block btn-primary font-weight-bold py-3">Place Order</button>
         <input type="hidden" name="usercart" value="<%= JSON.stringify(usercart) %>">

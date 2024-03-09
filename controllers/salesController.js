@@ -1,6 +1,7 @@
 
 const { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } = require('date-fns');
-
+const Product=require("../models/product");
+const Coupon=require("../models/coupon")
 const PDFDocument = require('pdfkit');
 const Order = require('../models/order');
 
@@ -132,13 +133,31 @@ async function getOrderData(startDate, endDate) {
         let totalDiscount = 0;
         let totalCouponDiscount = 0;
 
-        orders.forEach(order => {
+        for (const order of orders) {
             // Calculate total sales by summing up the quantity of ordered items
             totalSales += order.orderedItems.reduce((acc, item) => acc + item.quantity, 0);
             totalOrderAmount += order.totalAmount;
-            totalDiscount += order.totalDiscount || 0;
+
+            // Calculate total discount for all products in the order
+            for (const item of order.orderedItems) {
+                const product = await Product.findById(item.productId);
+                if (product) {
+                    // Calculate discount for the product
+                    const discount = (product.price - product.sellingPrice) * item.quantity;
+                    totalDiscount += discount;
+                }
+            }
+
+            // Add coupon discount to the total coupon discount
             totalCouponDiscount += order.couponDiscount || 0;
-        });
+        }
+
+        // Fetch all coupons and sum their discount amounts
+        const coupons = await Coupon.find({});
+        const couponDiscounts = coupons.reduce((acc, coupon) => acc + coupon.discountAmount, 0);
+
+        // Add the sum of coupon discount amounts to the total coupon discount
+        totalCouponDiscount += couponDiscounts;
 
         return [{
             date: startDate,

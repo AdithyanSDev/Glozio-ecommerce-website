@@ -6,7 +6,6 @@ const Address=require('../models/address')
 const Wallet=require('../models/wallet')
 const Coupon =require('../models/coupon')
 
-
 exports.renderCartPage = async (req, res) => {
     try {
         const token = req.cookies.token;
@@ -34,10 +33,11 @@ exports.renderCartPage = async (req, res) => {
             // Retrieve available coupons
             const availableCoupons = await Coupon.find({});
 
-            // Pass original subtotal to the view
+            // Pass original subtotal and couponCode to the view
             const originalSubtotal = subtotalFromCart;
-
-            res.render('cart', { usercart, categories, token, subtotal: subtotalFromCart, availableCoupons, originalSubtotal });
+            const {couponCode} =req.body; // Initialize couponCode as empty string or retrieve it from somewhere
+console.log(couponCode,"carts")
+            res.render('cart', { usercart, categories, token, subtotal: subtotalFromCart, availableCoupons, originalSubtotal, couponCode });
         }
     } catch (error) {
         console.error(error);
@@ -45,9 +45,6 @@ exports.renderCartPage = async (req, res) => {
     }
 };
 
-
-
-// addToCart controller
 exports.addToCart = async (req, res) => {
     try {
         const { productId, quantity } = req.body;
@@ -84,7 +81,7 @@ exports.addToCart = async (req, res) => {
                 cart.product.push({
                     productId: product._id,
                     name: product.name,
-                    price: product.price,
+                    price: product.sellingPrice, // Use sellingPrice instead of price
                     quantity: quantity || 1,
                 });
             } else {
@@ -92,15 +89,9 @@ exports.addToCart = async (req, res) => {
             }
         }
 
-        // Recalculate the subtotal
+        // Recalculate the subtotal based on the selling price
         let subtotal = 0;
         cart.product.forEach(item => {
-            // Check if price or quantity is not a valid number
-            if (typeof item.price !== 'number' || typeof item.quantity !== 'number') {
-                console.error('Invalid price or quantity:', item);
-                return;
-            }
-        
             subtotal += item.price * item.quantity;
         });
 
@@ -197,6 +188,7 @@ exports.removeFromCart = async (req, res) => {
 
 exports.renderCheckout = async (req, res) => {
     const { couponCode } = req.body;
+    console.log(couponCode,"checkout")
     try {
         const token = req.cookies.token;
         if (token) {
@@ -241,7 +233,7 @@ exports.renderCheckout = async (req, res) => {
             const wallet = await Wallet.findOne({ userId });
 
             // Pass discountedSubtotal to the checkout page along with other data
-            res.render('checkout', { user, usercart, subtotal, discountedSubtotal, token, categories, address, productsInfo, wallet });
+            res.render('checkout', { user, usercart, subtotal, discountedSubtotal, token, categories, address, productsInfo, wallet ,couponCode});
         }
     } catch (error) {
         console.error(error);
@@ -249,17 +241,27 @@ exports.renderCheckout = async (req, res) => {
     }
 };
 
-//apply coupon
+// apply coupon
 exports.applyCoupon = async (req, res) => {
     try {
         const { couponCode } = req.body;
-
+console.log(couponCode,"kittty")
+        // Find the coupon by code
         const coupon = await Coupon.findOne({ code: couponCode });
+
         if (!coupon) {
             return res.status(404).send('Coupon not found');
         }
 
-        const userId = req.userId; 
+        // Check if the coupon has already been used by the user
+        const userId = req.userId;
+        const user = await User.findById(userId);
+
+        if (user.couponUsed) {
+            return res.status(400).send('Coupon already used');
+        }
+
+        // Retrieve the user's cart
         let usercart = await Cart.find({ user: userId }).populate('product.productId');
 
         if (!usercart || usercart.length === 0) {
@@ -267,6 +269,8 @@ exports.applyCoupon = async (req, res) => {
         }
 
         let subtotal = 0;
+
+        // Calculate subtotal and apply discount if conditions are met
         usercart.forEach(cartItem => {
             cartItem.product.forEach(product => {
                 // Check if the product is in stock
@@ -285,15 +289,20 @@ exports.applyCoupon = async (req, res) => {
         // Save the updated cart items to the database
         await Promise.all(usercart.map(cartItem => cartItem.save()));
 
-        // Render the cart page with the updated subtotal
+        // Mark the coupon as used by the user
+        user.couponUsed = true;
+        await user.save();
+
+        // Render the cart page with the updated subtotal and couponCode
         const categories = await Category.find({ isDeleted: false });
         const automaticallyAppliedCoupons = [];
         const availableCoupons = await Coupon.find({});
         const originalSubtotal = subtotal;
 
-        res.render('cart', { usercart, categories, token: req.cookies.token, subtotal, automaticallyAppliedCoupons, availableCoupons, originalSubtotal });
+        res.render('cart', { usercart, categories, token: req.cookies.token, subtotal, automaticallyAppliedCoupons, availableCoupons, originalSubtotal, couponCode });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal server error');
     }
 };
+

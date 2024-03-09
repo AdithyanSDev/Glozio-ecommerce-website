@@ -55,7 +55,7 @@ exports.userLogin = async (req, res) => {
       }
 
       if (await bcrypt.compare(password, user.password)) {
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '6h' });
 
         // Set token in a cookie with an expiration time of 1 hour
         res.cookie('token', token, { maxAge: 3600000 });

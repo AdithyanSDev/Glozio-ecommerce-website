@@ -7,6 +7,7 @@ const Product = require('../models/product')
 const Wallet = require('../models/wallet');
 const User =require( '../models/user');
 const Razorpay = require('razorpay');
+const Coupon=require('../models/coupon')
 const{RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET}=process.env
 
 const razorpaykeyId= RAZORPAY_KEY_ID;
@@ -36,7 +37,8 @@ exports.placeOrder = async (req, res) => {
         const usercart = JSON.parse(req.body.usercart);
         const addressId = req.body.addressId;
         const paymentMethod = req.body.paymentMethod;
-        
+        const couponCode = req.body.couponCode; // Get the coupon code from the request
+        console.log(couponCode,"lalalala")
         // Find the user's cart
         let cart = await Cart.findOne({ user: userId });
 
@@ -50,27 +52,39 @@ exports.placeOrder = async (req, res) => {
             totalAmount += product.productId.sellingPrice * product.quantity;
         });
 
+        let couponUsed = null; // Initialize couponUsed as null
+
+        // Check if a coupon code is provided
+        if (couponCode) {
+           
+            const coupon = await Coupon.findOne({ code: couponCode });
+            if (coupon) {
+                // Deduct coupon discount amount from total amount
+                totalAmount -= coupon.discountAmount;
+                couponUsed = coupon._id; // Assign the coupon ID to couponUsed
+            }
+        }
+
         // Create the order
         const order = new Order({
             userId: userId,
             orderedItems: usercart.product,
             totalAmount: totalAmount,
             shippingAddress: addressId,
-            paymentMethod: paymentMethod 
+            paymentMethod: paymentMethod,
+            couponUsed: couponUsed // Set couponUsed to the coupon ID if a coupon is used, otherwise keep it as null
         });
-
         // Update payment status based on payment method
         if (paymentMethod === 'Wallet') {
             order.paymentStatus = 'Completed';
         } else if (paymentMethod === 'Razorpay') {
-            
             const razorpayOrder = await razorpay.orders.create({
                 amount: totalAmount * 100, 
                 currency: 'INR',
                 payment_capture: 1 
             });
             order.paymentStatus = 'Failed';
-            order.razorpayOrderId=razorpayOrder.id;
+            order.razorpayOrderId = razorpayOrder.id;
             await order.save();
             return res.redirect(`/razorpaypage/${order._id}`); // Redirect to Razorpay page
         }
@@ -109,6 +123,7 @@ exports.placeOrder = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 
 exports.renderOrderList = async (req, res) => {
@@ -307,6 +322,7 @@ const user=await User.findById(userId)
     } 
 };
 
+
 exports.razorsuccess = async (req, res) => {
     try {
         const orderId = req.params.orderId;
@@ -322,7 +338,16 @@ exports.razorsuccess = async (req, res) => {
         order.paymentStatus = 'Completed';
         await order.save();
 
-        res.redirect('/orderpage')
+        // Remove ordered products from the cart
+        const userId = order.userId;
+        const orderedItems = order.orderedItems;
+        await Cart.findOneAndUpdate(
+            { user: userId },
+            { $pull: { product: { productId: { $in: orderedItems.map(item => item.productId) } } } },
+            { new: true }
+        );
+
+        res.redirect('/orderpage');
     } catch (error) {
         console.error('Error in updating payment status');
         console.error(error);

@@ -31,14 +31,19 @@ exports.showAddProductForm = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+
 exports.addProduct = async (req, res) => {
   try {
-    const { name, description, price, discount, category, stock, highlights, brand } = req.body;
-    
-    const existingProduct = await Product.findOne({ name });
-    if (existingProduct) {
-      return res.status(400).send('Product already exists');
-    }
+    const { name, description, price, sellingPrice, category, stock, highlights, brand } = req.body;
+
+    // Convert price and sellingPrice to numbers
+    const numericPrice = parseFloat(price);
+    const numericSellingPrice = parseFloat(sellingPrice);
+
+    // Calculate discount based on price and sellingPrice
+    const discount = numericPrice > 0 ? ((numericPrice - numericSellingPrice) / numericPrice) * 100 : 0;
+
     // Log the received files
     console.log('Received files:', req.files);
 
@@ -50,16 +55,13 @@ exports.addProduct = async (req, res) => {
     // Map uploaded files to their paths
     const images = req.files.map(file => file.path);
 
-    // Calculate selling price based on the provided discount
-    const sellingPrice = price * (1 - discount / 100);
-
     // Create a new product instance with the provided data
     const newProduct = new Product({
       name,
       description,
-      price,
-      discount,
-      sellingPrice, // Store selling price in the database
+      price: numericPrice,
+      sellingPrice: numericSellingPrice,
+      discount, // Store dynamically calculated discount
       category,
       stock,
       highlights,
@@ -96,51 +98,53 @@ exports.addProduct = async (req, res) => {
     }
   };
 
-
 // editProduct controller method
 exports.editProduct = async (req, res, next) => {
   try {
-    const productId = req.params.productId;
-    const updates = req.body;
-    const product = await Product.findById(productId); // Fetch the product
-    if (!product) {
-      return res.status(404).send('Product not found');
-    }
-
-    // Check if there are other products with the same name
-    const existingProduct = await Product.findOne({ name: updates.name, _id: { $ne: productId } });
-    if (existingProduct) {
-      return res.status(400).send('Another product with the same name already exists');
-    }
-
-    // Handle image deletion
-    if (req.query.index) {
-      const index = parseInt(req.query.index);
-      const imagePath = path.join(__dirname, '../uploads/', product.images[index]); // Use the absolute path of the image
-      if (imagePath) {
-        // Remove the image from the file system
-        fs.unlink(imagePath, (err) => {
-          if (err) console.error(err);
-        });
-
-        // Remove the image from the images array
-        product.images.splice(index, 1);
+      const productId = req.params.productId;
+      const updates = req.body;
+      const product = await Product.findById(productId); // Fetch the product
+      if (!product) {
+          return res.status(404).send('Product not found');
       }
-    }
 
-    // Handle individual image upload
-    if (req.files && req.files.length > 0) { // Check if files are uploaded
-      req.files.forEach((file) => {
-        const newImage = file.path;
-        product.images.push(newImage);
-      });
-    }
+      // Check if there are other products with the same name excluding the current product
+      const existingProduct = await Product.findOne({ name: updates.name, _id: { $ne: productId } });
+      if (existingProduct) {
+          return res.status(400).send('Another product with the same name already exists');
+      }
 
-    // Update the product with the new data
-    await Product.findByIdAndUpdate(productId, updates);
-    res.redirect('/admin/products');
+      // Handle image deletion
+      if (req.query.index) {
+          const index = parseInt(req.query.index);
+          const imagePath = path.join(__dirname, '../uploads/', product.images[index]); // Use the absolute path of the image
+          if (imagePath) {
+              // Remove the image from the file system
+              fs.unlink(imagePath, (err) => {
+                  if (err) console.error(err);
+              });
+
+              // Remove the image from the images array
+              product.images.splice(index, 1);
+          }
+      }
+
+      // Handle individual image upload
+      if (req.files && req.files.length > 0) { // Check if files are uploaded
+          // Clear existing images array
+          product.images = [];
+
+          req.files.forEach((file) => {
+              const newImage = file.path;
+              product.images.push(newImage);
+          });
+      }
+
+      // Update the product with the new data
+      await Product.findByIdAndUpdate(productId, updates);
+      res.redirect('/admin/products');
   } catch (error) {
-    next(error);
+      next(error);
   }
 };
 

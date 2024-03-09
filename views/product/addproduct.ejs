@@ -102,11 +102,11 @@
             </div>
             <div class="form-group">
                 <label for="price">Product Price:</label>
-                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" onchange="calculateSellingPrice()" required>
+                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
             </div>
             <div class="form-group">
-                <label for="discount">Discount Percentage:</label>
-                <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" onchange="calculateSellingPrice()">
+                <label for="sellingPrice">Selling Price:</label>
+                <input type="number" class="form-control" id="sellingPrice" name="sellingPrice" min="0" step="0.01" required>
             </div>
             <div class="form-group">
                 <label for="brand">Brand:</label>
@@ -133,13 +133,14 @@
                 <label for="UrunImage">Product Images</label>
                 <input name="img" accept="image/*" id="image" type="file" class="form-control" multiple>
                 <div class="container d-flex">
-                  <div id="image-container" class="mt-5 ms-5 mb-5"></div>
-                  <div id="cropper-container" class="mt-3 mb-5"></div>
+                    <div id="image-container" class="mt-5 ms-5 mb-5"></div>
+                    <div id="cropper-container" class="mt-3 mb-5"></div>
                 </div>
-              </div>
+            </div>
             <div id="image-container"></div>
             <button type="submit" class="btn btn-primary btn-block btn-submit">Add Product</button>
         </form>
+        
     </div>
 
     <!-- <div class="popup-container" id="popup-container" style="display: none;">

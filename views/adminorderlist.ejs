@@ -154,7 +154,7 @@
                   <td><%= item.productId.name %></td>
                   <td><%= item.quantity %></td>
                   <td><%= order.orderDate.toDateString() %></td>
-                  <td>₹<%= item.productId.price %></td>
+                  <td>₹<%= order.totalAmount %></td>
                   <td>
                     <select class="form-select" id="orderStatus<%= index %>" name="orderStatus" onchange="updateOrderStatus('<%= order._id %>', this.value)" style="color: cornsilk;">
                       <option class="text-dark" value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>

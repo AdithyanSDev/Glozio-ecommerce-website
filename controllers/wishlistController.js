@@ -1,6 +1,7 @@
 const Wishlist = require('../models/wishlist');
 const User = require('../models/user')
 const Category=require('../models/category')
+const Swal = require('sweetalert2');
 
 // Controller to add a product to the wishlist
 exports.addToWishlist = async (req, res) => {
@@ -9,9 +10,7 @@ exports.addToWishlist = async (req, res) => {
     const userId = req.userId;
     
     const existingItem = await Wishlist.findOne({ user: userId, product: productId });
-console.log(productId)
-console.log(userId)
-console.log(existingItem)
+
     if (existingItem) {
       return res.status(400).json({ message: 'Product already in wishlist' });
     }
@@ -25,7 +24,17 @@ console.log(existingItem)
     // Save the wishlist item to the database
     await wishlistItem.save();
 
-    res.status(201).json({ message: 'Product added to wishlist successfully' });
+    // SweetAlert integration
+    Swal.fire({
+      position: "top-end",
+      icon: "success",
+      title: "Product added to wishlist",
+      showConfirmButton: false,
+      timer: 1500
+    });
+
+    // Redirect to the detail page with the productId parameter
+    res.redirect(`/detail/${productId}`);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

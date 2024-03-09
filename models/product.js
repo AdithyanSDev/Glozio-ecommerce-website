@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -12,10 +13,23 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  discount: {
+  sellingPrice: {
     type: Number,
     required: true,
-    default: 0, // Default discount is 0 if not provided
+  },
+  discount: {
+    type: Number,
+    default: function () {
+      // Calculate discount based on price and selling price
+      return ((this.price - this.sellingPrice) / this.price) * 100;
+    },
+    validate: {
+      validator: function () {
+        // Ensure discount is valid
+        return this.discount >= 0 && this.discount <= 100;
+      },
+      message: 'Discount percentage must be between 0 and 100',
+    },
   },
   stock: {
     type: Number,
@@ -23,7 +37,7 @@ const productSchema = new mongoose.Schema({
     default: 0,
   },
   brand: {
-    type: String, // Add brand field
+    type: String,
     required: true,
   },
   category: {
@@ -32,22 +46,15 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   highlights: [String],
-  images: [String], // Change to a simple array of strings
+  images: [String],
   isDeleted: {
     type: Boolean,
     default: false,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
-  sellingPrice: {
-    type: Number,
-    default: function() {
-      // Selling price is the calculated total price
-      return this.price * (1 - this.discount / 100);
-    }
-  }
 });
 
 const Product = mongoose.model('Product', productSchema);

@@ -294,12 +294,19 @@
                             });
                         });
                     %>
-                    
                     <% if (anyProductInStock) { %>
-                        <a class="btn btn-block btn-primary font-weight-bold my-3 py-3" href="/checkout">Proceed To Checkout</a>
+                        <!-- Form for proceeding to checkout -->
+                        <form action="/checkout" method="GET">
+                            <!-- Hidden input field for the coupon code -->
+                            <input type="hidden" name="couponCode" value="<%= couponCode %>">
+                            <!-- Button to submit the form -->
+                            <button type="submit" class="btn btn-block btn-primary font-weight-bold my-3 py-3">Proceed To Checkout</button>
+                        </form>
                     <% } else { %>
+                        <!-- Button for when no products are available -->
                         <button class="btn btn-block btn-primary font-weight-bold my-3 py-3" disabled>No Products Available</button>
                     <% } %>
+                    
                     
                     </div>
                 </div>

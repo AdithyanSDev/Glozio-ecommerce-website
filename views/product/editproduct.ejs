@@ -26,18 +26,16 @@
             </div>
             <div class="form-group">
                 <label for="price">Product Price:</label>
-                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" value="<%= product.price %>" onchange="calculateSellingPrice()" required>
+                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" value="<%= product.price %>" required>
             </div>
             <div class="form-group">
-                <label for="discount">Discount Percentage:</label>
-                <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" value="<%= product.discount %>" onchange="calculateSellingPrice()">
+                <label for="sellingPrice">Selling Price:</label>
+                <input type="number" class="form-control" id="sellingPrice" name="sellingPrice" min="0" step="0.01" value="<%= product.sellingPrice %>" required>
             </div>
-            <!-- Removed the input field for discount price -->
             <div class="form-group">
                 <label for="brand">Brand:</label>
                 <input type="text" class="form-control" id="brand" name="brand" value="<%= product.brand %>" required>
             </div>
-            
             <div class="form-group">
                 <label for="category">Category:</label>
                 <select class="form-control" id="category" name="category" required>
@@ -46,14 +44,13 @@
                     <% }); %>
                 </select>
             </div>
-            
             <div class="form-group">
                 <label for="stock">Stock:</label>
                 <input type="number" class="form-control" id="stock" name="stock" min="0" value="<%= product.stock %>" required>
             </div>
             <div class="form-group">
                 <label for="highlights">Highlights/Specs:</label>
-                <textarea class="form-control" id="highlights" name="highlights" rows="4" required><%= product.highlights %></textarea>
+                <textarea class="form-control" id="highlights" name="highlights" rows="4" required><%= product.highlights.join("\n") %></textarea>
             </div>
             <div class="form-group">
                 <label>Existing Product Images:</label>
@@ -66,22 +63,20 @@
                     <% }); %>
                 </div>
             </div>
-            
             <div class="form-group">
                 <label for="images">Product Images:</label>
                 <input type="file" class="form-control-file" id="new_images" name="img" accept="image/*" multiple>
             </div>
-            <!-- Displaying selling price and discount percentage -->
             <h3 class="font-weight-semi-bold mb-4">
-                ₹<span id="selling_price"><%= product.discount ? (product.price * (1 - product.discount / 100)).toFixed(2) : product.price.toFixed(2) %></span> 
+                ₹<span id="selling_price"><%= product.sellingPrice.toFixed(2) %></span> 
                 <small class="text-muted ml-2">
                     <del>₹<span id="original_price"><%= product.price.toFixed(2) %></span></del> 
-                    (<span id="discount_percentage"><%= product.discount ? product.discount.toFixed(2) : '0.00' %>%</span>)
+                    (<span id="discount_percentage"><%= product.discount.toFixed(2) %>%</span>)
                 </small>
             </h3>
-            
             <button type="submit" class="btn btn-primary btn-block">Update Product</button>
         </form>
+        
     </div>
     
     <script>
@@ -99,7 +94,7 @@
                     button.closest('.col-md-3').remove();
                 } else {    
                     console.error('Failed to delete image');
-                }
+                }   
             })
             .catch(error => {
                 console.error('Error:', error);

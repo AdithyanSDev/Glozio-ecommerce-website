@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+// Update the OrderSchema to include a reference to the coupon used
 const OrderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Types.ObjectId,
@@ -43,9 +43,9 @@ const OrderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    coupons: {
-        type: String,
-        default: ''
+    couponUsed: {
+        type: mongoose.Schema.Types.ObjectId, // Reference to the Coupon schema
+        ref: 'Coupon'
     },
     totalAmount: {
         type: Number,

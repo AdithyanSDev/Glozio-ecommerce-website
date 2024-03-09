@@ -4,6 +4,7 @@ const Order = require('../models/order');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
+const Product=require('../models/product')
 
 
 const hashPassword = async (password) => {
@@ -46,47 +47,61 @@ exports.adminLogin = async (req, res) => {
   }
 };
 
-
 exports.adminhome = async (req, res) => {
   try {
     const token = req.cookies.Authorization;
     console.log("login token", token);
     if (token) {
       // Fetch data for overall sales, discount, and order amount from the database
-      const overallSales = await Order.aggregate([
-        { $match: { orderStatus: "Delivered" } }, // Assuming "Delivered" status indicates a successful sale
-        { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } }
-      ]);
+      const overallSales = await Order.find().count();
 
       const overallDiscount = await Order.aggregate([
         { $match: { orderStatus: "Delivered" } },
         { $group: { _id: null, totalDiscount: { $sum: "$coupons" } } }
       ]);
 
+      // Calculate total discount for all products
+      const totalProductDiscount = await Product.aggregate([
+        { $match: { isDeleted: false } }, // Exclude deleted products
+        { 
+          $group: { 
+            _id: null, 
+            totalDiscount: { 
+              $sum: { 
+                $subtract: ["$price", "$sellingPrice"] // Calculate discount for each product
+              } 
+            } 
+          } 
+        }
+      ]);
+
+      // Calculate total discount from coupons used by users
+      const totalCouponDiscount = await Order.aggregate([
+        { $match: { orderStatus: "Delivered", coupons: { $exists: true, $ne: [] } } }, // Filter orders with coupons
+        { $unwind: "$coupons" },
+        { $group: { _id: null, totalCouponDiscount: { $sum: "$coupons.discountAmount" } } }
+      ]);
+
       const totalOrderAmount = await Order.aggregate([
-        { $match: { orderStatus: "Delivered" } },
-        { $unwind: "$orderedItems" },
-        {
-          $lookup: {
-            from: "products",
-            localField: "orderedItems.productId",
-            foreignField: "_id",
-            as: "productDetails"
-          }
-        },
-        { $unwind: "$productDetails" },
-        { $group: { _id: null, totalAmount: { $sum: "$productDetails.price" } } }
+        { $match: { orderStatus: "Delivered" } }, // Assuming "Delivered" status indicates a successful sale
+        { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } }
       ]);
 
       // Extract the total order amount from the result
       const totalOrderAmountValue = totalOrderAmount.length > 0 ? totalOrderAmount[0].totalAmount : 0;
 
       // Extract calculated values from aggregation results
-      const totalSales = overallSales.length > 0 ? overallSales[0].totalAmount : 0;
+      const totalSales = overallSales;
       const totalDiscount = overallDiscount.length > 0 ? overallDiscount[0].totalDiscount : 0;
+      const totalProductDiscountValue = totalProductDiscount.length > 0 ? totalProductDiscount[0].totalDiscount : 0;
+      const totalCouponDiscountValue = totalCouponDiscount.length > 0 ? totalCouponDiscount[0].totalCouponDiscount : 0;
 
+      console.log(totalSales,"totalsales")
+      console.log(totalDiscount,"totalDiscount")
+      console.log(totalProductDiscount,"totalProductDiscount")
+      console.log(totalCouponDiscount,"totalCouponDiscount")
       // Render admin home page with calculated values
-      res.render('adminhome', { totalSales, totalDiscount,totalOrderAmountValue });
+      res.render('adminhome', { totalSales, totalDiscount, totalOrderAmountValue, totalProductDiscount: totalProductDiscountValue, totalCouponDiscount: totalCouponDiscountValue });
     } else {
       // Token doesn't exist, render admin login page
       res.render('adminlogin');
@@ -96,6 +111,8 @@ exports.adminhome = async (req, res) => {
     res.status(500).send('Internal server error');
   }
 };
+
+
 
 // List users
 exports.listUsers = async (req, res) => {

@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
   wallet: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Wallet'
+  },
+  couponUsed: {
+    type: Boolean,
+    default: false
   }
 });
 

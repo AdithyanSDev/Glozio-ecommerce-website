@@ -28,6 +28,7 @@
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+   
 </head>
 
 <body>
@@ -261,14 +262,17 @@
                     <form action="/addcart" method="POST">
                         <input type="hidden" name="productId" value="<%= product._id %>">
                         <% if (product.stock > 0) { %>
-                            <% let isInCart = usercart.some(cartItem => cartItem.product.some(item => item.productId.equals(product._id))); %>
-                        
-                         
-                            <% if (isInCart) { %>
-                                
-                                <a href="/cart" class="btn btn-primary px-3">
-                                    <i class="fa fa-shopping-cart mr-1"></i> Go to Cart
-                                </a>
+                            <% if (usercart && Array.isArray(usercart) && usercart.length > 0) { %>
+                                <% let isInCart = usercart.some(cartItem => cartItem.product.some(item => item.productId.equals(product._id))); %>
+                                <% if (isInCart) { %>
+                                    <a href="/cart" class="btn btn-primary px-3">
+                                        <i class="fa fa-shopping-cart mr-1"></i> Go to Cart
+                                    </a>
+                                <% } else { %>
+                                    <button class="btn btn-primary px-3" type="submit">
+                                        <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
+                                    </button>
+                                <% } %>
                             <% } else { %>
                                 <button class="btn btn-primary px-3" type="submit">
                                     <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
@@ -280,7 +284,7 @@
                             </button>
                         <% } %>
                     </form>
-                  
+                    
                    
                     
                     
@@ -538,8 +542,23 @@
     <script src="js/main.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-   
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Check if the URL contains productId parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('productId');
+      
+        // If productId is present, show SweetAlert
+        if (productId) {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Product added to wishlist",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      </script>
 
     <script>
         document.getElementById('img-container').addEventListener('mouseover', function(){

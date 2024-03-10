@@ -33,6 +33,7 @@ router.post('/razorpay/pay/:orderId',verifyToken,orderController.razorsuccess)
 // wishlist routes
 router.get('/wishlist', verifyToken,wishlistController.getWishlist);
 router.post('/wishlist/add',verifyToken, wishlistController.addToWishlist);
+router.get('/addtocart/:productId', verifyToken, wishlistController.addToCartfromWishlist);
 router.get('/wishlistremove/:productid',verifyToken, wishlistController.removeFromWishlist);
 
 //coupen apply route

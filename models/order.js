@@ -43,10 +43,7 @@ const OrderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    couponUsed: {
-        type: mongoose.Schema.Types.ObjectId, // Reference to the Coupon schema
-        ref: 'Coupon'
-    },
+    
     totalAmount: {
         type: Number,
         required: true

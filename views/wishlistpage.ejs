@@ -188,7 +188,6 @@
                         <div class="card-body">
                             <% wishlistItems.forEach(item => { %>
                             <div class="row mb-4">
-                                
                                 <div class="col-md-2">
                                     <img src="<%= item.product.images[0] %>" class="img-fluid" alt="<%= item.product.name %>">
                                 </div>
@@ -208,19 +207,24 @@
                                         <a href="/wishlistremove/<%= item.product.id %>" class="btn btn-danger btn-sm">
                                             <i class="fa-solid fa-trash"></i>
                                         </a>
-                                        
+                                        <a href="/addtocart/<%= item.product.id %>" class="btn btn-primary btn-sm ml-2">
+                                            Add to Cart
+                                        </a>
                                     </div>
-                                   
-                                    <p><strong>₹<%= item.product.sellingPrice.toFixed(2) %></strong>  <span class="text-muted ml-2"><del>₹<%= item.product.price %></del> <span class="text-success"><%= item.product.discount%>% off</span></span></p>
-                                   
+                                    <p>
+                                        <strong>₹<%= item.product.sellingPrice.toFixed(2) %></strong>
+                                        <span class="text-muted ml-2">
+                                            <del>₹<%= item.product.price %></del>
+                                            <span class="text-success"><%= Math.round(item.product.discount)%>% off</span>
+                                        </span>
+                                    </p>
                                 </div>
-                                
                             </div>
-                           
                             <% }); %>
                         </div>
                     </div>
                 </div>
+                
                 
                 
                 

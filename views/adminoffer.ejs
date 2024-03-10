@@ -134,30 +134,25 @@
     
     
     <div class="container">
-      
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Discount</th>
-                    <!-- Add other columns as needed -->
-                </tr>
-            </thead>
-            <tbody>
-                <% offer.forEach(offer => { %>
-                    <tr>
-                        <td><%= offer.title %></td>
-                        <td><%= offer.type %></td>
-                        <td><%= offer.discount %></td>
-                        <!-- Add other columns as needed -->
-                    </tr>
-                <% }); %>
-            </tbody>
-        </table>
-    </div>
-
-
+      <div class="row">
+          <% offer.forEach((offer) => { %>
+              <div class="col-lg-4 mb-4" style="height: 600px; width: 500px;">
+                  <div class="card">
+                      <img src="/uploads/<%= offer.bannerImg[0] %>" class="card-img-top" alt="Offer Image">
+                      <div class="card-body">
+                          <h5 class="card-title"><%= offer.title %></h5>
+                          <p class="card-text"><%= offer.description %></p>
+                          <p class="card-text">Type: <%= offer.type %></p>
+                          <p class="card-text">Discount: <%= offer.discount %></p>
+                          <p class="card-text">Expiry Date: <%= offer.expiryDate.toDateString() %></p>
+                      </div>
+                  </div>
+              </div>
+          <% }) %>
+      </div>
+  </div>
+  
+  
 
   </main>
   <div class="fixed-plugin">

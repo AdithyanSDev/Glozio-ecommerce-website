@@ -4,6 +4,8 @@ const Product=require('../models/product')
 const Category=require('../models/category')
 const Wallet=require( '../models/wallet')
 const Order=require('../models/order')
+const Coupon = require('../models/coupon');
+const Offer=require('../models/offer')
 
 
 exports.renderUserprofile = async (req, res) => {
@@ -221,3 +223,28 @@ exports.walletShow = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+exports.getCouponData = async (req, res) => {
+    try {
+        const userId = req.userId; // Assuming userId is accessible from the request
+
+        // Check if userId is valid
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID not found in request' });
+        }
+
+        // Fetch user data
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const categories = await Category.find({ isDeleted: false });
+        const coupons = await Coupon.find({});
+        
+        res.render('viewcoupons', { categories, user,coupons });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+

@@ -6,6 +6,14 @@ const offerSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String,
+        required: true
+    },
+    bannerImg: {
+        type: [String],
+        required: true
+    },
     type: {
         type: String,
         enum: ['Product', 'Category', 'Referral'],
@@ -15,7 +23,11 @@ const offerSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    // Add other fields as per your requirements
+    expiryDate: {
+        type: Date,
+        required: true
+    }
 }, { timestamps: true });
+ 
 
 module.exports = mongoose.model('Offer', offerSchema);

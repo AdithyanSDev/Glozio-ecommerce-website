@@ -12,7 +12,7 @@ exports.addToWishlist = async (req, res) => {
     const existingItem = await Wishlist.findOne({ user: userId, product: productId });
 
     if (existingItem) {
-      return res.status(400).json({ message: 'Product already in wishlist' });
+      return res.redirect(`/detail/${productId}?msg=error`)
     }
 
     // Create a new wishlist item
@@ -23,18 +23,10 @@ exports.addToWishlist = async (req, res) => {
 
     // Save the wishlist item to the database
     await wishlistItem.save();
-
-    // SweetAlert integration
-    Swal.fire({
-      position: "top-end",
-      icon: "success",
-      title: "Product added to wishlist",
-      showConfirmButton: false,
-      timer: 1500
-    });
+  
 
     // Redirect to the detail page with the productId parameter
-    res.redirect(`/detail/${productId}`);
+    res.redirect(`/detail/${productId}?msg=added`);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

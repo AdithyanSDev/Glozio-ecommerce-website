@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const Category = require('../models/category');
 const Review = require('../models/product')
 const User=require('../models/user')
+const Offer=require('../models/offer')
 const fs = require('fs');
 const path = require('path');
 
@@ -279,5 +280,49 @@ exports.getSortProductsCategory = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+
+exports.productOffer=async(req,res)=>{
+  try{
+    const offer=await Offer.find()
+    const categories = await Category.find({ isDeleted: false }).populate('products');
+    const token = req.cookies.token;
+    res.render('offer',{categories,token,offer})
+  }catch(error){
+    console.error(error)
+  }
+ 
+}
+
+
+exports.getOfferDetail = async (req, res) => {
+  try {
+      const offerId = req.params.id;
+
+      // Fetch the offer details
+      const offer = await Offer.findById(offerId);
+
+      // Fetch the products associated with the offer
+      const products = await Product.find();
+
+      // Calculate discounted prices for products
+      const discountedProducts = products.map(product => {
+          const discountedPrice = product.price - (product.price * (offer.discount / 100));
+          return {
+              ...product.toObject(),
+              discountedPrice
+          };
+      });
+      const categories = await Category.find({ isDeleted: false }).populate('products');
+      const token = req.cookies.token;
+
+      // Render the offer detail page with offer and discounted products
+      res.render('offerdetail', { offer, products: discountedProducts ,categories,token});
+  } catch (error) {
+      console.error('Error fetching offer details:', error);
+      res.status(500).json({ message: 'Internal server error' });
   }
 };

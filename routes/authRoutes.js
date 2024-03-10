@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { redirectToUserLogin, userLogin, registerUser, renderOTPPage,changePassword,  verifyOTP, resendOTP, logout,renderChangePasswordPage,renderForgotPasswordPage,sendPasswordResetEmail } = require('../controllers/authController');
-const{renderUserprofile,renderAddress,addAddress,renderUpdateAddress,renderEdit, editAddress,deleteAddress,addAddressCheckOut, editprofile}=require('../controllers/profileController')
+const{renderUserprofile,renderAddress,addAddress,renderUpdateAddress,renderEdit, editAddress,deleteAddress,addAddressCheckOut, editprofile,getCouponData}=require('../controllers/profileController')
 const { verifyToken } = require('../middleware/authMiddleware');
 
 router.get('/signin', redirectToUserLogin);
@@ -32,6 +32,7 @@ router.get('/forgot-password',verifyToken, renderForgotPasswordPage);
 // Route for handling the password reset request
 router.post('/forgot-password',verifyToken, sendPasswordResetEmail);
 
+router.get('/coupons',verifyToken, getCouponData);
 
 
 router.get('/admin/login', (req, res) => {

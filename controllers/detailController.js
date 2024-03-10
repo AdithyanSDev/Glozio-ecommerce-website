@@ -3,34 +3,35 @@ const Product = require('../models/product');
 const Review = require('../models/review');
 const Category = require('../models/category');
 const Cart = require('../models/cart');
+
 exports.renderDetailPage = async (req, res) => {
   try {
-    const productId = req.params.productId;
-    const product = await Product.findById(productId);
-    
-    // Fetch reviews for the product
-    const reviews = await Review.find({ productId });
+      const productId = req.params.productId;
+      const product = await Product.findById(productId);
+      // Fetch reviews for the product
+      const reviews = await Review.find({ productId });
 
-    // Fetch reviews count for the product
-    const reviewCount = await Review.countDocuments({ productId });
-    const token = req.cookies.token;
-    const userId = req.userId; 
+      // Fetch reviews count for the product
+      const reviewCount = await Review.countDocuments({ productId });
+      const token = req.cookies.token;
+      const userId = req.userId; 
 
-    // Fetch user's cart if available
-    let usercart;
-    if (userId) {
-      usercart = await Cart.findOne({ user: userId }).populate('product.productId');
-    }
+      // Fetch related products based on the current product's category
+      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
 
-    // Fetch related products based on the current product's category
-    const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
+      // Fetch user's cart
+      const usercart = await Cart.find({ user: userId }).populate('product.productId');
+      res.render('detail', { product, reviews, reviewCount, relatedProducts, token, usercart});
 
-    res.render('detail', { product, reviews, reviewCount, relatedProducts, token, usercart });
+
+
   } catch (error) {
-    console.error(error);
-    res.render('404page');
+      console.error(error);
+      res.render('404page');
   }
 };
+
+
 
 
 exports.reviewCount=async (req, res) => {

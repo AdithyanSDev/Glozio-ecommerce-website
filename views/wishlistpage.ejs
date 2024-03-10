@@ -161,7 +161,7 @@
                                     <!-- Add any relevant icons or badges -->
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                    <a class="mb-0">Coupons</a>
+                                    <a href="/api/coupons" class="mb-0">Coupons</a>
                                     <!-- Add any relevant icons or badges -->
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap dropdown">
@@ -210,10 +210,11 @@
                                         </a>
                                         
                                     </div>
-                                    
+                                   
                                     <p><strong>₹<%= item.product.sellingPrice.toFixed(2) %></strong>  <span class="text-muted ml-2"><del>₹<%= item.product.price %></del> <span class="text-success"><%= item.product.discount%>% off</span></span></p>
                                    
                                 </div>
+                                
                             </div>
                            
                             <% }); %>

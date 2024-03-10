@@ -188,7 +188,7 @@ exports.removeFromCart = async (req, res) => {
 
 exports.renderCheckout = async (req, res) => {
     const { couponCode } = req.body;
-    console.log(couponCode,"checkout")
+    console.log(couponCode, "checkout")
     try {
         const token = req.cookies.token;
         if (token) {
@@ -196,17 +196,17 @@ exports.renderCheckout = async (req, res) => {
             if (!userId) {
                 return res.redirect('/api/user/login');
             }
-            
+
             const categories = await Category.find({ isDeleted: false });
             const user = await User.findById(userId);
-            
+
             // Retrieve user's cart with subtotal
             let usercart = await Cart.findOneAndUpdate(
                 { user: userId },
                 { $pull: { 'product': { 'productId.stock': 0 } } }, // Remove products with zero stock
                 { new: true }
             ).populate('product.productId');
-            
+
             // Get subtotal from user's cart
             const subtotal = usercart.subtotal;
 
@@ -216,14 +216,15 @@ exports.renderCheckout = async (req, res) => {
             // Map productsInfo from user's cart
             const productsInfo = usercart.product.map(cartItem => ({
                 name: cartItem.name,
-                price: subtotal
+                price: cartItem.price, // Use cartItem.price instead of subtotal
+                quantity: cartItem.quantity // Include quantity if needed
             }));
-            
+
             // Retrieve coupon information
             const coupon = await Coupon.findOne({ code: couponCode });
 
             let discountedSubtotal = subtotal; // Initialize discountedSubtotal with subtotal
-            
+
             // Apply coupon discount if applicable
             if (coupon && subtotal >= coupon.minimumPurchaseAmount) {
                 discountedSubtotal -= coupon.discountAmount;
@@ -232,8 +233,8 @@ exports.renderCheckout = async (req, res) => {
             const address = await Address.find({ user: userId });
             const wallet = await Wallet.findOne({ userId });
 
-            // Pass discountedSubtotal to the checkout page along with other data
-            res.render('checkout', { user, usercart, subtotal, discountedSubtotal, token, categories, address, productsInfo, wallet ,couponCode});
+            // Pass discountedSubtotal and productsInfo to the checkout page along with other data
+            res.render('checkout', { user, usercart, subtotal, discountedSubtotal, token, categories, address, productsInfo, wallet, couponCode });
         }
     } catch (error) {
         console.error(error);

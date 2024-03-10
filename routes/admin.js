@@ -8,6 +8,7 @@ const couponController =require( '../controllers/couponController' )
 const salesController =require('../controllers/salesController')
 const offerController =require('../controllers/offerController')
 const upload=require('../multer/multerConfig')
+const uploadbanner = require('../multer/bannerMulter')
 const { isAdmin } = require('../middleware/authMiddleware');
 
 
@@ -59,6 +60,7 @@ router.get('/generateReport', salesController.generateReport);
 //offer routes
 router.get('/offer',isAdmin,offerController.renderOffer)
 router.get('/addofferpage',isAdmin,offerController.renderAddoffer)
-router.post('/addoffer',isAdmin,offerController.createOffer)
+router.post('/addoffer', isAdmin,uploadbanner, offerController.createOffer);
+
 
 module.exports = router;

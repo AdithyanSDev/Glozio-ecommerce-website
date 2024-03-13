@@ -38,7 +38,7 @@ router.get('/products/add',isAdmin, productController.showAddProductForm);
 router.post('/products/add',isAdmin, upload, productController.addProduct);
 router.get('/products/:productId/edit',isAdmin, productController.showEditProductForm);
 router.post('/products/:productId/edit',isAdmin, upload, productController.editProduct);
-router.delete('/admin/products/:productId/delete-image/:imageIndex',isAdmin,productController.deleteImage)
+router.delete('/deleteimage/:productId/:index', productController.imagedelete);
 router.post('/products/:productId/delete', productController.deleteProduct);
 
 
@@ -61,6 +61,8 @@ router.get('/generateReport', salesController.generateReport);
 router.get('/offer',isAdmin,offerController.renderOffer)
 router.get('/addofferpage',isAdmin,offerController.renderAddoffer)
 router.post('/addoffer', isAdmin,uploadbanner, offerController.createOffer);
-
+router.get('/offers/:id/edit',isAdmin, offerController.editOffer);
+router.post('/edit/:id',isAdmin,upload,offerController.editofferpost);
+router.post('/offers/:id/delete',isAdmin ,offerController.deleteOffer);
 
 module.exports = router;

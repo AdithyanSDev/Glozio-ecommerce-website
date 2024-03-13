@@ -276,9 +276,9 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-<%= address._id %>">
-                                            <a class="dropdown-item" href="/api//addresses/<%= address._id %>">Edit</a>
+                                            <a class="dropdown-item" href="/api/addresses/<%= address._id %>">Edit</a>
 
-                                            <a class="dropdown-item delete"  data-id="<%= address._id %>">Delete</a>
+                                            <a class="dropdown-item delete" href="/api/user/address/:id"  data-id="<%= address._id %>">Delete</a>
 
 
                                         </div>
@@ -425,19 +425,30 @@
               
              if(confirm("Do you really want to delete this record")){
                  $.ajax(request).done(function(response){
-                     alert("Record deleted successfully")
                      location.reload();
                  })
+             }else{
+                location.reload();
              }
          })
      }
    </script>
+   
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const addAddressForm = document.getElementById('addAddressForm');
         const formInputs = addAddressForm.querySelectorAll('input, select');
 
         addAddressForm.addEventListener('submit', function (event) {
+            // Remove previous error styling and messages
+            formInputs.forEach(input => {
+                input.classList.remove('is-invalid');
+                const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                if (errorElement) {
+                    errorElement.textContent = '';
+                }
+            });
+
             // Prevent form submission
             event.preventDefault();
 
@@ -451,21 +462,44 @@
                 // Check if input value is empty
                 if (!input.value) {
                     isValid = false;
-                    // Show alert message
-                    alert('All fields are required.');
+                    // Show error message
+                    const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                    if (errorElement) {
+                        errorElement.textContent = 'This field is required.';
+                    }
+                    input.classList.add('is-invalid');
+                } else {
+                    // Validate name input to allow only letters
+                    if (input.name === 'name' && !/^[a-zA-Z]+$/.test(input.value)) {
+                        isValid = false;
+                        // Show error message
+                        const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                        if (errorElement) {
+                            errorElement.textContent = 'Only letters are allowed in the name.';
+                        }
+                        input.classList.add('is-invalid');
+                    }
                 }
 
                 // Additional validation for mobile number and pincode
                 if (input.name === 'mobileNumber' && input.value === '0000000000') {
                     isValid = false;
-                    // Show alert message
-                    alert('Mobile number cannot be all zeros.');
+                    // Show error message
+                    const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                    if (errorElement) {
+                        errorElement.textContent = 'Mobile number cannot be all zeros.';
+                    }
+                    input.classList.add('is-invalid');
                 }
 
                 if (input.name === 'pincode' && input.value === '000000') {
                     isValid = false;
-                    // Show alert message
-                    alert('Pincode cannot be all zeros.');
+                    // Show error message
+                    const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                    if (errorElement) {
+                        errorElement.textContent = 'Pincode cannot be all zeros.';
+                    }
+                    input.classList.add('is-invalid');
                 }
             });
 

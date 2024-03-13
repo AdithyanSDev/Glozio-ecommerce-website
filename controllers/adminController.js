@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const Product=require('../models/product')
+const Chart=require('chart.js')
 
 
 const hashPassword = async (password) => {
@@ -96,12 +97,42 @@ exports.adminhome = async (req, res) => {
       const totalProductDiscountValue = totalProductDiscount.length > 0 ? totalProductDiscount[0].totalDiscount : 0;
       const totalCouponDiscountValue = totalCouponDiscount.length > 0 ? totalCouponDiscount[0].totalCouponDiscount : 0;
 
-      console.log(totalSales,"totalsales")
-      console.log(totalDiscount,"totalDiscount")
-      console.log(totalProductDiscount,"totalProductDiscount")
-      console.log(totalCouponDiscount,"totalCouponDiscount")
+      // Fetch best selling products
+      const bestSellingProducts = await Order.aggregate([
+        { $match: { orderStatus: "Delivered" } },
+        { $unwind: "$orderedItems" },
+        { $group: { _id: "$orderedItems.productId", count: { $sum: "$orderedItems.quantity" } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+        { $lookup: { from: "products", localField: "_id", foreignField: "_id", as: "productDetails" } }
+      ]);
+
+      // Fetch best selling categories
+      const bestSellingCategories = await Product.aggregate([
+        { $group: { _id: "$category", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+        { $lookup: { from: "categories", localField: "_id", foreignField: "_id", as: "categoryDetails" } }
+      ]);
+
+      // Fetch best selling brands
+      const bestSellingBrands = await Product.aggregate([
+        { $group: { _id: "$brand", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 }
+      ]);
+
       // Render admin home page with calculated values
-      res.render('adminhome', { totalSales, totalDiscount, totalOrderAmountValue, totalProductDiscount: totalProductDiscountValue, totalCouponDiscount: totalCouponDiscountValue });
+      res.render('adminhome', { 
+        totalSales, 
+        totalDiscount, 
+        totalOrderAmountValue, 
+        totalProductDiscount: totalProductDiscountValue, 
+        totalCouponDiscount: totalCouponDiscountValue,
+        bestSellingProducts,
+        bestSellingCategories,
+        bestSellingBrands
+      });
     } else {
       // Token doesn't exist, render admin login page
       res.render('adminlogin');
@@ -111,6 +142,11 @@ exports.adminhome = async (req, res) => {
     res.status(500).send('Internal server error');
   }
 };
+
+
+
+
+
 
 
 

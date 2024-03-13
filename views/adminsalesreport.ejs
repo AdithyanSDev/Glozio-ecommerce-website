@@ -155,23 +155,25 @@
     <!-- End Navbar -->
     <div class="container" style="margin-top: 20px;">
       <div class="row justify-content-center">
-          <div class="col-md-6" style="background-color: #f8f8f8; padding: 20px; border-radius: 5px;">
-              <h1 style="text-align: center;">Sales Report</h1>
+          <div class="col-md-6" style="background-color: #1b1b1b; padding: 20px; border-radius: 5px;">
+              <h2 class="text-light" style="text-align: center;">Sales Report</h2>
               <form action="/admin/generateReport" method="GET">
-                  <label for="filterType" style="display: block; margin-bottom: 5px;">Filter Type:</label>
-                  <select name="filterType" id="filterType" style="width: 100%; padding: 5px; margin-bottom: 10px;">
-                      <option value="daily">Daily</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="monthly">Monthly</option>
-                      <option value="yearly">Yearly</option>
-                      <option value="custom">Custom</option>
-                  </select>
-                  <label for="startDate" style="display: block; margin-bottom: 5px;">Start Date:</label>
-                  <input type="date" name="startDate" id="startDate" style="width: 100%; padding: 5px; margin-bottom: 10px;">
-                  <label for="endDate" style="display: block; margin-bottom: 5px;">End Date:</label>
-                  <input type="date" name="endDate" id="endDate" style="width: 100%; padding: 5px; margin-bottom: 10px;">
-                  <button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Generate Report</button>
-              </form>
+                <label for="filterType" style="display: block; margin-bottom: 5px;">Filter Type:</label>
+                <select name="filterType" id="filterType" style="width: 100%; padding: 5px; margin-bottom: 10px;" onchange="toggleDateInputs()">
+                    <option value="">Filter By</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <label for="startDate" id="startDateLabel" style="display: none; margin-bottom: 5px;">Start Date:</label>
+                <input type="date" name="startDate" id="startDate" style="display: none; width: 100%; padding: 5px; margin-bottom: 10px;">
+                <label for="endDate" id="endDateLabel" style="display: none; margin-bottom: 5px;">End Date:</label>
+                <input type="date" name="endDate" id="endDate" style="display: none; width: 100%; padding: 5px; margin-bottom: 10px;">
+                <button type="submit" style="width: 100%; padding: 10px; background-color: #e52c92; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Generate Report</button>
+            </form>
+            
           </div>
       </div>
   </div>
@@ -251,6 +253,27 @@
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
   <script>
+    function toggleDateInputs() {
+        var filterType = document.getElementById("filterType").value;
+        var startDateLabel = document.getElementById("startDateLabel");
+        var startDateInput = document.getElementById("startDate");
+        var endDateLabel = document.getElementById("endDateLabel");
+        var endDateInput = document.getElementById("endDate");
+
+        if (filterType === "custom") {
+            startDateLabel.style.display = "block";
+            startDateInput.style.display = "block";
+            endDateLabel.style.display = "block";
+            endDateInput.style.display = "block";
+        } else {
+            startDateLabel.style.display = "none";
+            startDateInput.style.display = "none";
+            endDateLabel.style.display = "none";
+            endDateInput.style.display = "none";
+        }
+    }
+</script>
+ <script>
     document.getElementById('reportType').addEventListener('change', function() {
         var reportType = this.value;
         var reports = ['daily', 'weekly', 'yearly', 'custom'];

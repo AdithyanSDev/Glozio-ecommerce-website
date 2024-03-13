@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 <style>
     body{
@@ -54,12 +58,12 @@
             </div>
             <div class="form-group">
                 <label>Existing Product Images:</label>
-                <div class="row">
+                <div class="row" id="imageContainer">
                     <% product.images.forEach((image, index) => { %>
                         <div class="col-md-3">
-                            <img src="/<%= image %>" class="img-thumbnail" alt="Product Image" style="width: 100px;">
-                            <button class="delete-btn btn-danger mt-2" data-image-index="<%= index %>" onclick="deleteImage(this)">Delete</button>
-                        </div>
+                            <img src="/<%= image %>" class="img-thumbnail" alt="Product Image" id="imgView_<%=index%>" style="width: 100px;">
+                            <button type="button" class="btn btn-danger btn-sm delete-image position-absolute" onclick="deleteImage('<%= product._id %>', '<%= index %>')">x</button>            
+                                    </div>
                     <% }); %>
                 </div>
             </div>
@@ -78,29 +82,55 @@
         </form>
         
     </div>
-    
-    <script>
-        function deleteImage(button) {
-            // Get the image index from the button's data-image-index attribute
-            const imageIndex = button.getAttribute('data-image-index');
-        
-            // Send AJAX request to delete the image at the specified index
-            fetch(`/admin/products/:productId/delete-image/${imageIndex}`, {
-                method: 'DELETE'
-            })
-            .then(response => { 
-                if (response.ok) {
-                    // Remove the image from the UI
-                    button.closest('.col-md-3').remove();
-                } else {    
-                    console.error('Failed to delete image');
-                }   
-            })
-            .catch(error => {
-                console.error('Error:', error);
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- <script>
+        function deleteImage(productId, index) {
+            if (!confirm("Are you sure you want to delete this image?")) {
+                return;
+            }
+            console.log(index, "is the index",productId);
+            $.ajax({
+                type: "DELETE",
+                url: `/admin/products/${productId}/delete-image/${index}`,
+                success: function(response) {
+                    console.log(response.message);
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert("An error occurred while deleting the image.");
+                }
             });
         }
-
+    </script> -->
+    
+    <script>
+        function deleteImage(productId, index) {
+            console.log(index,productId)
+    // Send an AJAX request to delete the image
+    fetch(`/admin/deleteimage/${productId}/${index}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // If the image is deleted successfully, remove it from the DOM
+            const imageContainer = document.getElementById('imageContainer');
+            const imagePreview = document.getElementById(`imgView_${index}`);
+            imageContainer.removeChild(imagePreview.parentElement);
+            console.log('Image deleted successfully');
+        } else {
+            console.error('Error deleting image:', response.statusText);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting image:', error);
+    });
+}
         function calculateSellingPrice() {
             var price = parseFloat(document.getElementById("price").value);
             var discount = parseFloat(document.getElementById("discount").value);

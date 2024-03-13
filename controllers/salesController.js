@@ -67,7 +67,8 @@ exports.generateReport = async (req, res) => {
         }).moveDown(0.5); // Move down a bit to create space between the logo and the text
         doc.fontSize(20).text('GLOZIO', { align: 'left' });
     // Report title
-    doc.fontSize(18).text('Sales report', { align: 'center' });
+    doc.fontSize(18).text(`Sales Report (${reportTitle})`, { align: 'center' });
+
     doc.moveDown();
 
     // Sales data
@@ -171,3 +172,4 @@ async function getOrderData(startDate, endDate) {
         throw error; // Throw the error to be caught in the calling function
     }
 }
+

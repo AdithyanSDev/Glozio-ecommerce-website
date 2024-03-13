@@ -52,3 +52,65 @@ exports.createOffer = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// Controller for editing an offer
+exports.editOffer = async (req, res) => {
+    try {
+        const offer = await Offer.findById(req.params.id);
+        if (!offer) {
+            return res.status(404).send('Offer not found');
+        }
+        // Render edit form
+        res.render('editOffer', { offer });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+};
+
+
+exports.editofferpost = async (req, res) => {
+    console.log(req.params)
+    console.log(req.body) 
+
+    try {
+        const { id } = req.params;
+        const { title, description, bannerImg, type, discount, expiryDate } = req.body;
+
+        // Find the offer by ID
+        let offer = await Offer.findById(id);
+
+        // Update offer properties if they are provided
+        if (title) offer.title = title;
+        if (description) offer.description = description;
+        if (bannerImg) offer.bannerImg = bannerImg;
+        if (type) offer.type = type;
+        if (discount) offer.discount = discount;
+        if (expiryDate) offer.expiryDate = expiryDate;
+
+        // Save the updated offer
+        offer = await offer.save();
+
+        res.redirect('/admin/offer');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
+
+
+// Controller for deleting an offer
+exports.deleteOffer = async (req, res) => {
+    try {
+        const offer = await Offer.findByIdAndDelete(req.params.id);
+        if (!offer) {
+            return res.status(404).send('Offer not found');
+        }
+        res.redirect('/admin/offer'); // Redirect to the offers page after deletion
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+};

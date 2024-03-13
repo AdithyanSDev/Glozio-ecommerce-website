@@ -232,7 +232,7 @@ exports.renderCheckout = async (req, res) => {
 
             const address = await Address.find({ user: userId });
             const wallet = await Wallet.findOne({ userId });
-
+           
             // Pass discountedSubtotal and productsInfo to the checkout page along with other data
             res.render('checkout', { user, usercart, subtotal, discountedSubtotal, token, categories, address, productsInfo, wallet, couponCode });
         }
@@ -246,7 +246,7 @@ exports.renderCheckout = async (req, res) => {
 exports.applyCoupon = async (req, res) => {
     try {
         const { couponCode } = req.body;
-console.log(couponCode,"kittty")
+
         // Find the coupon by code
         const coupon = await Coupon.findOne({ code: couponCode });
 
@@ -259,7 +259,7 @@ console.log(couponCode,"kittty")
         const user = await User.findById(userId);
 
         if (user.couponUsed) {
-            return res.status(400).send('Coupon already used');
+            return res.redirect('/cart?msg=added')
         }
 
         // Retrieve the user's cart

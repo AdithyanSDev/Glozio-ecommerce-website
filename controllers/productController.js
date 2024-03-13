@@ -5,6 +5,7 @@ const User=require('../models/user')
 const Offer=require('../models/offer')
 const fs = require('fs');
 const path = require('path');
+const { image } = require('pdfkit');
 
 // Function to list all products
 exports.listProducts = async (req, res) => {
@@ -104,6 +105,7 @@ exports.editProduct = async (req, res, next) => {
   try {
       const productId = req.params.productId;
       const updates = req.body;
+      const images=req.files
       const product = await Product.findById(productId); // Fetch the product
       if (!product) {
           return res.status(404).send('Product not found');
@@ -129,17 +131,11 @@ exports.editProduct = async (req, res, next) => {
               product.images.splice(index, 1);
           }
       }
-
-      // Handle individual image upload
-      if (req.files && req.files.length > 0) { // Check if files are uploaded
-          // Clear existing images array
-          product.images = [];
-
-          req.files.forEach((file) => {
-              const newImage = file.path;
-              product.images.push(newImage);
-          });
+      if(images&&images.length>0){
+        product.images=product.images.concat(images.map(image=>image.path))
+        await product.save()
       }
+      console.log(req.files)
 
       // Update the product with the new data
       await Product.findByIdAndUpdate(productId, updates);
@@ -150,24 +146,35 @@ exports.editProduct = async (req, res, next) => {
 };
 
 
-exports.deleteImage=async(req,res)=>{
-  const { productId, imageIndex } = req.params;
 
+// Controller logic
+exports.imagedelete = async (req, res) => {
   try {
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).send('Product not found');
-    }
-    product.images.splice(imageIndex, 1);
-    await product.save();
+      console.log("Entering image deletion controller");
+      const productId = req.params.productId;
+      const index = req.params.index;
+      console.log("Index:", index);
 
-    res.sendStatus(200);
+      let product = await Product.findById(productId);
+      console.log("Product:", product);
+
+      if (!product) {
+          return res.status(404).json({ message: "Product not found" });
+      }
+
+      if (index < 0 || index >= product.images.length) {
+          return res.status(400).json({ message: "Invalid image index" });
+      }
+
+      product.images.splice(index, 1);
+      await product.save();
+
+      res.status(200).json({ message: "Image deleted successfully" });
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+      console.error("Error deleting image:", error);
+      res.status(500).json({ message: "Internal Server Error" });
   }
-}
-
+};
 // Function to delete a product
 exports.deleteProduct = async (req, res) => {
   const productId = req.params.productId;

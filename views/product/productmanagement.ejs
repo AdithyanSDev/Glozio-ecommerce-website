@@ -157,7 +157,7 @@
                                 </td>
                                 <td><%= product.category ? product.category.name : 'Uncategorized' %></td>
                                 <td>₹<%= Math.round(product.price) %></td>
-                                <td><%= product.discount %>%</td>
+                                <td><%= Math.round(product.discount) %>%</td>
                                 <td>₹<%= Math.round(product.sellingPrice) %> </td>
                                 <td><%= product.stock %></td>
                                 <td>

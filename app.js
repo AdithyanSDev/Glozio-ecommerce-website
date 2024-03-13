@@ -112,6 +112,12 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
   res.cookie('token', token, { maxAge: 3600000 }); // Set token in cookie with an expiration time of 1 hour
   res.redirect('/');
 });
+  // app.use((req,res)=>{
+  //   res.status(404).render('404page')
+
+  // })
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -107,8 +107,8 @@ exports.getRelatedProducts = async (req, res) => {
 exports.searchProducts = async (req, res) => {
   try {
       const query = req.query.q;
-      const regex = new RegExp(query, 'i'); // 'i' for case-insensitive search
-      const products = await Product.find({ name: { $regex: regex } });
+      const regex = new RegExp(query, 'i'); 
+      const products = await Product.find({ name: { $regex: regex } },{brand:{$regex:regex}});
 
       // Fetch categories
       const categories = await Category.find({ isDeleted: false });

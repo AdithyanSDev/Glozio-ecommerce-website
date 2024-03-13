@@ -305,22 +305,38 @@
             const form = document.getElementById('editProfileForm');
             const fullNameInput = document.getElementById('fullName');
             const saveChangesBtn = document.getElementById('saveChangesBtn');
+            const fullNameError = document.createElement('div');
+            fullNameError.classList.add('invalid-feedback');
+            fullNameInput.parentNode.appendChild(fullNameError);
     
             // Add event listener to form submit event
             form.addEventListener('submit', function (event) {
                 // Trim white spaces from full name field
                 fullNameInput.value = fullNameInput.value.trim();
     
+                // Remove previous error styling and message
+                fullNameInput.classList.remove('is-invalid');
+                fullNameError.textContent = '';
+    
                 // Validate if full name field is not empty after trimming
                 if (fullNameInput.value === '') {
                     // Prevent form submission
                     event.preventDefault();
                     // Display error message or handle validation
-                    alert('Full name cannot be empty.');
+                    fullNameInput.classList.add('is-invalid');
+                    fullNameError.textContent = 'Full name cannot be empty.';
+                } else if (!/^[a-zA-Z]+$/.test(fullNameInput.value)) {
+                    // Prevent form submission
+                    event.preventDefault();
+                    // Display error message or handle validation
+                    fullNameInput.classList.add('is-invalid');
+                    fullNameError.textContent = 'Full name should contain only letters.';
                 }
             });
         });
     </script>
+    
+    
 
 </body>
 </html>

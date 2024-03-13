@@ -24,6 +24,11 @@
   <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
 </head>
+<style>
+  .container-wrapper {
+    overflow-x: hidden;
+  }
+</style>
 
 <body class="g-sidenav-show  bg-gray-200">
   <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
@@ -106,7 +111,10 @@
         </li>
        
   </aside>
-  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+
+
+  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg" style="overflow-x: hidden;">
     <!-- Navbar -->
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
       <div class="container-fluid py-1 px-3">
@@ -181,7 +189,150 @@
           </div>
         </div>
       </div>
+      <!-- <div class="row mt-4">
+        <div>
+          <button class="btn btn-primary btn-block" onclick="updateChart('daily')">Daily</button>
+          <button class="btn btn-primary btn-block" onclick="updateChart('weekly')">Weekly</button>
+          <button class="btn btn-primary btn-block" onclick="updateChart('yearly')">Yearly</button>
+        </div>
+          
+       
+      </div> -->
+      <div class="row mt-6">
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+          <div class="card z-index-2 ">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+              <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                <div class="chart">
+                  <canvas id="chart-bars" class="chart-canvas" height="250"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h6 class="mb-0 ">Sales report</h6>
+              <p class="text-sm ">Daily</p>
+              <hr class="dark horizontal">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+          <div class="card z-index-2  ">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+              <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                <div class="chart">
+                  <canvas id="chart-line" class="chart-canvas" height="250"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h6 class="mb-0 ">Sales report</h6>
+              <p class="text-sm ">Monthly</p>
+              <hr class="dark horizontal">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 mt-4 mb-3">
+          <div class="card z-index-2 ">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+              <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
+                <div class="chart">
+                  <canvas id="chart-line-tasks" class="chart-canvas" height="250"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h6 class="mb-0 ">Sales report</h6>
+              <p class="text-sm ">Yearly</p>
+              <hr class="dark horizontal">
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </div>
+<!-- Best Selling Products -->
+<div class="row">
+  <div class="col-lg-4 mt-4 mb-3">
+    <div class="card z-index-2 ">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+   
+    <table class="table">
+      
+      <thead>
+        <h4>Best Selling Products</h4> 
+        <tr>
+          <th scope="col">Product Name</th>
+          <th scope="col">Sold Units</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% bestSellingProducts.forEach(product => { %>
+          <tr>
+            <td><%= product.productDetails[0].name %></td>
+            <td><%= product.count %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  </div>
+  </div>
+
+
+<!-- Best Selling Categories -->
+
+  <div class="col-lg-4 mt-4 mb-3">
+    <div class="card z-index-2 ">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+    <h4>Best Selling Categories</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Category Name</th>
+          <th scope="col">Sold Units</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% bestSellingCategories.forEach(category => { %>
+          <tr>
+            <td><%= category.categoryDetails[0].name %></td>
+            <td><%= category.count %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  </div>
+  </div>
+  
+
+
+<!-- Best Selling Brands -->
+<div class="col-lg-4 mt-4 mb-3">
+  <div class="card z-index-2 ">
+    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+    <h4>Best Selling Brands</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Brand Name</th>
+          <th scope="col">Sold Units</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% bestSellingBrands.forEach(brand => { %>
+          <tr>
+            <td><%= brand._id %></td>
+            <td><%= brand.count %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  </div>
+  </div>
+</div>
+
     
   </main>
 
@@ -255,7 +406,9 @@
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../assets/js/plugins/chartjs.min.js"></script>
+
   <script>
     var ctx = document.getElementById("chart-bars").getContext("2d");
 
@@ -503,6 +656,7 @@
       },
     });
   </script>
+  
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {

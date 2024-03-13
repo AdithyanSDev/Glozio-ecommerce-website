@@ -49,7 +49,12 @@ exports.placeOrder = async (req, res) => {
         usercart.product.forEach(product => {
             totalAmount += product.productId.sellingPrice * product.quantity;
         });
-
+         // Check if total amount is above 1000 for COD
+         if (paymentMethod === 'COD' && totalAmount > 1000) {
+            return res.status(400).json({ message: 'COD is not allowed for orders above 1000' });
+        }
+        console.log(cart)
+console.log(totalAmount);
         // Create the order
         const order = new Order({
             userId: userId,

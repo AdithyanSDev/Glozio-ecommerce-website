@@ -6,6 +6,7 @@ const Cart = require('../models/cart')
 const Product = require('../models/product')
 const Wallet = require('../models/wallet');
 const User =require( '../models/user');
+const PDFDocument = require('pdfkit');
 const Razorpay = require('razorpay');
 const{RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET}=process.env
 
@@ -344,3 +345,70 @@ exports.razorsuccess = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+exports.generateReport = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findById(orderId)
+            .populate({
+                path: 'orderedItems.productId',
+                select: 'name price discount images'
+            })
+            .populate('userId shippingAddress');
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        const doc = new PDFDocument();
+        // Set content disposition to attachment so that the browser will prompt the user to download the PDF
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=order_invoice.pdf');
+        doc.pipe(res);
+
+        // Add content to the PDF document based on the order details
+        doc.image('public/img/Gloziologo.png', {
+            width: 25,
+            align: 'center'
+        }).moveDown(0.5); // Move down a bit to create space between the logo and the text
+
+        doc.fontSize(20).text('GLOZIO', { align: 'left' });
+        doc.fontSize(18).text('Order Invoice', { align: 'center' });
+        doc.moveDown();
+
+        // Order details
+        doc.fontSize(12).text(`Order ID: ${order._id}`);
+        doc.fontSize(12).text(`Order Date: ${order.orderDate.toDateString()}`);
+        doc.moveDown();
+
+        // User details
+        doc.fontSize(12).text(`User Name: ${order.userId.name}`);
+        doc.fontSize(12).text(`User Address: ${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.pincode}`);
+        doc.moveDown();
+
+        // Ordered items
+        order.orderedItems.forEach(item => {
+            doc.fontSize(12).text(`Product: ${item.productId.name}`);
+            doc.fontSize(12).text(`Quantity: ${item.quantity}`);
+            doc.fontSize(12).text(`Price: ₹${item.productId.price}`);
+            doc.fontSize(12).text(`Discount: ${item.productId.discount}%`);
+
+            // Include product image if available
+            if (item.productId.images.length > 0) {
+                const img = item.productId.images[1];
+                doc.image(img, { width: 100, height: 100 }).moveDown();
+            }
+
+            doc.moveDown();
+        });
+
+        // Total amount
+        doc.fontSize(14).text(`Total Amount: ₹${order.totalAmount}/-`, { align: 'right' });
+
+        doc.end();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+

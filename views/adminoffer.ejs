@@ -151,7 +151,7 @@
                   <tbody>
                       <% offer.forEach((offer) => { %>
                           <tr>
-                              <td><img src="/uploads/<%= offer.bannerImg[0] %>" alt="Offer Image" style="max-height: 50px;"></td>
+                              <td><img src="/<%= offer.bannerImg[0] %>" alt="Offer Image" style="max-height: 50px;"></td>
                               <td><%= offer.title %></td>
                               <td><%= offer.description.substring(0, 50) + (offer.description.length > 50 ? '...' : '') %></td>
                               <td><%= offer.type %></td>

@@ -62,7 +62,8 @@ router.get('/offer',isAdmin,offerController.renderOffer)
 router.get('/addofferpage',isAdmin,offerController.renderAddoffer)
 router.post('/addoffer', isAdmin,uploadbanner, offerController.createOffer);
 router.get('/offers/:id/edit',isAdmin, offerController.editOffer);
-router.post('/edit/:id',isAdmin,upload,offerController.editofferpost);
+router.post('/edit/:id',isAdmin,uploadbanner,offerController.editofferpost);
 router.post('/offers/:id/delete',isAdmin ,offerController.deleteOffer);
+router.delete('/deleteofferimage/:offerId/:index',offerController.offerimagedelete);
 
 module.exports = router;

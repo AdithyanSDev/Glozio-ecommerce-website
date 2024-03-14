@@ -68,36 +68,63 @@ exports.editOffer = async (req, res) => {
     }
 };
 
-
 exports.editofferpost = async (req, res) => {
-    console.log(req.params)
-    console.log(req.body) 
+    console.log(req.params);
+    console.log(req.body); 
 
     try {
         const { id } = req.params;
-        const { title, description, bannerImg, type, discount, expiryDate } = req.body;
-
-        // Find the offer by ID
+        const updates = req.body;
+        const images = req.files;
         let offer = await Offer.findById(id);
-
-        // Update offer properties if they are provided
-        if (title) offer.title = title;
-        if (description) offer.description = description;
-        if (bannerImg) offer.bannerImg = bannerImg;
-        if (type) offer.type = type;
-        if (discount) offer.discount = discount;
-        if (expiryDate) offer.expiryDate = expiryDate;
-
-        // Save the updated offer
-        offer = await offer.save();
-
+        if (!offer) {
+            return res.status(404).send('Offer not found');
+        }
+        const existingOffer = await Offer.findOne({ title: updates.title, _id: { $ne: id } });
+        if (existingOffer) {
+            return res.status(400).send('Another offer with the same name already exists');
+        }
+        if (images && images.length > 0) {
+            offer.bannerImg = offer.bannerImg ? offer.bannerImg.concat(images.map(image => image.path)) : images.map(image => image.path);
+            await offer.save();
+        }
+        console.log(req.files);
+        await Offer.findByIdAndUpdate(id, updates);
         res.redirect('/admin/offer');
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
-}
+};
 
+
+exports.offerimagedelete = async (req, res) => {
+    try {
+        console.log("Entering image deletion controller");
+        const offerId = req.params.offerId;
+        const index = req.params.index;
+        console.log("Index:", index);
+  console.log(offerId)
+        let offer = await Offer.findById(offerId);
+        console.log("offer:", offer);
+  
+        if (!offer) {
+            return res.status(404).json({ message: "Offer not found" });
+        }
+  
+        if (index < 0 || index >= offer.bannerImg.length) {
+            return res.status(400).json({ message: "Invalid image index" });
+        }
+  
+        offer.bannerImg.splice(index, 1);
+        await offer.save();
+  
+        res.status(200).json({ message: "Image deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting image:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
 
 
 

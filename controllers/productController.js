@@ -175,6 +175,8 @@ exports.imagedelete = async (req, res) => {
       res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
 // Function to delete a product
 exports.deleteProduct = async (req, res) => {
   const productId = req.params.productId;

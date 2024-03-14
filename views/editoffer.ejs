@@ -129,46 +129,47 @@
         <div class="row justify-content-center">
             <div class="col-md-6" style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
                 <h4 class="text-center">Edit Offer</h4>
-                <form action="/admin/edit/<%= offer._id %>" method="POST">
+                <form action="/admin/edit/<%= offer._id %>" method="POST" enctype="multipart/form-data">
                   <div class="form-group">
-                        <label for="title">Title:</label>
-                        <input type="text" id="title" name="title" class="form-control" value="<%= offer.title %>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description:</label>
-                        <textarea id="description" name="description" class="form-control" required><%= offer.description %></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="img">Banner Images:</label>
-                        <input name="img" accept="image/*" id="img" type="file" class="form-control" multiple>
-                        <div class="container d-flex">
-                            <div id="image-container" class="mt-3">
-                                <!-- Display current images if needed -->
-                                <% offer.bannerImg.forEach(image => { %>
-                                    <img src="/uploads/<%= image %>" alt="Offer Image" style="max-height: 100px;">
-                                <% }); %>
-                            </div>
-                            <div id="cropper-container" class="mt-3"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="type">Type:</label>
-                        <select id="type" name="type" class="form-control" required>
-                            <option value="Product" <%= offer.type === 'Product' ? 'selected' : '' %>>Product</option>
-                            <option value="Category" <%= offer.type === 'Category' ? 'selected' : '' %>>Category</option>
-                            <option value="Referral" <%= offer.type === 'Referral' ? 'selected' : '' %>>Referral</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="discount">Discount:</label>
-                        <input type="number" id="discount" name="discount" class="form-control" value="<%= offer.discount %>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="expiryDate">Expiry Date:</label>
-                        <input type="date" id="expiryDate" name="expiryDate" class="form-control" value="<%= offer.expiryDate.toISOString().slice(0, 10) %>" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update Offer</button>
-                </form>
+                      <label for="title">Title:</label>
+                      <input type="text" id="title" name="title" class="form-control" value="<%= offer.title %>" required>
+                  </div>
+                  <div class="form-group">
+                      <label for="description">Description:</label>
+                      <textarea id="description" name="description" class="form-control" required><%= offer.description %></textarea>
+                  </div>
+                  <div class="form-group">
+                      <label for="img">Banner Images:</label>
+                      <input name="img" accept="image/*" id="img" type="file" class="form-control" multiple>
+                      <div class="container d-flex" id="imageContainer">
+                          <!-- Display current images if needed -->
+                          <% offer.bannerImg.forEach((image, index) => { %>
+                              <div>
+                                  <img src="/<%= image %>" alt="Offer Image" id="imgView_<%= index %>" style="max-height: 100px;">
+                                  <button type="button" class="btn btn-danger btn-sm delete-image position-absolute" onclick="deleteImage('<%= offer._id %>', '<%= index %>')">x</button>
+                              </div>
+                          <% }); %>
+                      </div>
+                      <div id="cropper-container" class="mt-3"></div>
+                  </div>
+                  <div class="form-group">
+                      <label for="type">Type:</label>
+                      <select id="type" name="type" class="form-control" required>
+                          <option value="Product" <%= offer.type === 'Product' ? 'selected' : '' %>>Product</option>
+                          <option value="Category" <%= offer.type === 'Category' ? 'selected' : '' %>>Category</option>
+                          <option value="Referral" <%= offer.type === 'Referral' ? 'selected' : '' %>>Referral</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label for="discount">Discount:</label>
+                      <input type="number" id="discount" name="discount" class="form-control" value="<%= offer.discount %>" required>
+                  </div>
+                  <div class="form-group">
+                      <label for="expiryDate">Expiry Date:</label>
+                      <input type="date" id="expiryDate" name="expiryDate" class="form-control" value="<%= offer.expiryDate.toISOString().slice(0, 10) %>" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Update Offer</button>
+              </form>
             </div>
         </div>
     </div>
@@ -258,6 +259,33 @@
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
   </script>
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+ <script>
+  function deleteImage(offerId, index) {
+      // Send an AJAX request to delete the image
+      fetch(`/admin/deleteofferimage/${offerId}/${index}`, {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      })
+      .then(response => {
+          if (response.ok) {
+              // If the image is deleted successfully, remove it from the DOM
+              const imageContainer = document.getElementById('imageContainer');
+              const imagePreview = document.getElementById(`imgView_${index}`);
+              imageContainer.removeChild(imagePreview.parentElement);
+              console.log('Image deleted successfully');
+          } else {
+              console.error('Error deleting image:', response.statusText);
+          }
+      })
+      .catch(error => {
+          console.error('Error deleting image:', error);
+      });
+  }
+</script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->

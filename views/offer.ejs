@@ -185,7 +185,7 @@
                     <% offer.forEach((offer, index) => { %>
                     <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
                         <a href="/offer/<%= offer._id %>">
-                            <img src="/uploads/<%= offer.bannerImg[0] %>" class="d-block w-100" alt="Offer Image" style="width: 100px; height: 500px;">
+                            <img src="/<%= offer.bannerImg[0] %>" class="d-block w-100" alt="Offer Image" style="width: 100px; height: 500px;">
 
                             <div class="carousel-caption d-none d-md-block">
                                

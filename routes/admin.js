@@ -66,4 +66,9 @@ router.post('/edit/:id',isAdmin,uploadbanner,offerController.editofferpost);
 router.post('/offers/:id/delete',isAdmin ,offerController.deleteOffer);
 router.delete('/deleteofferimage/:offerId/:index',offerController.offerimagedelete);
 
+
+router.get('/sales/daily', salesController.getDailySalesData);
+router.get('/sales/monthly', salesController.getMonthlySalesData);
+router.get('/sales/yearly', salesController.getYearlySalesData);
+
 module.exports = router;

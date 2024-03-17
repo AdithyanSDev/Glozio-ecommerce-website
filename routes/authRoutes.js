@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { redirectToUserLogin, userLogin, registerUser, renderOTPPage,changePassword,  verifyOTP, resendOTP, logout,renderChangePasswordPage,renderForgotPasswordPage,sendPasswordResetEmail } = require('../controllers/authController');
+const { redirectToUserLogin, userLogin, registerUser, renderOTPPage,changePassword,  verifyOTP, resendOTP, logout,renderChangePasswordPage,renderForgotPasswordPage,forgotpassword,renderForgotPassOTPPage,verifyForgotPassOTP,resetPasswordpage,resetpassword } = require('../controllers/authController');
 const{renderUserprofile,renderAddress,addAddress,renderUpdateAddress,renderEdit, editAddress,deleteAddress,addAddressCheckOut, editprofile,getCouponData}=require('../controllers/profileController')
 const { verifyToken } = require('../middleware/authMiddleware');
 
@@ -27,10 +27,12 @@ router.delete('/user/address/:id',deleteAddress);
 router.get('/user/resetpassword',verifyToken, renderChangePasswordPage);
 router.post('/user/change-password', verifyToken, changePassword);
 // Route for rendering the forgot password page
-router.get('/forgot-password',verifyToken, renderForgotPasswordPage);
-
-// Route for handling the password reset request
-router.post('/forgot-password',verifyToken, sendPasswordResetEmail);
+router.get('/forgot-password', renderForgotPasswordPage);
+router.post('/forgotpassword',forgotpassword)
+router.get('/forgotpass-otp', renderForgotPassOTPPage);
+router.post('/forgotpass-otp',verifyForgotPassOTP);
+router.get('/reset-password', resetPasswordpage);
+router.post('/resetpassword',resetpassword)
 
 router.get('/coupons',verifyToken, getCouponData);
 

@@ -157,18 +157,37 @@
     </div>
     <!-- Breadcrumb End -->
    <!-- Display order details -->
-<div class="row">
+   <div class="row">
     <div class="col-md-6">
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title">Order Details</h5>
                 <p class="card-text">Order ID: <%= order._id %></p>
-                <p class="card-text">Username : <%= user.name %></p>
+                <p class="card-text">Username: <%= user.name %></p>
                 <p class="card-text">Total Amount: ₹<%= order.totalAmount %></p>
+                <p class="card-text">Address: <%= order.shippingAddress.address %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %>, <%= order.shippingAddress.country %> - <%= order.shippingAddress.zip %></p>
+
             </div>
         </div>
     </div>
 </div>
+
+<% order.orderedItems.forEach(item => { %>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <h5 class="card-title">Product: <%= item.productId.name %></h5>
+            <p class="card-text">Quantity: <%= item.quantity %></p>
+            
+
+            <!-- Display product image if available -->
+            <% if (item.productId.images.length > 0) { %>
+                <img src="/<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;">
+            <% } %>
+        </div>
+    </div>
+<% }); %>
+
+
 
 <!-- Razorpay checkout form -->
 <div class="row">
@@ -183,7 +202,7 @@
                     data-buttontext=""
                     data-name="Glozio"
                     data-description="Payment for Order <%= order._id %>"
-                    data-image="/img/loomblack.png"
+                    data-image="/img/Gloziologo.png"
                     data-prefill.name="<%= user.name %>"
                     data-prefill.email="<%= user.email %>"
                     data-theme.color="#4169E1">

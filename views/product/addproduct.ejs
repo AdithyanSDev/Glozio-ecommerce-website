@@ -6,7 +6,7 @@
     <title>Add Product</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
-    <style>
+        <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
@@ -154,7 +154,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-
     <script>
         const imageContainer = document.getElementById('image-container');
         let croppers = [];
@@ -202,6 +201,7 @@
                   // Optionally, you can remove the "Save" button after saving
                   containerDiv.removeChild(saveButton);
                 });
+    
                 // Create a "Remove" button for each image
                 const removeButton = document.createElement('button');
                 removeButton.className = 'btn btn-danger remove-button';
@@ -240,9 +240,8 @@
           });
     
         });
+    </script>
     
-    
-      </script>
         
 </body>
 </html>

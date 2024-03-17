@@ -45,6 +45,8 @@ console.log(couponCode,"carts")
     }
 };
 
+
+
 exports.addToCart = async (req, res) => {
     try {
         const { productId, quantity } = req.body;
@@ -106,6 +108,7 @@ exports.addToCart = async (req, res) => {
         res.render('404page');
     }
 };
+
 
 exports.updateCartQuantity = async (req, res) => {
     try {

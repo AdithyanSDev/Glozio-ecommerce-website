@@ -190,12 +190,13 @@
                                     <th scope="col">Quantity</th>
                                     <th scope="col">Order Date</th>
                                     <th scope="col">Order Status</th>
+                                    <th scope="col">Payment Status</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% orders.forEach((order) => { %>
-                                    <% if (order.orderStatus === 'Pending') { %>
+                                    <% if (order.orderStatus === 'Pending' && order.paymentStatus === 'Failed') { %>
                                         <% order.orderedItems.forEach((item) => { %>
                                             <tr>
                                                 <td>
@@ -206,16 +207,35 @@
                                                 <td><%= item.quantity %></td>
                                                 <td><%= order.orderDate.toDateString() %></td>
                                                 <td><%= order.orderStatus %></td>
+                                                <td><%= order.paymentStatus %></td>
                                                 <td>
-                                                    <% if (order.orderStatus !== 'Cancelled') { %>
-                                                        <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
-                                                    <% } %>
+                                                    <form action="/razorpaypage/<%= order._id %>" method="GET">
+                                                    <button class="btn btn-primary pay-now-btn" data-order-id="<%= order._id %>">Pay</button>
+                                                </form>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } else if (order.orderStatus === 'Pending') { %>
+                                        <% order.orderedItems.forEach((item) => { %>
+                                            <tr>
+                                                <td>
+                                                    <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
+                                                </td>
+                                                <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                                                <td>₹<%= order.totalAmount %></td>
+                                                <td><%= item.quantity %></td>
+                                                <td><%= order.orderDate.toDateString() %></td>
+                                                <td><%= order.orderStatus %></td>
+                                                <td><%= order.paymentStatus %></td>
+                                                <td>
+                                                    <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel</button>
                                                 </td>
                                             </tr>
                                         <% }); %>
                                     <% } %>
                                 <% }); %>
                             </tbody>
+                            
                         </table>
                     </div>
                     <div class="tab-pane fade" id="nav-delivered">

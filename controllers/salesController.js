@@ -173,3 +173,95 @@ async function getOrderData(startDate, endDate) {
     }
 }
 
+//home chart logic
+exports.getDailySalesData = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const startOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+        const endOfWeek = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + 7);
+
+        const dailySalesDataToday= await Order.find({
+            orderDate: {
+                $gte: startOfWeek,
+                $lt: endOfWeek
+            }
+        });
+
+        const dailySalesData = [ ...dailySalesDataToday];
+        
+     
+        res.json(dailySalesData);
+    } catch (error) {
+        console.error('Error fetching daily sales data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+exports.getMonthlySalesData = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+        const monthlySalesData = await Order.find({
+            orderDate: {
+                $gte: startOfMonth,
+                $lt: endOfMonth
+            }
+        });
+
+        res.json(monthlySalesData);
+    } catch (error) {
+        console.error('Error fetching monthly sales data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.getYearlySalesData = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const startOfFirstYear = new Date(currentYear - 4, 0, 1); // Start from 5 years ago
+        const endOfCurrentYear = new Date(currentYear + 1, 0, 1); // Up to the start of next year
+
+        const yearlySalesData = await Order.aggregate([
+            {
+                $match: {
+                    orderDate: {
+                        $gte: startOfFirstYear,
+                        $lt: endOfCurrentYear
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: { $year: "$orderDate" },
+                    salesCount: { $sum: 1 } // Count orders for each year
+                }
+            },
+            {
+                $project: {
+                    year: "$_id",
+                    salesCount: 1,
+                    _id: 0
+                }
+            }
+        ]);
+
+        const yearlySalesMap = new Map(yearlySalesData.map(item => [item.year, item.salesCount]));
+
+        // Create an array with sales count for each year (filling zeros for missing years)
+        let lastFiveYearsSales = Array.from({ length: 5 }, (_, index) => {
+            const year = currentYear - index;
+            return yearlySalesMap.has(year) ? yearlySalesMap.get(year) : 0;
+        });
+        lastFiveYearsSales.reverse()
+     
+      
+        res.json(lastFiveYearsSales);
+    } catch (error) {
+        console.error('Error fetching yearly sales data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

@@ -86,9 +86,10 @@ console.log(totalAmount);
         // Remove ordered products from the cart
         await Cart.findOneAndUpdate(
             { user: userId },
-            { $pull: { product: { productId: { $in: usercart.product.map(item => item.productId) } } } },
+            { $pull: { product: { productId: { $in: usercart.product.map(item => item.productId) } } }, $set: { subtotal: 0 } },
             { new: true }
         );
+        
 
         // Reduce the stock of ordered products
         usercart.product.forEach(async (product) => {
@@ -275,7 +276,7 @@ exports.processReturn=async(req,res)=>{
     }
 };
 
-exports.renderRazorpayPage   = async (req, res) => {
+exports.renderRazorpayPage = async (req, res) => {
     try {
         const userId = req.userId; // Assuming user ID is available in the request
         if (!userId) {
@@ -289,29 +290,37 @@ exports.renderRazorpayPage   = async (req, res) => {
             return res.status(404).json({ message: 'Cart not found' });
         }
 
-        const order = await Order.findById(req.params.orderId);
+        const order = await Order.findById(req.params.orderId)
+            .populate({
+                path: 'orderedItems.productId',
+                select: 'name images' // Select only necessary fields
+            })
+            .populate('userId shippingAddress');
 
         if (!order) {
             return res.status(404).json({ message: 'Order with Razorpay payment method not found' });
         }
 
+        const user = await User.findById(userId);
 
         // Calculate total amount
         let totalAmount = 0;
         userCart.product.forEach(item => {
             totalAmount += item.productId.price * item.quantity;
-        }); 
-const user=await User.findById(userId)
+        });
+
         // Fetch categories
         const categories = await Category.find({ isDeleted: false });
-        res.render('razorpay', { order, categories,user, totalAmount,razorpaykeyId:razorpaykeyId });
+
+        res.render('razorpay', { order, categories, user, totalAmount, razorpaykeyId: razorpaykeyId });
 
     } catch (error) {
         console.error("Error in rendering RazorPay Page");
         console.error(error);
         res.status(500).send('Internal Server Error');
-    } 
+    }
 };
+
 
 
 exports.razorsuccess = async (req, res) => {
@@ -370,7 +379,7 @@ exports.generateReport = async (req, res) => {
         doc.image('public/img/Gloziologo.png', {
             width: 25,
             align: 'center'
-        }).moveDown(0.5); // Move down a bit to create space between the logo and the text
+        }).moveDown(0.5); 
 
         doc.fontSize(20).text('GLOZIO', { align: 'left' });
         doc.fontSize(18).text('Order Invoice', { align: 'center' });
@@ -390,7 +399,7 @@ exports.generateReport = async (req, res) => {
         order.orderedItems.forEach(item => {
             doc.fontSize(12).text(`Product: ${item.productId.name}`);
             doc.fontSize(12).text(`Quantity: ${item.quantity}`);
-            doc.fontSize(12).text(`Price: ₹${item.productId.price}`);
+            doc.fontSize(12).text(`Price: Rs.${item.productId.price}`);
             doc.fontSize(12).text(`Discount: ${item.productId.discount}%`);
 
             // Include product image if available
@@ -403,7 +412,7 @@ exports.generateReport = async (req, res) => {
         });
 
         // Total amount
-        doc.fontSize(14).text(`Total Amount: ₹${order.totalAmount}/-`, { align: 'right' });
+        doc.fontSize(14).text(`Total Amount: Rs.${order.totalAmount}/-`, { align: 'right' });
 
         doc.end();
     } catch (error) {

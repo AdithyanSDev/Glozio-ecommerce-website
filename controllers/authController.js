@@ -302,27 +302,99 @@ exports.renderForgotPasswordPage = async (req, res) => {
 };
 
 
-// Function to handle sending password reset email
-exports.sendPasswordResetEmail = async (req, res) => {
+exports.forgotpassword = async (req, res) => {
+  const { email } = req.body;
+req.session.emailId=req.body.email
   try {
-      const { email } = req.body;
-      // Check if the user with the provided email exists
+      // Check if the email exists in the database
       const user = await User.findOne({ email });
       if (!user) {
-          return res.status(404).json({ message: 'User not found' });
+          return res.render('forgotpassword', { error: 'Email address not found' });
       }
-      // Generate a unique token for password reset
-      const resetToken = generateUniqueToken(); // Implement this function
-      // Set the token and expiry time in the user document
-      user.resetPasswordToken = resetToken;
-      user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-      await user.save();
-      // Send password reset email
-      await sendPasswordResetEmail(user.email, resetToken); // Implement this function
-      res.status(200).json({ message: 'Password reset email sent successfully' });
+
+      // Generate and store OTP in session
+      const otp = generateRandomString(4);
+      req.session.otp = { code: otp, timestamp: Date.now() };
+
+      // Send OTP to the user's email
+      await sendOtpEmail(email, otp);
+console.log("otp",otp)
+      // Redirect to the OTP verification page
+      res.redirect('/api/forgotpass-otp'); // Change this to the route for your OTP verification page
   } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).send('Internal Server Error');
+  }
+};
+
+// Render the forgot password OTP verification page
+exports.renderForgotPassOTPPage = async (req, res) => {
+  try {
+      res.render('forgotpass-otp');
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+};
+
+// Verify the OTP entered by the user
+exports.verifyForgotPassOTP = async (req, res) => {
+  const { otp } = req.body;
+  const sessionOtp = req.session.otp;
+
+  try {
+      // Check if the entered OTP matches the one stored in the session
+      if (otp === sessionOtp.code && (Date.now() - sessionOtp.timestamp) <= 30000) {
+          // Redirect to the page where the user can reset their password
+          res.redirect('/api/reset-password'); // Change this to your password reset page route
+      } else {
+          // If OTP verification fails, render the OTP verification page with an error message
+          res.render('forgotpass-otp', { error: 'Invalid OTP' });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+};
+
+exports.resetPasswordpage=async(req,res)=>{
+  res.render('resetpassword')
+}
+
+exports.resetpassword = async (req, res) => {
+  const { password, confirmpassword } = req.body;
+  console.log("hayyyy")
+  console.log(req.body)
+  console.log(password, "password", confirmpassword, "confirm")
+  try {
+    // Check if the password and confirm password match
+    if (password !== confirmpassword) {
+      return res.render('resetpassword', { error: 'Passwords do not match' });
+    }
+
+    // Extract the userId from the request
+    const email =req.session.emailId ;
+
+    // Retrieve the user using the userId
+    const user = await User.findOne({email:email});
+    console.log(email,user,"user")
+    if (!user) {
+      return res.render('resetpassword', { error: 'User not found' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(hashedPassword, "hashh");
+
+    // Update user's password in the database
+    user.password = hashedPassword;
+    await user.save();
+
+    // Redirect to the user login page
+    res.redirect('/api/user/login')
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 };
 

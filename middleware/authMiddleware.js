@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const verifyToken = (req, res, next) => {
   const token = req.cookies.token;
   if (!token) {
-      return res.status(401).json({ message: 'User not authenticated' });
+    return res.redirect('/api/user/login')
   }
 
   try {
@@ -14,7 +14,7 @@ const verifyToken = (req, res, next) => {
       req.userId = decoded.userId;
       next();
   } catch (error) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.redirect('/api/user/login')
   }
 };
 
@@ -23,7 +23,7 @@ const isAdmin = (req, res, next) => {
     console.log('Received Authorization token:', token);
 
     if (!token) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.redirect('/adminlogin')
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
@@ -37,7 +37,8 @@ const isAdmin = (req, res, next) => {
             req.user = decoded; 
             next();
         } else {
-            res.status(403).json({ message: 'Forbidden: Admin access required' });
+            return res.redirect('/adminlogin')
+
         }
     });
 };

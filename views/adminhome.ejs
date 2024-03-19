@@ -25,7 +25,22 @@
   <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
 </head>
 <style>
-  .container-wrapper {
+  /* Style to ensure correct display in a row */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+  .col-lg-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  /* Style to prevent horizontal scrolling */
+  body {
     overflow-x: hidden;
   }
 </style>
@@ -250,88 +265,89 @@
     </div>
     
     </div>
-<!-- Best Selling Products -->
-<div class="row">
-  <div class="col-lg-4 mt-4 mb-3">
-    <div class="card z-index-2 ">
-      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-   
-    <table class="table">
-      
-      <thead>
-        <h4>Best Selling Products</h4> 
-        <tr>
-          <th scope="col">Product Name</th>
-          <th scope="col">Sold Units</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% bestSellingProducts.forEach(product => { %>
-          <tr>
-            <td><%= product.productDetails[0].name %></td>
-            <td><%= product.count %></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-  </div>
-  </div>
-  </div>
-
-
-<!-- Best Selling Categories -->
-
-  <div class="col-lg-4 mt-4 mb-3">
-    <div class="card z-index-2 ">
-      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-    <h4>Best Selling Categories</h4>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Category Name</th>
-          <th scope="col">Sold Units</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% bestSellingCategories.forEach(category => { %>
-          <tr>
-            <td><%= category.categoryDetails[0].name %></td>
-            <td><%= category.count %></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-  </div>
-  </div>
-  </div>
+    <div class="container mt-5">
+      <div class="row">
+        <!-- Best Selling Products -->
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Best Selling Products</h5>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Product Name</th>
+                    <th scope="col">Sold</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loop through bestSellingProducts and populate table rows -->
+                  <% bestSellingProducts.forEach(product => { %>
+                    <tr>
+                      <td><img src="/<%= product.productDetails[0].images[0] %>" alt="<%= product.productDetails[0].name %>" style="max-width: 50px;"><%= product.productDetails[0].name %></td>
+                      <td><%= product.count %></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
   
+        <!-- Best Selling Categories -->
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Best Selling Categories</h5>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Category Name</th>
+                    <th scope="col">Sold</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loop through bestSellingCategories and populate table rows -->
+                  <% bestSellingCategories.forEach(category => { %>
+                    <tr>
+                      <td><%= category.name %></td>
+                      <td><%= category.count %></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Best Selling Brands -->
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Best Selling Brands</h5>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Brand Name</th>
+                    <th scope="col">Sold</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loop through bestSellingBrands and populate table rows -->
+                  <% bestSellingBrands.forEach(brand => { %>
+                    <tr>
+                      <td><%= brand._id %></td>
+                      <td><%= brand.count %></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-
-<!-- Best Selling Brands -->
-<div class="col-lg-4 mt-4 mb-3">
-  <div class="card z-index-2 ">
-    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-    <h4>Best Selling Brands</h4>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Brand Name</th>
-          <th scope="col">Sold Units</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% bestSellingBrands.forEach(brand => { %>
-          <tr>
-            <td><%= brand._id %></td>
-            <td><%= brand.count %></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-  </div>
-  </div>
-  </div>
-</div>
+    
 
     
   </main>
@@ -402,6 +418,7 @@
     </div>
   </div>
   <!--   Core JS Files   -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="../assets/js/core/popper.min.js"></script>
   <script src="../assets/js/core/bootstrap.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>

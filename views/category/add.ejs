@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Category</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #1a1a1a;
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,56 +19,71 @@
         }
         .container {
             max-width: 600px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
         }
         h2 {
             text-align: center;
+            margin-bottom: 30px;
+            color: #55acee;
         }
         form {
             margin-top: 20px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: #55acee;
         }
         input[type="text"],
         textarea {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #55acee;
+            border-radius: 6px;
             box-sizing: border-box;
+            font-size: 16px;
+            color: #fff;
+            background-color: #1a1a1a;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #1e90ff;
         }
         textarea {
             resize: vertical;
         }
         button {
-            padding: 10px 20px;
-            background-color: #007bff;
+            padding: 12px 24px;
+            background-color: #55acee;
             color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            font-size: 16px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #1e90ff;
+        }
+        .fa-plus-circle {
+            margin-right: 8px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Add Category</h2>
+        <h2><i class="fas fa-plus-circle"></i>Add Category</h2>
         <form action="/admin/categories/add" method="post">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
             
             <label for="description">Description:</label>
-            <textarea id="description" name="description"></textarea>
+            <textarea id="description" name="description" rows="5"></textarea>
             
             <button type="submit">Add Category</button>
         </form>

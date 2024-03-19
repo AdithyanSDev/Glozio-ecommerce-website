@@ -79,7 +79,7 @@ exports.softDeleteCategory = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
     await Category.findByIdAndUpdate(categoryId, { isDeleted: true });
-    res.redirect('/admin/categories');
+    res.redirect('/admin/categories?msg=del');
   } catch (error) {
     console.error(error);
     res.render('404page')

@@ -1,9 +1,28 @@
 // offerController.js
 const Offer = require('../models/offer');
+const cron = require('node-cron');
+
+
+const deleteExpiredOffers = async () => {
+    try {
+        const currentDate = new Date();
+        // Find offers with expiry date less than or equal to current date
+        const expiredOffers = await Offer.find({ expiryDate: { $lte: currentDate } });
+        console.log(expiredOffers,"hello");
+        // Delete expired offers from the database
+        await Offer.deleteMany({ _id: { $in: expiredOffers.map(offer => offer._id) } });
+        console.log('Expired offers deleted:', expiredOffers.length);
+    } catch (error) {
+        console.error('Error deleting expired offers:', error);
+    }
+};
+
+// Schedule task to run every day at midnight to delete expired offers
+cron.schedule('0 0 * * *', deleteExpiredOffers);
 
 
 
-    exports.renderOffer=async(req,res)=>{
+ exports.renderOffer=async(req,res)=>{
         
         try {
         

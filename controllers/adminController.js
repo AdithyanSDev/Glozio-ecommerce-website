@@ -107,20 +107,63 @@ exports.adminhome = async (req, res) => {
         { $lookup: { from: "products", localField: "_id", foreignField: "_id", as: "productDetails" } }
       ]);
 
-      // Fetch best selling categories
-      const bestSellingCategories = await Product.aggregate([
-        { $group: { _id: "$category", count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 10 },
-        { $lookup: { from: "categories", localField: "_id", foreignField: "_id", as: "categoryDetails" } }
-      ]);
-
-      // Fetch best selling brands
-      const bestSellingBrands = await Product.aggregate([
-        { $group: { _id: "$brand", count: { $sum: 1 } } },
+      const bestSellingCategories = await Order.aggregate([
+        { $match: { orderStatus: "Delivered" } },
+        { $unwind: "$orderedItems" },
+        {
+            $lookup: {
+                from: "products",
+                localField: "orderedItems.productId",
+                foreignField: "_id",
+                as: "productDetails"
+            }
+        },
+        { $unwind: "$productDetails" },
+        {
+            $lookup: {
+                from: "categories",
+                localField: "productDetails.category",
+                foreignField: "_id",
+                as: "category"
+            }
+        },
+        { $unwind: "$category" },
+        {
+            $group: {
+                _id: "$category._id", // Group by category ID
+                name: { $first: "$category.name" }, // Store category name
+                count: { $sum: "$orderedItems.quantity" }
+            }
+        },
         { $sort: { count: -1 } },
         { $limit: 10 }
-      ]);
+    ]);
+    
+    
+      // Fetch best selling brands
+      const bestSellingBrands = await Order.aggregate([
+        { $match: { orderStatus: "Delivered" } },
+        { $unwind: "$orderedItems" },
+        {
+            $lookup: {
+                from: "products",
+                localField: "orderedItems.productId",
+                foreignField: "_id",
+                as: "productDetails"
+            }
+        },
+        { $unwind: "$productDetails" },
+        {
+            $group: {
+                _id: "$productDetails.brand",
+                count: { $sum: "$orderedItems.quantity" },
+                productDetails: { $first: "$productDetails" }
+            }
+        },
+        { $sort: { count: -1 } },
+        { $limit: 10 }
+    ]);
+    
 
       // Render admin home page with calculated values
       res.render('adminhome', { 

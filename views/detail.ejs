@@ -340,12 +340,13 @@
                         </div>
                         <div class="tab-pane fade" id="tab-pane-3">
                             <div class="row">
+                               
                                 <div class="col-md-6">
                                     <h4 class="mb-4"><%= reviewCount %> reviews for "<%= product.name %>"</h4>
                                     <% if (reviews && reviews.length > 0) { %>
                                         <% reviews.forEach(review => { %>
                                             <div class="media mb-4">
-                                                <img src="img/user.jpg" alt="Image" class="img-fluid mr-3 mt-1" style="width: 45px;">
+                                                <img src="/img/profile.jpg" alt="Image" class="img-fluid mr-3 mt-1" style="width: 45px;">
                                                 <div class="media-body">
                                                     <h6><%= review.userId.name %><small> - <i><%= review.createdAt.toDateString() %></i></small></h6>
                                                     <div class="text-primary mb-2">
@@ -405,8 +406,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        
                 </div>
             </div>
         </div>

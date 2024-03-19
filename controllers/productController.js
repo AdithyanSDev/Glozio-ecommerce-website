@@ -182,7 +182,7 @@ exports.deleteProduct = async (req, res) => {
   const productId = req.params.productId;
   try {
     await Product.findByIdAndDelete(productId);
-    res.redirect('/admin/products');
+    res.redirect('/admin/products?msg=del');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');

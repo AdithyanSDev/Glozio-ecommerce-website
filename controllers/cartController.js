@@ -49,65 +49,67 @@ console.log(couponCode,"carts")
 
 exports.addToCart = async (req, res) => {
     try {
-        const { productId, quantity } = req.body;
-        const userId = req.userId;
-
-        const product = await Product.findById(productId);
-
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-
-        if (quantity > product.stock) {
-            return res.status(400).json({ message: 'Insufficient stock available' });
-        }
-
-        let cart = await Cart.findOne({ user: userId });
-
-        if (!cart) {
-            cart = new Cart({ user: userId, product: [], subtotal: 0 });
-        }
-
-        const existingProductIndex = cart.product.findIndex(item => item.productId.equals(productId));
-
-        if (existingProductIndex !== -1) {
-            const totalQuantity = cart.product[existingProductIndex].quantity + quantity;
-
-            if (totalQuantity > product.maxQuantityPerPerson) {
-                return res.status(400).json({ message: `Maximum ${product.maxQuantityPerPerson} quantity allowed per person` });
-            }
-
-            cart.product[existingProductIndex].quantity += quantity || 1;
-        } else {
-            if (product.stock > 0) {
-                cart.product.push({
-                    productId: product._id,
-                    name: product.name,
-                    price: product.sellingPrice, // Use sellingPrice instead of price
-                    quantity: quantity || 1,
-                });
-            } else {
-                return res.status(400).json({ message: 'Product out of stock' });
-            }
-        }
-
-        // Recalculate the subtotal based on the selling price
-        let subtotal = 0;
-        cart.product.forEach(item => {
-            subtotal += item.price * item.quantity;
+      const { productId, quantity } = req.body;
+      const userId = req.userId;
+  
+      console.log("User Id : ", userId); 
+  
+     
+      const product = await Product.findById(productId);
+  
+      if (!product) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+  
+      if (quantity > product.stock) {
+        return res.status(400).json({ message: 'Insufficient stock available' });
+      }
+  
+      if (product.maxQuantityPerPerson && quantity > product.maxQuantityPerPerson) {
+        return res.status(400).json({
+          message: `Maximum ${product.maxQuantityPerPerson} quantity allowed per person`
         });
-
-        // Update the subtotal field of the cart model
-        cart.subtotal = subtotal;
-
-        await cart.save();
-
-        res.redirect('/cart');
+      }
+  
+   
+      let cart = await Cart.findOne({ user: userId });
+  
+      if (!cart) {
+        cart = new Cart({ user: userId, product: [], subtotal: 0 });
+      }
+  
+      
+      const existingProductIndex = cart.product.findIndex(item => item.productId.equals(productId));
+  
+      if (existingProductIndex !== -1) {
+        const totalQuantity = cart.product[existingProductIndex].quantity + quantity;
+        cart.product[existingProductIndex].quantity = totalQuantity;
+      } else {
+        cart.product.push({
+          productId: product._id,
+          name: product.name,
+          price: product.sellingPrice, 
+          quantity: quantity
+        });
+      }
+  
+    
+      let subtotal = 0;
+      cart.product.forEach(item => {
+        subtotal += item.price * item.quantity;
+      });
+      cart.subtotal = subtotal;
+  
+     
+      await cart.save();
+  
+      res.redirect('/cart'); // Assuming a redirect to a cart page
     } catch (error) {
-        console.error(error);
-        res.render('404page');
+      console.error('Error adding product to cart:', error);
+      res.status(500).json({ message: 'Internal server error' }); // Generic error message for the user
     }
-};
+  };
+  
 
 
 exports.updateCartQuantity = async (req, res) => {

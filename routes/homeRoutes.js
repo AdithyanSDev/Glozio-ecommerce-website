@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { renderHomePage,productsByCategory} = require('../controllers/authController');
-const { renderDetailPage, reviewSubmit ,getRelatedProducts, reviewCount, reviewSave,searchProducts } = require('../controllers/detailController'); 
+const { renderDetailPage, reviewSubmit ,getRelatedProducts, reviewCount, reviewSave,searchProducts ,getProductSuggestions} = require('../controllers/detailController'); 
 const productController=require("../controllers/productController");
 const profileController =require( "../controllers/profileController")
 const upload=require('../multer/multerConfig')
@@ -14,8 +14,8 @@ router.get('/detail', (req, res) => {
 });
 router.get('/detail/:productId',verifyToken, renderDetailPage);
 router.get('/review/:productId',reviewCount );
-router.post('/review/:productId',reviewSave);
-router.post('/submit-review', reviewSubmit); 
+router.post('/review/:productId',verifyToken,reviewSave);
+router.post('/submit-review',verifyToken, reviewSubmit); 
 router.get('/category/:categoryId',verifyToken, productsByCategory);
 router.get('/shop',verifyToken, productController.getAllProducts);
 

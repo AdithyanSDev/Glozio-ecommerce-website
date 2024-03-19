@@ -211,6 +211,7 @@ exports.adminOrders = async (req, res) => {
     }
 };
 
+
 exports.updateOrderStatus = async (req, res) => {
     try {
       const orderId = req.params.orderId;
@@ -223,6 +224,17 @@ exports.updateOrderStatus = async (req, res) => {
         return res.status(404).json({ message: 'Order not found' });
       }
   
+      // If order is returned, add the order quantity back to the product's quantity
+      if (orderStatus === 'Returned') {
+        for (const item of updatedOrder.orderedItems) {
+          const productId = item.productId;
+          const quantity = item.quantity;
+  
+          // Find the product and update its quantity
+          await Product.findByIdAndUpdate(productId, { $inc: { stock: quantity } });
+        }
+      }
+  
       res.status(200).json({ message: 'Order status updated successfully', order: updatedOrder });
     } catch (error) {
       console.error(error);
@@ -230,7 +242,7 @@ exports.updateOrderStatus = async (req, res) => {
     }
   };
 
-       exports.orderdetails = async (req, res) => {
+exports.orderdetails = async (req, res) => {
     try {
         const { orderId, productId } = req.params;
         const userId = req.userId; 
@@ -255,16 +267,14 @@ exports.processReturn=async(req,res)=>{
     try {
         const { orderId } = req.body;
 
-        // Fetch the order from the database
         const order = await Order.findById(orderId);
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
-
-        // Update the order status to "ReturnRequested"
+      
+        
         order.orderStatus = 'ReturnRequested';
-
         // Save the updated order
         await order.save();
 

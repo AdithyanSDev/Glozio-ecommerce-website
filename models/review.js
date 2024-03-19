@@ -25,6 +25,11 @@ const reviewSchema = new mongoose.Schema({
     }
 });
 
+// Ensure the name field is populated in userId reference
+reviewSchema.pre('find', function() {
+    this.populate('userId', 'name');
+});
+
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;

@@ -189,8 +189,13 @@
             <!-- Wallet Balance -->
             <div class="col-4 mx-auto">
                 <div style="background-color: green; padding: 10px; text-align: center;">
-                    <h2 style="color: white;">₹<%= wallet.balance %></h2>
-                    <p style="color: white;">Available balance</p>
+                    <% if (wallet) { %>
+                        <h2 style="color: white;">₹<%= wallet.balance %></h2>
+                        <p style="color: white;">Available balance</p>
+                    <% } else { %>
+                        <h2 style="color: white;">₹0.00</h2>
+                        <p style="color: white;">No wallet found</p>
+                    <% } %>
                 </div>
             </div>
             <!-- Latest Transactions -->
@@ -214,19 +219,11 @@
                                         <td><%= order.orderedItems[0].productId.name %></td>
                                         <td>
                                             <% if (order.orderStatus === 'Cancelled') { %>
-                                               
-                                                    <span class="text-success">+ ₹<%=  Math.round(order.totalAmount) %></span>
-                                                
-                                                
+                                                <span class="text-success">+ ₹<%= Math.round(order.totalAmount) %></span>
                                             <% } else { %>
-                                               
-                                                    <span class="text-danger">- ₹<%= Math.round(order.totalAmount) %></span>
-                                               
-                                              
+                                                <span class="text-danger">- ₹<%= Math.round(order.totalAmount) %></span>
                                             <% } %>
                                         </td>
-                                        
-                                        
                                     </tr>
                                 <% } %>
                             <% }); %>
@@ -234,10 +231,9 @@
                     </table>
                 </div>
             </div>
-            
-            
         </div>
     </div>
+    
     
     
 </div>

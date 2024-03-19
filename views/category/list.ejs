@@ -152,11 +152,12 @@
                                         <a class="btn btn-link text-white px-3 mb-0" href="/admin/categories/<%= category._id %>/edit">
                                             <i class="material-icons text-sm me-2">edit</i>
                                         </a>
-                                        <form action="/admin/categories/<%= category._id %>/delete" method="POST" style="display: inline;">
-                                            <button type="submit" class="btn btn-link text-danger text-gradient px-3 mb-0">
-                                                <i class="material-icons text-sm me-2">delete</i> 
-                                            </button>
-                                        </form>
+                                        <form id="deleteForm_<%= category._id %>" action="/admin/categories/<%= category._id %>/delete" method="POST" style="display: inline;">
+                                          <button type="button" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="confirmDelete('<%= category._id %>')">
+                                              <i class="material-icons text-sm me-2">delete</i> 
+                                          </button>
+                                      </form>
+                                      
                                     </td>
                                 </tr>
                             <% }); %>
@@ -252,28 +253,21 @@
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="../assets/js/material-dashboard.min.js?v=3.1.0"></script>
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const message = urlParams.get("msg"); // Change 'message' to 'msg'
-    if (typeof message !== "undefined") {
-      if (message.includes("del")) {
+   function confirmDelete(categoryId) {
         Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: "Deleted!",
-            text: "Your file has been deleted.",
-            icon: "success"
-          });
-        }
-      });
-      } 
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form when confirmed
+                document.getElementById('deleteForm_' + categoryId).submit();
+            }
+        });
     }
   </script>
 </body>

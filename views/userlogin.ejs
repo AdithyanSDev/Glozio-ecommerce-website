@@ -69,6 +69,7 @@
         letter-spacing: 0.5px;
         text-transform: uppercase;
         margin-top: 10px;
+        margin-bottom: 20px;
         cursor: pointer;
     }
     
@@ -124,6 +125,7 @@
         width: 50%;
         opacity: 0;
         z-index: 1;
+        margin-bottom: 10px;
     }
     
     .container.active .sign-up{
@@ -263,6 +265,68 @@
   color: #ff8121;
   background-position: 100%;
 }
+input.error {
+    border: 2px solid red;
+}
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 2px;
+}
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 64%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.toggle-password i {
+    cursor: pointer;
+}
+.toggle-Confirmpassword {
+    position: absolute;
+    right: 10px;
+    top: 75%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.toggle-Confirmpassword i {
+    cursor: pointer;
+}
+.toggle-signinpassword {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.toggle-signinpassword i {
+    cursor: pointer;
+}
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-input {
+    padding-right: 40px; /* Adjust this value based on the width of your icon */
+}
+
+.toggle-password,
+.toggle-Confirmpassword {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 10px; /* Adjust this value based on the position you want the icon to be */
+    cursor: pointer;
+}
+
+.toggle-password i,
+.toggle-Confirmpassword i {
+    pointer-events: none; /* Ensure clicks go through to the input */
+}
+
     </style>
     
 <body>
@@ -277,55 +341,70 @@
       </nav>
 
       <div class="container" id="container">
-          <div class="form-container sign-up">
-              <form action="/api/user/register" method="post">
-                  <h1>Create Account</h1>
-                      <div class="social-icons">
-                          <a href="/auth/google" class="icon"><i class="fa-brands fa-google -g"></i></a>
-  
-                        
-                      </div>
-                      <span>or use your email for registration</span>
-                      <input type="text" placeholder="Name" name="name">
-                      <input type="email" placeholder="Email" name="email">
-                      <input type="password" placeholder="Password" name="password">
-  
-                    
-                      <% if (locals.success) { %>
-                          <p class="success-message"><%= locals.success %></p>
-                      <% } %>
-                      <button  type="submit">Sign Up</button>
-                  </form>
-              </div>
-          <div class="form-container sign-in">
-              <form action="/api/user/login" method="post">
-                  <h1>Sign In</h1>
-                  <div class="social-icons">
-                      <a href="/auth/google" class="icon"><i class="fa-brands fa-google -g"></i></a>
-                      
-                  </div>
-                  <span>or use your email password</span>
-                  <input type="email" placeholder="Email" name="email">
-                  <input type="password" placeholder="Password" name="password">
-                  <a href="/api/forgot-password">Forgot password?</a>
-                  <button type="submit">Sign In</button>
-              </form>
-          </div>
-          <div class="toggle-container">
-              <div class="toggle">
-                  <div class="toggle-panel toggle-left">
-                      <h1>Welcome to Glozio</h1>
-                      <p>Enter your personal    details </p>
-                      <button class="hidden" id="login">Sign In</button>
-                  </div>
-                  <div class="toggle-panel toggle-right">
-                      <h1>Welcome to Glozio</h1>
-                      <p>Enter your personal details </p>
-                      <button class="hidden" id="register">Sign Up</button>
-                  </div>
-              </div>
-          </div>
-      </div>
+        <div class="form-container sign-up">
+            <form action="/api/user/register" method="POST">
+                <h2>Create Account</h2>
+                <div class="social-icons">
+                    <a href="/auth/google" class="icon"><i class="fa-brands fa-google -g"></i></a>
+                </div>
+                <span>or use your email for registration</span>
+                <input type="text" placeholder="Name" name="name">
+                <input type="email" placeholder="Email" name="email">
+                <div class="password-container">
+                    <input type="password" placeholder="Password" name="password" class="password-input" id="password">
+                    <span class="toggle-password" id="togglePassword">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <div class="password-container">
+                    <input type="password" placeholder="Confirm Password" name="confirmPassword" class="password-input" id="confirmPassword">
+                    <span class="toggle-Confirmpassword" id="toggleConfirmPassword">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <% if (typeof errorMessage !== 'undefined') { %>
+                  <span class="error-message"><%= errorMessage %></span>
+                <% } %>
+                <% if (locals.success) { %>
+                    <p class="success-message"><%= locals.success %></p>
+                <% } %>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+        <div class="form-container sign-in">
+            <form action="/api/user/login" method="post">
+                <h1>Sign In</h1>
+                <div class="social-icons">
+                    <a href="/auth/google" class="icon"><i class="fa-brands fa-google -g"></i></a>
+                </div>
+                <span>or use your email password</span>
+                <input type="email" placeholder="Email" name="email">
+                <div class="password-container">
+                    <input type="password" placeholder="Password" name="password" class="password-input" id="signInPassword">
+                    <span class="toggle-signinpassword" id="toggleSignInPassword">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <a href="/api/forgot-password">Forgot password?</a>
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome to Glozio</h1>
+                    <p>Enter your personal details </p>
+                    <button class="hidden" id="login">Sign In</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Welcome to Glozio</h1>
+                    <p>Enter your personal details </p>
+                    <button class="hidden" id="register">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
       <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -357,6 +436,38 @@
   });
   
     </script>
+<script>
+    const togglePasswordIcons = document.querySelectorAll('.toggle-password');
+    togglePasswordIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // Toggle eye icon
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    });
+    const togglePasswordIcon = document.querySelectorAll('.toggle-Confirmpassword');
+    togglePasswordIcon.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // Toggle eye icon
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    });
+    const togglePassword = document.querySelectorAll('.toggle-signinpassword');
+    togglePassword.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // Toggle eye icon
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    });
+</script>
 
 
       

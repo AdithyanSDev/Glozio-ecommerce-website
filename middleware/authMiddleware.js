@@ -3,20 +3,28 @@
 const user =require('../models/user')
 const jwt = require('jsonwebtoken');
 
-const verifyToken = (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.redirect('/api/user/login')
-  }
-
-  try {
+const verifyToken = async (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.redirect('/api/user/login');
+    }
+  
+    try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.userId = decoded.userId;
+      
+      // Check if the user is blocked
+      const userData = await user.findById(decoded.userId);
+      if (userData.isBlocked === 'Blocked') {
+        res.clearCookie('token');
+        return res.redirect('/api/user/login');
+      }
+      
       next();
-  } catch (error) {
-      return res.redirect('/api/user/login')
-  }
-};
+    } catch (error) {
+      return res.redirect('/api/user/login');
+    }
+  };
 
 const isAdmin = (req, res, next) => {
     const token = req.cookies.Authorization;

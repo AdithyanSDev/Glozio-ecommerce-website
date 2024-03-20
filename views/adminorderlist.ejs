@@ -128,53 +128,64 @@
       </div>
     </nav>
     <!-- End Navbar -->
-
     <table class="table table-bordered table-dark table-hover">     
-        <thead class="thead-dark">
+      <thead class="thead-dark">
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Username</th>
-            <th scope="col">Product Name</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Order Date</th>
-            
-            <th scope="col">Price</th>
-            <th scope="col">Order Status</th>
-            <th scope="col">Payment Method</th>
-            <th scope="col">Payment Status</th>
-            
+              <th scope="col">#</th>
+              <th scope="col">Username</th>
+              <th scope="col">Product Name</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Order Date</th>
+  
+              <th scope="col">Price</th>
+              <th scope="col">Order Status</th>
+              <th scope="col">Payment Method</th>
+              <th scope="col">Payment Status</th>
+  
           </tr>
-        </thead>
+      </thead>
         <tbody>
             <% orders.forEach((order, index) => { %>
-              <% order.orderedItems.forEach((item) => { %>
-                <tr>
-                  <th scope="row"><%= index + 1 %></th>
-                  <td><%= order.userId.name %></td>
-                  <td><%= item.productId.name %></td>
-                  <td><%= item.quantity %></td>
-                  <td><%= order.orderDate.toDateString() %></td>
-                  <td>₹<%= order.totalAmount %></td>
-                  <td>
-                    <select class="form-select" id="orderStatus<%= index %>" name="orderStatus" onchange="updateOrderStatus('<%= order._id %>', this.value)" style="color: cornsilk;">
-                      <option class="text-dark" value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                      <option class="text-dark value="Processing" <%= order.orderStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
-                      <option class="text-dark value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                      <option class="text-dark value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                      <option class="text-dark value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                      <option class="text-dark" value="ReturnRequested" <%= order.orderStatus === 'ReturnRequested' ? 'selected' : '' %>>Return Requested</option>
-                      <option class="text-dark value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
-                    </select>
-                  </td>
-                  <td><%= order.paymentMethod %></td>
-                  <td><%= order.paymentStatus %></td>
-                </tr>
-              <% }); %>
+                <% order.orderedItems.forEach((item) => { %>
+                    <tr>
+                        <th scope="row"><%= index + 1 %></th>
+                        <td>
+                          <% if (order.userId && order.userId.name) { %>
+                            <%= order.userId.name %>
+                          <% } else { %>
+                            User Not Available
+                          <% } %>
+                        </td>
+                        
+                        <td>
+                            <% if (item.productId) { %>
+                                <%= item.productId.name %>
+                            <% } else { %>
+                                Product Not Available
+                            <% } %>
+                        </td>
+                        <td><%= item.quantity %></td>
+                        <td><%= order.orderDate.toDateString() %></td>
+                        <td>₹<%= order.totalAmount %></td>
+                        <td>
+                            <select class="form-select" id="orderStatus<%= index %>" name="orderStatus" onchange="updateOrderStatus('<%= order._id %>', this.value)" style="color: cornsilk;">
+                                <option class="text-dark" value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                <option class="text-dark value="Processing" <%= order.orderStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                <option class="text-dark value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                <option class="text-dark value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                <option class="text-dark value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                <option class="text-dark" value="ReturnRequested" <%= order.orderStatus === 'ReturnRequested' ? 'selected' : '' %>>Return Requested</option>
+                                <option class="text-dark value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                            </select>
+                        </td>
+                        <td><%= order.paymentMethod %></td>
+                        <td><%= order.paymentStatus %></td>
+                    </tr>
+                <% }); %>
             <% }); %>
-          </tbody>
-          
-        
-      </table>
+        </tbody>
+  </table>
+  
       
     
   

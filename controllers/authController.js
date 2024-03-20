@@ -38,8 +38,9 @@ exports.renderHomePage = async (req, res) => {
 
 // Redirect to user login page
 exports.redirectToUserLogin = (req, res) => {
-  console.log('Redirecting to user login page');
-  res.redirect('/user/login');
+  const errorMessage = '';
+
+  res.render('userlogin', { errorMessage }); 
 };
 
 
@@ -78,31 +79,34 @@ const generateRandomString=()=>{
   return String(otp);
 }
 
-
 exports.registerUser = async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
 
   try {
-    req.session.userData = { name, email, password };
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const otp = generateRandomString(4);
-    await sendOtpEmail(email, otp);
-    console.log("register page otp ",otp)
+    if (password !== confirmPassword) {
+      const errorMessage = 'Passwords do not match';
+      return res.status(400).render('userlogin', { errorMessage });
+  }
 
-   
-    req.session.otp = { code: otp, timestamp: Date.now() };
+      req.session.userData = { name, email, password };
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const otp = generateRandomString(4);
+      await sendOtpEmail(email, otp);
+      console.log("register page otp ", otp)
 
-    const successMessage = 'User registered successfully!';
-    if(successMessage){
-      res.redirect('/api/otp')
-    }
-    console.log(successMessage); 
+      req.session.otp = { code: otp, timestamp: Date.now() };
 
-    res.locals.success = successMessage; 
-    next();
+      const successMessage = 'User registered successfully!';
+      console.log(successMessage);
+      if(successMessage){
+        res.redirect('/api/otp')
+      }
+
+      res.locals.success = successMessage;
+      next();
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+      console.error(error);
+      res.status(500).send('Internal Server Error');
   }
 };
 

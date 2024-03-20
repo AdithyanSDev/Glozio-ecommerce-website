@@ -283,10 +283,16 @@
                   <!-- Loop through bestSellingProducts and populate table rows -->
                   <% bestSellingProducts.forEach(product => { %>
                     <tr>
-                      <td><img src="/<%= product.productDetails[0].images[0] %>" alt="<%= product.productDetails[0].name %>" style="max-width: 50px;"><%= product.productDetails[0].name %></td>
-                      <td><%= product.count %></td>
+                        <td>
+                            <% if (product.productDetails.length > 0 && product.productDetails[0].images.length > 0) { %>
+                                <img src="/<%= product.productDetails[0].images[0] %>" alt="<%= product.productDetails[0].name %>" style="max-width: 50px;">
+                            <% } %>
+                            <%= product.productDetails.length > 0 ? product.productDetails[0].name : 'Product not found' %>
+                        </td>
+                        <td><%= product.count %></td>
                     </tr>
-                  <% }); %>
+                <% }); %>
+                
                 </tbody>
               </table>
             </div>

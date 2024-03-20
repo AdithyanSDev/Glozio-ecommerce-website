@@ -14,8 +14,9 @@ exports.listCategories = async (req, res) => {
 };
 
 exports.showAddCategoryForm = (req, res) => {
-  res.render('category/add');
+  res.render('category/add', { errorMessage: null, name: '', description: '' });
 };
+
 
 exports.addCategory = async (req, res) => {
   try {
@@ -23,16 +24,17 @@ exports.addCategory = async (req, res) => {
     // Check if the category already exists
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
-      return res.status(400).send('Category already exists');
+      return res.render('category/add', { errorMessage: 'Category already exists', name, description });
     }
     const newCategory = new Category({ name, description });
     await newCategory.save();
     res.redirect('/admin/categories');
   } catch (error) {
     console.error(error);
-    res.render('404page')
+    res.render('404page');
   }
 };
+
 
 exports.showEditCategoryForm = async (req, res) => {
   try {
@@ -74,15 +76,19 @@ exports.updateCategory = async (req, res) => {
 };
 
 
-
 exports.softDeleteCategory = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
-    await Category.findByIdAndUpdate(categoryId, { isDeleted: true });
+    // Find all products belonging to the category
+    const productsToDelete = await Product.find({ category: categoryId });
+    // Delete all products found
+    await Product.deleteMany({ category: categoryId });
+    // Delete the category
+    await Category.findByIdAndDelete(categoryId);
     res.redirect('/admin/categories?msg=del');
   } catch (error) {
     console.error(error);
-    res.render('404page')
+    res.render('404page');
   }
 };
 

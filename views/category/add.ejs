@@ -73,20 +73,59 @@
         .fa-plus-circle {
             margin-right: 8px;
         }
+        .alert {
+            opacity: 0;
+            transition: opacity 1s ease-out;
+            color: red; /* Set text color to red */
+            margin-top: 0; /* Set margin top to 0 */
+            margin-bottom: 2px; /* Set margin bottom to 2px */
+            font-family: Arial, sans-serif; /* Set font family */
+        }
+
+        .alert.show {
+            opacity: 1;
+        }
+
+    input.error {
+    border-color: red;
+}
     </style>
 </head>
 <body>
     <div class="container">
         <h2><i class="fas fa-plus-circle"></i>Add Category</h2>
+       
         <form action="/admin/categories/add" method="post">
             <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
-            
+            <input type="text" id="name" name="name" value="<%= name %>" required class="<%= errorMessage ? 'error' : '' %>">
+
+            <% if (errorMessage) { %>
+                <div id="alertMessage" class="alert alert-danger" role="alert">
+                    <%= errorMessage %>
+                </div>
+            <% } %>
             <label for="description">Description:</label>
-            <textarea id="description" name="description" rows="5"></textarea>
+            <textarea id="description" name="description" rows="5"><%= description %></textarea>
             
             <button type="submit">Add Category</button>
         </form>
     </div>
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the alert element
+            const alertElement = document.getElementById('alertMessage');
+            
+            // Add a class to the alert to trigger the fade-out effect
+            alertElement.classList.add('show');
+            
+            // Set a timeout to remove the alert after 2 seconds
+            setTimeout(function() {
+                alertElement.classList.remove('show');
+            }, 2000);
+        });
+    </script>
+    
+    
 </body>
 </html>

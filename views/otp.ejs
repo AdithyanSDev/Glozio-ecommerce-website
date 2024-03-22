@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Verification Form</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">  
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Roboto';
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -128,6 +128,8 @@
         }
     </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.0/dist/sweetalert2.all.min.js"></script>
+
 <body>
    
    
@@ -245,7 +247,25 @@ function showCustomMessage(message, type) {
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
 </script>
-
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const message = urlParams.get("msg"); // Change 'message' to 'msg'
+    if (typeof message !== "undefined") {
+      if (message.includes("error")) {
+        Swal.fire({
+          title: "Invalid OTP",
+          text: "Check your OTP and try again",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
+      }
+    }
+  </script>
 </body>
 
 </html>

@@ -64,7 +64,7 @@ exports.userLogin = async (req, res) => {
       }
     }
 
-    res.redirect('/api/user/login?error=passw');
+    res.redirect('/api/user/login?msg=passw');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
@@ -152,7 +152,7 @@ exports.verifyOTP = async (req, res) => {
       delete req.session.otp;
       res.render('userlogin')
     } else {
-      res.status(400).json({ success: false, message: "Invalid OTP" });
+      res.redirect('/api/otp?msg=error')
     }
   } catch (error) {
     console.error(error);
@@ -197,15 +197,17 @@ exports.verifyOTPPost = async (req, res) => {
       await newUser.save();
       delete req.session.userData;
       delete req.session.otp;
-      res.render('userlogin')
+      const errorMessage = ''; 
+      res.render('userlogin', { errorMessage });
     } else {
-      res.status(400).json({ success: false, message: "Invalid OTP" });
+      res.redirect('/api/otp?msg=error')
     }
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
+
 //resend
 exports.resendOTP = async (req, res) => {
   try {
@@ -231,8 +233,6 @@ exports.logout = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
-
-//render the productlist.ejs
 exports.productsByCategory = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
@@ -244,7 +244,10 @@ exports.productsByCategory = async (req, res) => {
     const products = await Product.find({ _id: { $in: productIds } });
     const reviews = await Review.find({ productIds });
     const reviewCount = await Review.countDocuments({ productIds });
-    res.render('productlist', { category, products,reviewCount,categoryId });
+
+    // Add filteredProducts to the data object
+    const filteredProducts = []; // Initialize as an empty array initially
+    res.render('productlist', { category, products, reviewCount, categoryId, filteredProducts });
   } catch (err) {
     console.error(err);
     res.status(500).send('Internal Server Error');

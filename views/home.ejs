@@ -90,9 +90,9 @@
 
                 <form action="/search" method="GET">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for products" name="q">
+                        <input type="text" class="form-control" placeholder="Search for products" id="searchInput" name="q">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit">Search</button>
+                            <button class="btn btn-primary" type="submit" id="searchButton" disabled>Search</button>
                         </div>
                     </div>
                 </form>
@@ -442,6 +442,25 @@
             // Optionally, display an error message to the user
         }
     }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+
+        // Add event listener for input changes
+        searchInput.addEventListener('input', () => {
+            // Trim input value
+            const trimmedValue = searchInput.value.trim();
+
+            // Enable/disable search button based on input value
+            if (/^[a-zA-Z]+$/.test(trimmedValue)) {
+                searchButton.disabled = false;
+            } else {
+                searchButton.disabled = true;
+            }
+        });
+    });
 </script>
 
 

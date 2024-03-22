@@ -331,39 +331,63 @@ exports.renderRazorpayPage = async (req, res) => {
     }
 };
 
-
-
 exports.razorsuccess = async (req, res) => {
     try {
-        const orderId = req.params.orderId;
+        const cartId = req.params.cartId;
+        let addressId = req.body.addressId;
 
-        // Find the order by orderId
-        const order = await Order.findById(orderId);
-
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
+        // Ensure addressId is a single ObjectId
+        if (Array.isArray(addressId)) {
+            addressId = addressId[0]; // Select the first addressId
         }
 
-        // Update payment status to 'Completed'
-        order.paymentStatus = 'Completed';
-        await order.save();
+        console.log(addressId, "addrid");
 
-        // Remove ordered products from the cart
-        const userId = order.userId;
-        const orderedItems = order.orderedItems;
-        await Cart.findOneAndUpdate(
-            { user: userId },
-            { $pull: { product: { productId: { $in: orderedItems.map(item => item.productId) } } } },
-            { new: true }
-        );
+        // Find the cart by cartId
+        const cart = await Cart.findById(cartId);
 
-        res.redirect('/orderpage');
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart not found' });
+        }
+
+        // Create a new order based on the cart details
+        const newOrder = new Order({
+            userId: cart.user,
+            orderedItems: cart.product.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity
+            })),
+            paymentMethod: 'Razorpay', // Assuming payment method is Razorpay
+            totalAmount: cart.subtotal,
+            shippingAddress: addressId, // Assign the received addressId here
+            orderStatus: 'Pending' // Assuming initial order status is Pending
+        });
+
+        // Save the new order
+        const savedOrder = await newOrder.save();
+
+        await Order.findOneAndUpdate({ _id: savedOrder._id }, { paymentStatus: 'Completed' });
+
+        // Reduce the stock of each product in the cart
+        for (const item of cart.product) {
+            await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+        }
+
+        // Remove (pull) the products from the cart
+        await Cart.findByIdAndUpdate(cartId, { $set: { product: [], subtotal: 0 } });
+
+        // Perform any other necessary actions, such as updating inventory, etc.
+
+        res.redirect('/orderpage'); // Redirect to the appropriate page after order creation
     } catch (error) {
-        console.error('Error in updating payment status');
+        console.error('Error in processing Razorpay payment');
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+
+
 
 exports.generateReport = async (req, res) => {
     try {

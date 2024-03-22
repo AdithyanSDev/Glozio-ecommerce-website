@@ -28,7 +28,7 @@ router.get('/orderdetails/:orderId/:productId',verifyToken,orderController.order
 router.get('/generate-invoice/:orderId',orderController.generateReport)
 
 router.get('/razorpaypage/:orderId', verifyToken,orderController.renderRazorpayPage);
-router.post('/razorpay/pay/:orderId',verifyToken,orderController.razorsuccess)
+router.post('/razorpay/pay/:cartId', verifyToken, orderController.razorsuccess)
 
 
 // wishlist routes

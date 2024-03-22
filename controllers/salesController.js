@@ -2,7 +2,8 @@
 const { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } = require('date-fns');
 const Product=require("../models/product");
 const Coupon=require("../models/coupon")
-const PDFDocument = require('pdfkit');
+const PDFDocument = require('pdfkit-table');
+
 const Order = require('../models/order');
 
 
@@ -20,7 +21,6 @@ exports.renderSalesreport = async (req, res) => {
     }
 };
 
-
 exports.generateReport = async (req, res) => {
     try {
         const { filterType, startDate, endDate } = req.query;
@@ -28,66 +28,81 @@ exports.generateReport = async (req, res) => {
         let salesData;
         let reportTitle;
 
-        switch (filterType) {
-            case 'daily':
-                salesData = await getDailySales();
-                reportTitle = 'Today';
-                break;
-            case 'weekly':
-                salesData = await getWeeklySales();
-                reportTitle = 'This Week';
-                break;
-            case 'monthly':
-                salesData = await getMonthlySales();
-                reportTitle = 'This Month';
-                break;
-            case 'yearly':
-                salesData = await getYearlySales();
-                reportTitle = 'This Year';
-                break;
-            case 'custom':
-                if (!startDate || !endDate) {
-                    throw new Error('Custom date range requires both start date and end date.');
-                }
-                salesData = await getCustomRangeSales(startDate, endDate);
-                reportTitle = `${startDate} to ${endDate}`;
-                break;
-            default:
-                throw new Error('Invalid filter type.');
+        if (filterType === 'daily') {
+            salesData = await getDailySales();
+            reportTitle = 'Today';
+        } else if (filterType === 'weekly') {
+            salesData = await getWeeklySales();
+            reportTitle = 'This Week';
+        } else if (filterType === 'monthly') {
+            salesData = await getMonthlySales();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            reportTitle = monthNames[new Date().getMonth()]; // Use current month if no startDate provided
+        } else if (filterType === 'yearly') {
+            salesData = await getYearlySales();
+            reportTitle = `Yearly Sales Report (${new Date().getFullYear()})`;
+        } else if (filterType === 'custom') {
+            if (!startDate || !endDate) {
+                throw new Error('Custom date range requires both start date and end date.');
+            }
+            salesData = await getCustomRangeSales(startDate, endDate);
+            reportTitle = `${new Date(startDate).toLocaleDateString()} to ${new Date(endDate).toLocaleDateString()}`;
         }
-
+        
+        generatePDFReport(res, reportTitle, salesData);
+       
+    } catch (error) {
+        console.error(error);
+        res.render('404');
+    }
+};
+async function generatePDFReport(res, reportTitle, salesData) {
+    try {
+        
         const doc = new PDFDocument();
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
         doc.pipe(res);
 
-        doc.image('public/img/Gloziologo.png', {
-            width: 25,
-            align: 'center'
-        }).moveDown(0.5); // Move down a bit to create space between the logo and the text
-        doc.fontSize(20).text('GLOZIO', { align: 'left' });
-    // Report title
-    doc.fontSize(18).text(`Sales Report (${reportTitle})`, { align: 'center' });
+        doc.fontSize(20).text('GLOZIO', { align: 'center' });
+        doc.fontSize(18).text(`Sales Report (${reportTitle})`, { align: 'center' });
+        doc.moveDown(); 
 
-    doc.moveDown();
-
-    // Sales data
-    salesData.forEach(({ date, totalSales, totalOrderAmount, totalDiscount, totalCouponDiscount }) => {
-        doc.fontSize(14).text(`Date: ${date}`);
-        doc.fontSize(12).text(`Total Sales: ${totalSales}`);
-        doc.fontSize(12).text(`Total Order Amount: Rs.${totalOrderAmount}`);
-        doc.fontSize(12).text(`Total Discount: Rs.${totalDiscount}`);
-        doc.fontSize(12).text(`Total Coupon Discount: Rs.${totalCouponDiscount}`);
-        doc.moveDown();
-    });
-       
+        // Check if salesData is an array and has at least one element
+        if (Array.isArray(salesData) && salesData.length > 0) {
+            const { totalSales, totalOrderAmount, totalDiscount, totalCouponDiscount } = salesData[0];
+            
+            // Table Headers
+            const tableHeaders = ['Date', 'Total Sales', 'Total Order Amount', 'Total Discount', 'Total Coupon Discount'];
+           
+            const tableData = 
+               salesData.map(({ date, totalSales, totalOrderAmount, totalDiscount, totalCouponDiscount }) => 
+                [new Date(date).toLocaleDateString(), totalSales, 'Rs.' + totalOrderAmount, 'Rs.' + totalDiscount, 'Rs.' + totalCouponDiscount]
+               )
+        
+            
+      
+            doc.table({
+                headers: tableHeaders,
+                rows: tableData,
+                widths: Array(tableHeaders.length).fill('*'), 
+                heights: 20,
+                headerRows: 1
+            });
+        } else {
+            doc.text('No sales data available.');
+        }
 
         doc.end();
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: 'Error generating PDF report' });
     }
-};
+}
+
+
+
+
 
 async function getDailySales() {
     const today = new Date();

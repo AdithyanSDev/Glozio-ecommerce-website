@@ -5,7 +5,7 @@ const User = require('../models/user')
 const Address=require('../models/address')
 const Wallet=require('../models/wallet')
 const Coupon =require('../models/coupon')
-
+const Order=require('../models/order')
 exports.renderCartPage = async (req, res) => {
     try {
         const token = req.cookies.token;
@@ -237,9 +237,9 @@ exports.renderCheckout = async (req, res) => {
 
             const address = await Address.find({ user: userId });
             const wallet = await Wallet.findOne({ userId });
-           
+            const cartId = usercart._id; // Get the cart ID
             // Pass discountedSubtotal and productsInfo to the checkout page along with other data
-            res.render('checkout', { user, usercart, subtotal, discountedSubtotal, token, categories, address, productsInfo, wallet, couponCode });
+            res.render('checkout', { user, usercart, subtotal, discountedSubtotal, token, categories, address, productsInfo, wallet, couponCode, cartId });
         }
     } catch (error) {
         console.error(error);
@@ -256,7 +256,7 @@ exports.applyCoupon = async (req, res) => {
         const coupon = await Coupon.findOne({ code: couponCode });
 
         if (!coupon) {
-            return res.status(404).send('Coupon not found');
+            return res.redirect('/cart?msg=error');
         }
 
         // Check if the coupon has already been used by the user
@@ -264,7 +264,7 @@ exports.applyCoupon = async (req, res) => {
         const user = await User.findById(userId);
 
         if (user.couponUsed) {
-            return res.redirect('/cart?msg=added')
+            return res.redirect('/cart?msg=added');
         }
 
         // Retrieve the user's cart
@@ -284,20 +284,26 @@ exports.applyCoupon = async (req, res) => {
                     subtotal += product.productId.sellingPrice * product.quantity;
                 }
             });
-
-            // Check if the subtotal meets the minimum purchase amount for the coupon
-            if (subtotal >= coupon.minimumPurchaseAmount) {
-                // Subtract the discount amount from the subtotal
-                cartItem.subtotal -= coupon.discountAmount;
-            }
         });
 
-        // Save the updated cart items to the database
-        await Promise.all(usercart.map(cartItem => cartItem.save()));
+        // Check if the subtotal meets the minimum purchase amount for the coupon
+        if (subtotal >= coupon.minimumPurchaseAmount) {
+            // Mark the coupon as used by the user
+            user.couponUsed = true;
 
-        // Mark the coupon as used by the user
-        user.couponUsed = true;
-        await user.save();
+            // Save the updated user document to the database
+            await user.save();
+        }
+
+        // Subtract the discount amount from the subtotal if applicable
+        if (subtotal >= coupon.minimumPurchaseAmount) {
+            usercart.forEach(cartItem => {
+                cartItem.subtotal -= coupon.discountAmount;
+            });
+
+            // Save the updated cart items to the database
+            await Promise.all(usercart.map(cartItem => cartItem.save()));
+        }
 
         // Render the cart page with the updated subtotal and couponCode
         const categories = await Category.find({ isDeleted: false });

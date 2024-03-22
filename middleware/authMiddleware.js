@@ -17,7 +17,7 @@ const verifyToken = async (req, res, next) => {
       const userData = await user.findById(decoded.userId);
       if (userData.isBlocked === 'Blocked') {
         res.clearCookie('token');
-        return res.redirect('/api/user/login');
+        return res.redirect('/api/user/login?msg=blocked');
       }
       
       next();

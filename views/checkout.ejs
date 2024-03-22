@@ -73,7 +73,7 @@
     </div>
     <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
         <div class="col-lg-4">
-            <a href="" class="text-decoration-none">
+            <a href="/" class="text-decoration-none">
                 <span class="h1 text-uppercase text-black bg-white px-2">Glozio</span>
 
 
@@ -182,7 +182,8 @@
 
 
     <!-- Checkout Start -->
-    <form action="/placeorder" method="POST">
+  <!-- Checkout Start -->
+<form action="/placeorder" method="POST" id="checkoutForm">
     <div class="container-fluid">
        
         <div class="row px-xl-5">
@@ -190,42 +191,36 @@
                 <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
             
                 <div class="bg-light p-30 mb-5">
-                    <!-- <div class="row"> -->
-                        <div class="container">
-                            <div class="col">
-                              
-                                <% address.forEach(addressItem => { %>
-                                    <div class="col-md-1 rounded">
-                                        <input class="m-1" type="radio" name="addressId" value="<%= addressItem._id %>" required>
+                    <div class="container">
+                        <div class="col">
+                            <% address.forEach(addressItem => { %>
+                                <div class="col-md-1 rounded">
+                                    <input class="m-1" type="radio" name="addressId" value="<%= addressItem._id %>" required>
+                                </div>
+                                <div class="address-container mb-3 border rounded p-3 mt-2 position-relative">
+                                    <div class="address-type">
+                                        <span class="address-type-badge bg-secondary text-dark px-2 py-1 rounded"><%= addressItem.addressType %></span>
                                     </div>
-                                    <div class="address-container mb-3 border rounded p-3 mt-2 position-relative">
-                                        <div class="address-type">
-                                            <span class="address-type-badge bg-secondary text-dark px-2 py-1 rounded"><%= addressItem.addressType %></span>
+                                    <div class="address-details">
+                                        <div class=" row name-phone mt-2">
+                                            <strong class="ml-3"><%= addressItem.name %></strong>
+                                            <strong class="ml-3"><%= addressItem.mobileNumber %></strong>
                                         </div>
-                                        <div class="address-details">
-                                            <div class=" row name-phone mt-2">
-                                                <strong class="ml-3"><%= addressItem.name %></strong>
-                                                <strong class="ml-3"><%= addressItem.mobileNumber %></strong>
-                                            </div>
-                                            <div class="full-address">
-                                                <%= addressItem.address %>, <%= addressItem.locality %>, <%= addressItem.city %>, <%= addressItem.state %>, <%= addressItem.pincode %>
-                                            </div>
+                                        <div class="full-address">
+                                            <%= addressItem.address %>, <%= addressItem.locality %>, <%= addressItem.city %>, <%= addressItem.state %>, <%= addressItem.pincode %>
                                         </div>
                                     </div>
-                                <% }); %>
-                            </div>
-                            
-
-
+                                </div>
+                            <% }); %>
                         </div>
+                    </div>
     
-                        <div class="col-md-12-mt-4">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="shipto">
-                                <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Ship to different address</label>
-                            </div>
+                    <div class="col-md-12-mt-4">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="shipto">
+                            <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Ship to different address</label>
                         </div>
-                    <!-- </div> -->
+                    </div>
                 </div>
                
             </div>
@@ -235,14 +230,14 @@
                 <% productsInfo.forEach(product => { %>
                     <div class="d-flex justify-content-between">
                         <p><%= product.name %></p>
-                        <p>₹<%= product.price.toFixed(2) %></p> <!-- Update product price display -->
+                        <p>₹<%= product.price.toFixed(2) %></p>
                     </div>
                 <% }); %>
                             
                 <div class="border-bottom pt-3 pb-2">
                     <div class="d-flex justify-content-between mb-3">
                         <h6>Subtotal</h6>
-                        <h6>₹<%= subtotal.toFixed(2) %></h6> <!-- Display dynamic subtotal -->
+                        <h6>₹<%= subtotal.toFixed(2) %></h6>
                     </div>
                     <% if (discountedSubtotal && subtotal !== discountedSubtotal) { %>
                         <div class="bg-success text-white p-2 mb-2">Coupon Applied: Save ₹<%= (subtotal - discountedSubtotal).toFixed(2) %> </div>
@@ -255,12 +250,12 @@
                 <div class="pt-2">
                     <div class="d-flex justify-content-between mt-2">
                         <h5>Total</h5>
-                        <h5>₹<%= discountedSubtotal.toFixed(2) %></h5> <!-- Display dynamic discounted subtotal -->
+                        <h5>₹<%= discountedSubtotal.toFixed(2) %></h5>
                     </div>
                 </div>
                             
                             
-                <div class="mb-5">
+                <div class="mb-5" id="paymentMethodSection">
                     <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Payment</span></h5>
                     <div class="bg-light p-30">
                         <% if (subtotal <= 1000) { %>
@@ -296,11 +291,62 @@
             </div>
             
         </div>
+        
+        <!-- Hidden input to store selected address ID for Razorpay form -->
+        <input type="hidden" name="razorpayAddressId" id="razorpayAddressId">
+        
         <button type="submit" class="btn btn-block btn-primary font-weight-bold py-3">Place Order</button>
         <input type="hidden" name="usercart" value="<%= JSON.stringify(usercart) %>">
+    
     </div>
 </form>
-    <!-- Checkout End -->
+<div class="col-md-12" id="razorpayFormContainer" style="display: none;">
+   
+    <form id="razorpay-form" action="/razorpay/pay/<%= cartId %>" method="POST">
+        <div class="container">
+            <div class="col">
+                <% address.forEach(addressItem => { %>
+                    <div class="col-md-1 rounded">
+                        <input class="m-1" type="radio" name="addressId" value="<%= addressItem._id %>" required>
+                    </div>
+                    <div class="address-container mb-3 border rounded p-3 mt-2 position-relative">
+                        <div class="address-type">
+                            <span class="address-type-badge bg-secondary text-dark px-2 py-1 rounded"><%= addressItem.addressType %></span>
+                        </div>
+                        <div class="address-details">
+                            <div class=" row name-phone mt-2">
+                                <strong class="ml-3"><%= addressItem.name %></strong>
+                                <strong class="ml-3"><%= addressItem.mobileNumber %></strong>
+                            </div>
+                            <div class="full-address">
+                                <%= addressItem.address %>, <%= addressItem.locality %>, <%= addressItem.city %>, <%= addressItem.state %>, <%= addressItem.pincode %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+        <input type="hidden" name="cartId" value="<%= cartId %>">
+        <input type="hidden" name="addressId" id="razorpayAddressId"> 
+        <script src="https://checkout.razorpay.com/v1/checkout.js"
+        data-key="rzp_test_xKuv2UTXtdieZH"
+        data-amount="<%= usercart.subtotal * 100 %>"
+        data-currency="INR"
+        data-order_id="<%= usercart.razorpayOrderId %>"
+        data-buttontext=""
+        data-name="Glozio"
+        data-description="Payment for Order <%= usercart._id %>"
+        data-image="/img/Gloziologo.png"
+        data-prefill.name="<%= user.name %>"
+        data-prefill.email="<%= user.email %>"
+        data-theme.color="#4169E1">
+</script>
+<button id="rzp-button" class="btn btn-block btn-primary font-weight-bold py-3">Place order</button>
+</form>
+
+</div>
+<!-- Checkout End -->
+    
 <!--Shipping address add-->
 <div class="collapse mb-5 mt-5" id="shipping-address">
     <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Shipping Address</span></h5>
@@ -483,6 +529,48 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
+            const placeOrderButton = document.querySelector('button[type="submit"]');
+            const razorpayFormContainer = document.getElementById("razorpayFormContainer");
+            const razorpayButton = document.getElementById("rzp-button");
+            const paymentMethodSection = document.getElementById("paymentMethodSection");
+    
+            // Function to toggle display based on payment method selection
+            function togglePaymentMethod() {
+                if (paymentMethodRadios[2].checked) { // Razorpay radio button index is 2
+                    placeOrderButton.style.display = "none";
+                    paymentMethodSection.style.display = "block";
+                    razorpayFormContainer.style.display = "block";
+                    razorpayButton.textContent = "Place Order";
+                } else {
+                    placeOrderButton.style.display = "block";
+                    razorpayFormContainer.style.display = "none";
+                    paymentMethodSection.style.display = "block";
+                    razorpayButton.textContent = "Place Order";
+                }
+            }
+    
+            // Initial call to togglePaymentMethod to set initial state
+            togglePaymentMethod();
+    
+            // Event listener to toggle display when payment method changes
+            paymentMethodRadios.forEach(function (radio) {
+                radio.addEventListener("change", togglePaymentMethod);
+            });
+            
+            // Event listener to update hidden field value with selected address ID
+            const addressRadios = document.querySelectorAll('input[name="addressId"]');
+            addressRadios.forEach(function (radio) {
+                radio.addEventListener("change", function () {
+                    document.getElementById("razorpayAddressId").value = this.value;
+                });
+            });
+        });
+    </script>
+    
+    
 
   
 </body>

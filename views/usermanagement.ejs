@@ -244,10 +244,10 @@
           }
   
           const data = await response.json();
-          alert("User updated successfully");
+          // alert("User updated successfully");
   
        // Update status text in the UI based on the response
-       if (data.isBlocked === 'active') {
+       if (data.isBlocked === 'Unblocked') {
                             statusElement.textContent = 'Unblocked';
                           } else {
                             statusElement.textContent = 'Blocked';

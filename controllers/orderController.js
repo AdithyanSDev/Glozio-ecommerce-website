@@ -50,12 +50,12 @@ exports.placeOrder = async (req, res) => {
         usercart.product.forEach(product => {
             totalAmount += product.productId.sellingPrice * product.quantity;
         });
-         // Check if total amount is above 1000 for COD
-         if (paymentMethod === 'COD' && totalAmount > 1000) {
-            return res.status(400).json({ message: 'COD is not allowed for orders above 1000' });
+        
+        // Check if total amount is above 1000 for COD
+        if (paymentMethod === 'Cash On Delivery' && totalAmount > 1000) {
+            return res.status(400).json({ message: 'Cash On Delivery is not allowed for orders above 1000' });
         }
-        console.log(cart)
-console.log(totalAmount);
+
         // Create the order
         const order = new Order({
             userId: userId,
@@ -65,31 +65,31 @@ console.log(totalAmount);
             paymentMethod: paymentMethod 
         });
 
-        // Update payment status based on payment method
+        // Set payment status based on payment method
         if (paymentMethod === 'Wallet') {
             order.paymentStatus = 'Completed';
+
+            // Remove ordered products from the cart
+            await Cart.findOneAndUpdate(
+                { user: userId },
+                { $pull: { product: { productId: { $in: usercart.product.map(item => item.productId) } } }, $set: { subtotal: 0 } },
+                { new: true }
+            );
         } else if (paymentMethod === 'Razorpay') {
-            
             const razorpayOrder = await razorpay.orders.create({
                 amount: totalAmount * 100, 
                 currency: 'INR',
                 payment_capture: 1 
             });
             order.paymentStatus = 'Failed';
-            order.razorpayOrderId=razorpayOrder.id;
+            order.razorpayOrderId = razorpayOrder.id;
             await order.save();
             return res.redirect(`/razorpaypage/${order._id}`); // Redirect to Razorpay page
+        } else if (paymentMethod === 'Cash On Delivery') {
+            order.paymentStatus = 'Failed'; // Set payment status to failed for COD
         }
 
         await order.save();
-
-        // Remove ordered products from the cart
-        await Cart.findOneAndUpdate(
-            { user: userId },
-            { $pull: { product: { productId: { $in: usercart.product.map(item => item.productId) } } }, $set: { subtotal: 0 } },
-            { new: true }
-        );
-        
 
         // Reduce the stock of ordered products
         usercart.product.forEach(async (product) => {
@@ -100,9 +100,9 @@ console.log(totalAmount);
         if (paymentMethod === 'Wallet') {
             let wallet = await Wallet.findOne({ userId });
             if (!wallet) {
-                return res.status(400).json({ message: 'Wallet not found' });
+                return res.redirect('/checkout?msg=err')
             } else if (wallet.balance < totalAmount) {
-                return res.status(400).json({ message: 'Insufficient wallet balance' });
+                return res.redirect('/checkout?msg=balance')
             } else {
                 wallet.balance -= totalAmount;
                 await wallet.save();
@@ -113,9 +113,11 @@ console.log(totalAmount);
         return res.redirect('/orderpage');
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.render('404page')
     }
 };
+
+
 
 
 exports.renderOrderList = async (req, res) => {
@@ -295,7 +297,7 @@ exports.renderRazorpayPage = async (req, res) => {
 
         // Retrieve user's cart
         const userCart = await Cart.findOne({ user: userId }).populate('product.productId');
-
+    
         if (!userCart) {
             return res.status(404).json({ message: 'Cart not found' });
         }
@@ -331,6 +333,7 @@ exports.renderRazorpayPage = async (req, res) => {
     }
 };
 
+
 exports.razorsuccess = async (req, res) => {
     try {
         const cartId = req.params.cartId;
@@ -357,15 +360,16 @@ exports.razorsuccess = async (req, res) => {
                 productId: item.productId,
                 quantity: item.quantity
             })),
-            paymentMethod: 'Razorpay', // Assuming payment method is Razorpay
+            paymentMethod: 'Razorpay', 
             totalAmount: cart.subtotal,
             shippingAddress: addressId, // Assign the received addressId here
-            orderStatus: 'Pending' // Assuming initial order status is Pending
+            orderStatus: 'Pending' 
         });
 
         // Save the new order
         const savedOrder = await newOrder.save();
 
+        // Update the payment status to "Completed" for the order
         await Order.findOneAndUpdate({ _id: savedOrder._id }, { paymentStatus: 'Completed' });
 
         // Reduce the stock of each product in the cart
@@ -373,18 +377,51 @@ exports.razorsuccess = async (req, res) => {
             await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
         }
 
-        // Remove (pull) the products from the cart
-        await Cart.findByIdAndUpdate(cartId, { $set: { product: [], subtotal: 0 } });
+        // Remove ordered products from the cart
+        await Cart.findByIdAndUpdate(cartId, { $pull: { product: { productId: { $in: cart.product.map(item => item.productId) } } } });
 
-        // Perform any other necessary actions, such as updating inventory, etc.
-
-        res.redirect('/orderpage'); // Redirect to the appropriate page after order creation
+        res.redirect('/orderpage'); 
     } catch (error) {
         console.error('Error in processing Razorpay payment');
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+
+exports.paylater = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+
+        // Find the order by orderId
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.render('404page')
+        }
+
+        // Update payment status to 'Completed'
+        order.paymentStatus = 'Completed';
+        await order.save();
+
+        // Remove ordered products from the cart
+        const userId = order.userId;
+        const orderedItems = order.orderedItems;
+        await Cart.findOneAndUpdate(
+            { user: userId },
+            { $pull: { product: { productId: { $in: orderedItems.map(item => item.productId) } } } },
+            { new: true }
+        );
+
+        res.redirect('/orderpage');
+    } catch (error) {
+        console.error('Error in updating payment status');
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
 
 
 

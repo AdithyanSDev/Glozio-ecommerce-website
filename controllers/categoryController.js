@@ -91,6 +91,22 @@ exports.softDeleteCategory = async (req, res) => {
     res.render('404page');
   }
 };
+// Controller
+exports.toggleCategory = async (req, res) => {
+  try {
+      const categoryId = req.params.categoryId;
+      const category = await Category.findById(categoryId);
+
+      // Toggle the category status
+      category.isBlocked = !category.isBlocked;
+      await category.save();
+
+      res.status(200).json({ success: true });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+};
 
 exports.listProductsByCategory = async (req, res) => {
   try {

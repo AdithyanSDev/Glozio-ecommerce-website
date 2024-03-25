@@ -192,7 +192,7 @@
 <!-- Razorpay checkout form -->
 <div class="row">
     <div class="col-md-6">
-        <form id="razorpay-form" action="/razorpay/pay/<%=order._id %>" method="POST">
+        <form id="razorpay-form" action="/paylater/<%=order._id %>" method="POST">
             <input type="hidden" name="orderId" value="<%= order._id %>">
             <script src="https://checkout.razorpay.com/v1/checkout.js"
                     data-key="rzp_test_xKuv2UTXtdieZH"

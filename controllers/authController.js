@@ -10,10 +10,9 @@ const Offer=require('../models/offer')
 
 
 
-
 exports.renderHomePage = async (req, res) => {
   try {
-    const products = await Product.find({ isDeleted: false });
+    const products = await Product.find({ isDeleted: false }).populate('category');
     // Fetch review counts for each product
     const productReviewCounts = await Promise.all(products.map(async product => {
       const reviewCount = await Review.countDocuments({ productId: product._id });
@@ -26,7 +25,7 @@ exports.renderHomePage = async (req, res) => {
       return map;
     }, {});
 
-    const categories = await Category.find({ isDeleted: false }).populate('products');
+    const categories = await Category.find({ isDeleted: false });
     const token = req.cookies.token; // Retrieve token from cookies
     console.log("token from cookies:", token);
     res.render('home', { products, token, categories, reviewCountMap });   
@@ -282,7 +281,7 @@ exports.changePassword = async (req, res) => {
     const passwordMatch = await bcrypt.compare(currentPassword, user.password);
 
     if (!passwordMatch) {
-      return res.status(400).json({ message: 'Current password is incorrect' });
+      return res.redirect('/api/user/resetpassword?msg=wrongpass');
     }
 
     // Hash the new password
@@ -292,7 +291,7 @@ exports.changePassword = async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
-    res.redirect('/api/user/profile')
+    res.redirect('/api/user/profile?msg=changed')
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });

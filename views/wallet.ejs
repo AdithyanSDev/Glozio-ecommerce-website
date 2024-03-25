@@ -213,10 +213,16 @@
                         </thead>
                         <tbody>
                             <% orders.forEach(order => { %>
-                                <% if (order.paymentMethod === 'Wallet') { %>
+                                <% if (order.paymentMethod === 'Wallet' && order.orderedItems && order.orderedItems.length > 0) { %>
                                     <tr>
                                         <td><%= order._id %></td>
-                                        <td><%= order.orderedItems[0].productId.name %></td>
+                                        <td>
+                                            <% if (order.orderedItems[0].productId && order.orderedItems[0].productId.name) { %>
+                                                <%= order.orderedItems[0].productId.name %>
+                                            <% } else { %>
+                                                Product name not available
+                                            <% } %>
+                                        </td>
                                         <td>
                                             <% if (order.orderStatus === 'Cancelled') { %>
                                                 <span class="text-success">+ ₹<%= Math.round(order.totalAmount) %></span>
@@ -227,6 +233,7 @@
                                     </tr>
                                 <% } %>
                             <% }); %>
+                            
                         </tbody>
                     </table>
                 </div>

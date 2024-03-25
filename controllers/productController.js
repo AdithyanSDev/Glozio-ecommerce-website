@@ -188,12 +188,9 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
-
 exports.getSortedProducts = async (req, res) => {
   const { categoryId } = req.params;
-    const  sortBy  = req.params.sortId;
-  
-console.log(sortBy);
+  const sortBy = req.params.sortId;
 
   try {
       let sortedProducts;
@@ -202,37 +199,41 @@ console.log(sortBy);
 
       switch (sortBy) {
           case 'popularity':
-              sortedProducts = await Product.find().sort({_id:1});
+              sortedProducts = await Product.find().sort({ _id: 1 }).populate('category');
               break;
           case 'price-low-to-high':
-              sortedProducts = await Product.find().sort({ sellingPrice: 1 });
+              sortedProducts = await Product.find().sort({ sellingPrice: 1 }).populate('category');
               break;
           case 'price-high-to-low':
-              sortedProducts = await Product.find().sort({ sellingPrice: -1 });
+              sortedProducts = await Product.find().sort({ sellingPrice: -1 }).populate('category');
               break;
           case 'a-to-z':
-              sortedProducts = await Product.find().sort({ name: 1 });
+              sortedProducts = await Product.find().sort({ name: 1 }).populate('category');
               break;
           case 'z-to-a':
-              sortedProducts = await Product.find().sort({ name: -1 });
+              sortedProducts = await Product.find().sort({ name: -1 }).populate('category');
               break;
           case 'newest-first':
-              sortedProducts = await Product.find().sort({ _id: -1 });
+              sortedProducts = await Product.find().sort({ _id: -1 }).populate('category');
               break;
           default:
-              sortedProducts = await Product.find();
+              sortedProducts = await Product.find().populate('category');
       }
-console.log(sortedProducts)
+
+      // Filter out products belonging to blocked categories
+      sortedProducts = sortedProducts.filter(product => !product.category.isBlocked);
+
       res.json(sortedProducts);
   } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Internal server error'});
-}
+      res.status(500).json({ message: 'Internal server error' });
+  }
 };
+
 
 exports.getAllProducts = async (req, res) => {
   try {
-      const products = await Product.find({ isDeleted: false });
+      const products = await Product.find({ isDeleted: false }).populate('category');
       // Fetch review counts for each product
       const productReviewCounts = await Promise.all(products.map(async product => {
           const reviewCount = await Review.countDocuments({ productId: product._id });
@@ -340,10 +341,25 @@ exports.getOfferDetail = async (req, res) => {
 exports.filterProducts=async(req,res)=>{
   try {
     // Fetch all products from the database
-    const products = await Product.find();
+    const products = await Product.find().populate('category');
     res.json({ products });
 } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ error: 'Error fetching products' });
 }
+}
+
+
+exports.filterProductsByCategory=async(req,res)=>{
+  try{
+    console.log("started")
+    const categoryId = req.params.categoryId;
+    const products = await Product.find({ category: categoryId }).populate('category');
+    console.log(products);
+    res.json({ products });
+  }catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Error fetching products' });
+}
+  
 }

@@ -24,6 +24,8 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.0/dist/sweetalert2.all.min.js"></script>
+
 </head>
 
 <body>
@@ -181,7 +183,7 @@
     <!-- Breadcrumb End -->
 
 
-    <!-- Checkout Start -->
+   
   <!-- Checkout Start -->
 <form action="/placeorder" method="POST" id="checkoutForm">
     <div class="container-fluid">
@@ -191,7 +193,7 @@
                 <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
             
                 <div class="bg-light p-30 mb-5">
-                    <div class="container">
+                    <div class="address container">
                         <div class="col">
                             <% address.forEach(addressItem => { %>
                                 <div class="col-md-1 rounded">
@@ -218,7 +220,7 @@
                     <div class="col-md-12-mt-4">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="shipto">
-                            <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Ship to different address</label>
+                            <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Add a new address</label>
                         </div>
                     </div>
                 </div>
@@ -539,18 +541,26 @@
     
             // Function to toggle display based on payment method selection
             function togglePaymentMethod() {
-                if (paymentMethodRadios[2].checked) { // Razorpay radio button index is 2
-                    placeOrderButton.style.display = "none";
-                    paymentMethodSection.style.display = "block";
-                    razorpayFormContainer.style.display = "block";
-                    razorpayButton.textContent = "Place Order";
-                } else {
-                    placeOrderButton.style.display = "block";
-                    razorpayFormContainer.style.display = "none";
-                    paymentMethodSection.style.display = "block";
-                    razorpayButton.textContent = "Place Order";
-                }
-            }
+    // Find the index of the Razorpay radio button
+    let razorpayIndex = Array.from(paymentMethodRadios).findIndex(radio => radio.value === 'Razorpay');
+    
+    // Check if Razorpay radio button is checked
+    if (paymentMethodRadios[razorpayIndex].checked) {
+        placeOrderButton.style.display = "none";
+        paymentMethodSection.style.display = "block";
+        razorpayFormContainer.style.display = "block";
+        razorpayButton.textContent = "Place Order";
+        // Hide the address container if Razorpay is selected
+        document.querySelector('.address.container').style.display = "none";
+    } else {
+        placeOrderButton.style.display = "block";
+        razorpayFormContainer.style.display = "none";
+        paymentMethodSection.style.display = "block";
+        razorpayButton.textContent = "Place Order";
+        // Show the address container for other payment methods
+        document.querySelector('.address.container').style.display = "block";
+    }
+}
     
             // Initial call to togglePaymentMethod to set initial state
             togglePaymentMethod();
@@ -570,6 +580,30 @@
         });
     </script>
     
+
+
+     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('msg'); // Change 'message' to 'msg'
+        if (typeof message !== 'undefined') {
+            if (message.includes('err')) {
+                Swal.fire({
+                    icon: "failure",
+                    title: "Wallet not found",
+                    confirmButtonText: "Ok",
+                });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }else if(message.includes('balance')){
+                Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Insufficient Balance!",
+                footer: 'Add some money to your account.'
+                });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    </script>
     
 
   

@@ -19,7 +19,8 @@
    
        <!-- Customized Bootstrap Stylesheet -->
        <link rel="stylesheet" type="text/css" href="/css/style.css" />
-      
+       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.0/dist/sweetalert2.all.min.js"></script>
+
     </head>
     <style>
        
@@ -360,5 +361,20 @@
  
      <!-- Template Javascript -->
      <script src="js/main.js"></script>
-
+     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('msg'); // Change 'message' to 'msg'
+        if (typeof message !== 'undefined') {
+            if(message.includes('changed')){
+                Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Your password has been changed",
+                showConfirmButton: false,
+                timer: 1500
+                });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    </script>
 </html>

@@ -28,6 +28,7 @@ router.get('/categories/:categoryId/products',isAdmin, categoryController.listPr
 router.get('/categories/:categoryId/edit',isAdmin, categoryController.editCategory);
 router.post('/categories/:categoryId/edit',isAdmin, categoryController.updateCategory);
 router.post('/categories/:categoryId/delete', categoryController.softDeleteCategory);
+router.post('/categories/:categoryId/toggle', isAdmin, categoryController.toggleCategory);
 
 
 

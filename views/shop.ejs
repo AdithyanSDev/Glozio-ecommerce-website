@@ -78,16 +78,17 @@
                 </a>
             </div>
             <div class="col-lg-4 col-6 text-left">
-                <form action="">
+                <!-- search.ejs -->
+
+                <form action="/search" method="GET">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for products">
+                        <input type="text" class="form-control" placeholder="Search for products" name="q">
                         <div class="input-group-append">
-                            <span class="input-group-text bg-transparent text-primary">
-                                <i class="fa fa-search"></i>
-                            </span>
+                            <button class="btn btn-primary" type="submit">Search</button>
                         </div>
                     </div>
                 </form>
+
             </div>
             <div class="col-lg-4 col-6 text-right">
                 <p class="m-0">Customer Service</p>
@@ -153,65 +154,104 @@
     </div>
     <!-- Navbar End -->
 
-
-    <div class="col-lg-12 col-md-8">
-        <div class="row pb-4">
-            <div class="col-9 pb-1">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <div class="ml-2">
-                        <div class="btn-group">
-                            <select class="form-select"  id="sortBySelect" >
-                                <option value="">Sort by</option>
-                                <option value="newest-first">Newest</option>
-                                <option value="popularity">Popularity</option>
-                                <option value="price-low-to-high">Price - Low to High</option>
-                                <option value="price-high-to-low">Price - High to Low</option>
-                                <option value="a-to-z">A-Z</option>
-                                <option value="z-to-a">Z-A</option>
-                            </select>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <!-- Shop Sidebar Start -->
+                <!-- Price Start -->
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by price</span></h5>
+                <div class="bg-light p-4 mb-30">
+                    <form id="price-filter-form">
+                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                            <input type="checkbox" class="custom-control-input" checked id="price-all">
+                            <label class="custom-control-label" for="price-all">All Price</label>
+                            <span class="badge border font-weight-normal"><%= products.length %></span>
+                        </div>
+                        <% const priceRanges = [
+                            { min: 500, max:2000 }, 
+                            { min: 2000, max: 10000 }, 
+                            { min: 10000, max: 50000 }, 
+                            { min: 50000, max: 1000000 } 
+                        ]; %>
+                                                
+                        <% priceRanges.forEach((range, index) => { %>
+                            <% const filteredProducts = products.filter(product => product.sellingPrice >= range.min && product.sellingPrice<= range.max); %>
+                            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                                <input type="checkbox" class="custom-control-input" id="price-<%= range.min %>-<%= range.max %>">
+                                <label class="custom-control-label" for="price-<%= range.min %>-<%= range.max %>">₹<%= range.min %> - ₹<%= range.max %></label>
+                                <span class="badge border font-weight-normal"><%= filteredProducts.length %></span>
+                            </div>
+                        <% }); %>
+                        <button type="button" class="btn btn-primary" id="applyFilterBtn">Apply</button>
+                    </form>
+                </div>
+                <!-- Shop Sidebar End -->
+            </div>
+    
+            <!-- Product List Start -->
+            <div class="col-lg-9 col-md-8">
+                <div class="row pb-4">
+                    <div class="col-9 pb-1">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <div class="ml-2">
+                                <div class="btn-group">
+                                    <select class="form-select"  id="sortBySelect" >
+                                        <option value="">Sort by</option>
+                                        <option value="newest-first">Newest</option>
+                                        <option value="popularity">Popularity</option>
+                                        <option value="price-low-to-high">Price - Low to High</option>
+                                        <option value="price-high-to-low">Price - High to Low</option>
+                                        <option value="a-to-z">A-Z</option>
+                                        <option value="z-to-a">Z-A</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
- <!-- productlist.ejs -->
- <div class="container-fluid py-4">
-    <div class="row" id="productList">   
-        <% products.forEach(product => { %>
-            <div class="col-lg-2 col-md-2 col-sm-4 col-6 pb-4"> 
-            <div class="product-item bg-light mb-4">
-                <div class="product-img position-relative overflow-hidden">
-                    <% if (product.images.length > 0) { %>
-                    <img class="img-fluid w-100 product-image" src="/<%= product.images[0] %>" alt="<%= product.name %>">
-                    <% } else { %>
-                    <img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">
-                    <% } %>
-                    <div class="product-action">
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                <div class="container-fluid py-4">
+                    <div class="row" id="productList">   
+                        <% products.forEach(product => { %>
+                            <% if (!product.category.isBlocked) { %> <!-- Check if the category of the product is not blocked -->
+                                <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                                    <div class="product-item bg-light mb-4">
+                                        <div class="product-img position-relative overflow-hidden">
+                                            <% if (product.images.length > 0) { %>
+                                                <img class="img-fluid w-100 product-image" src="/<%= product.images[0] %>" alt="<%= product.name %>">
+                                            <% } else { %>
+                                                <img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">
+                                            <% } %>
+                                            <div class="product-action">
+                                                <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
+                                                <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="text-center py-4">
+                                            <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
+                                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                                <h5>₹<%= product.sellingPrice.toFixed(2) %></h5>
+                                                <h6 class="text-muted ml-2"><del>₹<%= product.price %></del></h6>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center mb-1">
+                                                <small class="fa fa-star text-primary mr-1"></small>
+                                                <small class="fa fa-star text-primary mr-1"></small>
+                                                <small class="fa fa-star text-primary mr-1"></small>
+                                                <small class="fa fa-star text-primary mr-1"></small>
+                                                <small class="fa fa-star text-primary mr-1"></small>
+                                                <small>(0)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% }); %>
                     </div>
                 </div>
-                <div class="text-center py-4">
-                    <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
-                    <div class="d-flex align-items-center justify-content-center mt-2">
-                        <h5>₹<%= product.sellingPrice.toFixed(2) %></h5>
-                        <h6 class="text-muted ml-2"><del>₹<%= product.price %></del></h6>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-center mb-1">
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small>(0)</small>
-                    </div>
-                </div>
             </div>
+            <!-- Product List End -->
         </div>
-        <% }); %>
     </div>
-</div>
-</div>
-</div>
+    
 
     <!-- Shop Product End -->
 </div>
@@ -340,7 +380,7 @@
             products.forEach(product => {
                 // Create product HTML dynamically
                 const productHTML = `
-                    <div class="col-lg-2 col-md-3 col-sm-5 pb-1">
+                <div class="col-lg-3 col-md-4 col-sm-6 pb-1">   
                         <div class="product-item bg-light mb-4">
                             <div class="product-img position-relative overflow-hidden">
                                 ${product.images.length > 0 ? `<img class="img-fluid w-100 product-image" src="/${product.images[0]}" alt="${product.name}">` : `<img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">`}
@@ -371,10 +411,142 @@
                 productList.insertAdjacentHTML('beforeend', productHTML);
             });
         }
+        
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get the "Apply" button
+        const applyFilterBtn = document.getElementById('applyFilterBtn');
 
+        // Add click event listener to the "Apply" button
+        applyFilterBtn.addEventListener('click', applyFilter);
+
+        // Fetch product data asynchronously
+        async function fetchProducts() {
+            try {
+                // Fetch product data from your backend API
+                const response = await fetch('/filterproducts');
+                const data = await response.json();
+                return data.products; // Assuming the API response contains a "products" array
+            } catch (error) {
+                console.error('Error fetching product data:', error);
+                return []; // Return an empty array if there's an error
+            }
+        }
+
+      // Declare filteredProducts globally
+      let filteredProducts = [];
+// Function to apply filter when "Apply" button is clicked
+async function applyFilter() {
+try {
+// Fetch product data
+const products = await fetchProducts();
+console.log('Fetched products:', products);
+
+// Get all checked checkboxes
+const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+// Check if the "All Price" checkbox is checked
+const allPriceCheckbox = document.getElementById('price-all');
+const isAllPriceChecked = allPriceCheckbox.checked;
+
+
+
+// If "All Price" is checked, render all products
+if (isAllPriceChecked) {
+    filteredProducts = products;
+} else {
+    // Get the selected price ranges
+    const selectedRanges = Array.from(checkedCheckboxes).map(checkbox => {
+        const rangeValues = checkbox.id.split('-').slice(1); // Extract min and max values from checkbox id
+
+        // Ensure rangeValues has exactly two elements
+        if (rangeValues.length !== 2) {
+            console.error('Invalid rangeValues:', rangeValues);
+            return null; // Return null for invalid rangeValues
+        }
+
+        // Parse min and max values
+        const min = parseInt(rangeValues[0]);
+        const max = parseInt(rangeValues[1]);
+
+        // Check if min and max are valid numbers
+        if (isNaN(min) || isNaN(max)) {
+            console.error('Invalid min or max:', min, max);
+            return null; // Return null for invalid min or max values
+        }
+
+        return { min, max };
+    }).filter(range => range !== null); // Filter out null values
+
+    // Filter products based on selected price ranges
+    filteredProducts = selectedRanges.reduce((result, range) => {
+        return result.concat(products.filter(product => product.sellingPrice >= range.min && product.sellingPrice <= range.max));
+    }, []);
+}
+
+console.log('Filtered products:', filteredProducts);
+
+// Render filtered products
+renderFilteredProducts(filteredProducts);
+} catch (error) {
+console.error('Error applying filter:', error);
+}
+}
+
+// Function to render filtered products
+function renderFilteredProducts() {
+const productListContainer = document.getElementById('productList');
+productListContainer.innerHTML = ''; // Clear existing products
+
+if (filteredProducts.length === 0) {
+// Render a message indicating no products in the range
+productListContainer.innerHTML = '<p>No products in this range.</p>';
+} else {
+// Iterate over filteredProducts and render each product
+filteredProducts.forEach(product => {
+    const productHTML = `
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+            <div class="product-item bg-light mb-4">
+                <div class="product-img position-relative overflow-hidden">
+                    ${product.images.length > 0 ? `<img class="img-fluid w-100 product-image" src="/${product.images[0]}" alt="${product.name}">` : `<img class="img-fluid w-100 product-image" src="/placeholder.jpg" alt="Placeholder">`}
+                    <div class="product-action">
+                        <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
+                        <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                    </div>
+                </div>
+                <div class="text-center py-4">
+                    <a class="h6 text-decoration-none text-truncate" href="/detail/${product._id}">${product.name}</a>
+                    <div class="d-flex align-items-center justify-content-center mt-2">
+                        <h5>₹${product.sellingPrice.toFixed(2)}</h5>
+                        <h6 class="text-muted ml-2"><del>₹${product.price}</del></h6>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center mb-1">
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small>(<!-- Calculate and add review count here -->)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    productListContainer.insertAdjacentHTML('beforeend', productHTML);
+});
+}
+}
+
+        // Add event listener to the "Apply" button
+        document.addEventListener('DOMContentLoaded', () => {
+            const applyFilterBtn = document.getElementById('applyFilterBtn');
+            applyFilterBtn.addEventListener('click', applyFilter);
+        });
+    });
+</script>
 
 </body>
 

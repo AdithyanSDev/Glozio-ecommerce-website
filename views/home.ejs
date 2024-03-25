@@ -271,14 +271,15 @@
         </div>
     </div>
     <!-- Featured End -->
-    <!--Categories-->
-    <a class="text-decoration-none" href="/category/<%= categories._id %>">
-        <div class="container-fluid pt-5">
-            <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Categories</span></h2>
-            <div class="row px-xl-5 pb-3">
-                <% categories.forEach(category => { %>
+ <!--Categories-->
+<a class="text-decoration-none" href="/category/<%= categories._id %>">
+    <div class="container-fluid pt-5">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Categories</span></h2>
+        <div class="row px-xl-5 pb-3">
+            <% categories.forEach(category => { %>
+                <% if (!category.isBlocked) { %> <!-- Check if the category is not blocked -->
                     <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                        <a class="text-decoration-none" href="/category/<%= category._id %>"> <!-- Use category._id -->
+                        <a class="text-decoration-none" href="/category/<%= category._id %>">
                             <div class="cat-item d-flex align-items-center mb-4">
                                 <div class="overflow-hidden" style="width: 100px; height: 100px;">
                                     <img class="img-fluid" src="img/cat-1.jpg" alt="">
@@ -290,51 +291,51 @@
                             </div>
                         </a>
                     </div>
-                <% }) %>
-                
-            </div>
+                <% } %>
+            <% }) %>
         </div>
-    </a>
-    
-    
+    </div>
+</a>
 
-    
-  <!-- Products Start -->
-  <div class="container-fluid py-4">   
+<!-- Products Start -->
+<div class="container-fluid py-4">   
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Featured Products</span></h2>
     <div class="row">
         <% products.forEach(product => { %>
-        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-            <div class="product-item bg-light mb-4"> <!-- Added the product-item class here -->
-                <div class="product-img position-relative overflow-hidden d-flex align-items-center justify-content-center"> <!-- Modified this line -->
-                    <% if (product.images.length > 0) { %>
-                    <img class="img-fluid w-50 product-image" src="<%= product.images[0] %>" alt="<%= products.name %>">
-                    <% } else { %>
-                    <% } %>
-                    <div class="product-action">
-                        <a class="btn btn-outline-dark btn-square"  href="/cart"><i class="fa fa-shopping-cart"></i></a>
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+            <% if (!product.category.isBlocked) { %> <!-- Check if the category of the product is not blocked -->
+                <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                    <div class="product-item bg-light mb-4">
+                        <div class="product-img position-relative overflow-hidden d-flex align-items-center justify-content-center">
+                            <% if (product.images.length > 0) { %>
+                                <img class="img-fluid w-50 product-image" src="<%= product.images[0] %>" alt="<%= product.name %>">
+                            <% } else { %>
+                                <!-- Placeholder or alternate content if no image available -->
+                            <% } %>
+                            <div class="product-action">
+                                <a class="btn btn-outline-dark btn-square"  href="/cart"><i class="fa fa-shopping-cart"></i></a>
+                                <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                            </div>
+                        </div>
+                        <div class="text-center py-4">
+                            <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
+                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                <h5>₹<%= Math.round(product.sellingPrice) %> </h5> 
+                                <h6 class="text-muted ml-2"><del>₹<%= Math.round(product.price) %></del></h6> 
+                            </div>
+                           
+                            <div class="d-flex align-items-center justify-content-center mb-1">
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <% const reviewCount = reviewCountMap[product._id] || 0; %>
+                                <small>(<%= reviewCount %>)</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="text-center py-4">
-                    <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
-                    <div class="d-flex align-items-center justify-content-center mt-2">
-                        <h5>₹<%= Math.round(product.sellingPrice) %> </h5> 
-                        <h6 class="text-muted ml-2"><del>₹<%= Math.round(product.price) %></del></h6> 
-                    </div>
-                   
-                    <div class="d-flex align-items-center justify-content-center mb-1">
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <% const reviewCount = reviewCountMap[product._id] || 0; %>
-                        <small>(<%= reviewCount %>)</small>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <% } %>
         <% }); %>
     </div>
 </div>

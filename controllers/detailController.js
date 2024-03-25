@@ -128,15 +128,18 @@ exports.searchProducts = async (req, res) => {
   try {
     const query = req.query.q;
     const regex = new RegExp(query, 'i');
+    
+    // Fetch non-blocked categories
+    const categories = await Category.find({ isDeleted: false });
+
+    // Find products from non-blocked categories that match the search query
     const products = await Product.find({
       $or: [
         { name: { $regex: regex } },
         { brand: { $regex: regex } }
-      ]
+      ],
+      category: { $in: categories.filter(category => !category.isBlocked).map(category => category._id) }
     });
-
-    // Fetch categories
-    const categories = await Category.find({ isDeleted: false });
 
     // Pass token, categories, products, and query to the searchResults page
     res.render('searchResults', { products, query, token: req.cookies.token, categories });

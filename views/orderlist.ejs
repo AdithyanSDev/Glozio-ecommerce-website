@@ -197,42 +197,47 @@
                                 <% orders.forEach((order) => { %>
                                     <% if (order.orderStatus === 'Pending' && order.paymentStatus === 'Failed') { %>
                                         <% order.orderedItems.forEach((item) => { %>
-                                            <tr>
-                                                <td>
-                                                    <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
-                                                </td>
-                                                <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
-                                                <td>₹<%= order.totalAmount %></td>
-                                                <td><%= item.quantity %></td>
-                                                <td><%= order.orderDate.toDateString() %></td>
-                                                <td><%= order.orderStatus %></td>
-                                                <td><%= order.paymentStatus %></td>
-                                                <td>
-                                                    <form action="/razorpaypage/<%= order._id %>" method="GET">
-                                                    <button class="btn btn-primary pay-now-btn" data-order-id="<%= order._id %>">Pay</button>
-                                                </form>
-                                                </td>
-                                            </tr>
+                                            <% if (item.productId) { %> <!-- Add null check for productId -->
+                                                <tr>
+                                                    <td>
+                                                        <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
+                                                    </td>
+                                                    <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                                                    <td>₹<%= order.totalAmount %></td>
+                                                    <td><%= item.quantity %></td>
+                                                    <td><%= order.orderDate.toDateString() %></td>
+                                                    <td><%= order.orderStatus %></td>
+                                                    <td><%= order.paymentStatus %></td>
+                                                    <td>
+                                                        <form action="/razorpaypage/<%= order._id %>" method="GET">
+                                                            <button class="btn btn-primary pay-now-btn" data-order-id="<%= order._id %>">Pay</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
                                         <% }); %>
                                     <% } else if (order.orderStatus === 'Pending') { %>
                                         <% order.orderedItems.forEach((item) => { %>
-                                            <tr>
-                                                <td>
-                                                    <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
-                                                </td>
-                                                <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
-                                                <td>₹<%= order.totalAmount %></td>
-                                                <td><%= item.quantity %></td>
-                                                <td><%= order.orderDate.toDateString() %></td>
-                                                <td><%= order.orderStatus %></td>
-                                                <td><%= order.paymentStatus %></td>
-                                                <td>
-                                                    <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel</button>
-                                                </td>
-                                            </tr>
+                                            <% if (item.productId) { %> <!-- Add null check for productId -->
+                                                <tr>
+                                                    <td>
+                                                        <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
+                                                    </td>
+                                                    <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                                                    <td>₹<%= order.totalAmount %></td>
+                                                    <td><%= item.quantity %></td>
+                                                    <td><%= order.orderDate.toDateString() %></td>
+                                                    <td><%= order.orderStatus %></td>
+                                                    <td><%= order.paymentStatus %></td>
+                                                    <td>
+                                                        <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel</button>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
                                         <% }); %>
                                     <% } %>
                                 <% }); %>
+                                
                             </tbody>
                             
                         </table>
@@ -302,32 +307,32 @@
                                 <% orders.forEach((order) => { %>
                                     <% if (order.orderStatus === 'Cancelled') { %>
                                         <% order.orderedItems.forEach((item) => { %>
-                                            <tr>
-                                                <td>
-                                                    <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
-                                                </td>
-                                                <td></td>
-                                                <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
-                                                <td>₹<%= order.totalAmount %></td>
-                                                <td></td>
-                                               
-                                                <td><%= item.quantity %></td>
-                                                <td></td>
-
-                                                <td><%= order.orderDate.toDateString() %></td>
-                                                <td></td>
-
-                                                <td>
-                                                    <% if (order.cancelledDate) { %>
-                                                        <%= order.cancelledDate.toDateString() %>
-                                                    <% } else { %>
-                                                        N/A
-                                                    <% } %>
-                                                </td>
-                                            </tr>
+                                            <% if (item.productId) { %> <!-- Add null check for productId -->
+                                                <tr>
+                                                    <td>
+                                                        <a href="/orderdetails/<%= order._id %>/<%= item.productId._id %>"><%= item.productId.name %></a>
+                                                    </td>
+                                                    <td></td>
+                                                    <td><img src="<%= item.productId.images[0] %>" alt="<%= item.productId.name %>" style="width: 100px; height: 100px;"></td>
+                                                    <td>₹<%= order.totalAmount %></td>
+                                                    <td></td>
+                                                    <td><%= item.quantity %></td>
+                                                    <td></td>
+                                                    <td><%= order.orderDate.toDateString() %></td>
+                                                    <td></td>
+                                                    <td>
+                                                        <% if (order.cancelledDate) { %>
+                                                            <%= order.cancelledDate.toDateString() %>
+                                                        <% } else { %>
+                                                            N/A
+                                                        <% } %>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
                                         <% }); %>
                                     <% } %>
                                 <% }); %>
+                                
                             </tbody>
                         </table>
                         

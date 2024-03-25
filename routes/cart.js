@@ -29,7 +29,7 @@ router.get('/generate-invoice/:orderId',orderController.generateReport)
 
 router.get('/razorpaypage/:orderId', verifyToken,orderController.renderRazorpayPage);
 router.post('/razorpay/pay/:cartId', verifyToken, orderController.razorsuccess)
-
+router.post('/paylater/:orderId',verifyToken,orderController.paylater)
 
 // wishlist routes
 router.get('/wishlist', verifyToken,wishlistController.getWishlist);

@@ -177,28 +177,51 @@
   <!-- Main Content Start -->
   <div class="container-fluid mt-5">
     <div class="row">
-        <div class="col-lg-1"></div>
-        <div class="col-lg-12">
-            <h3 class="text-primary">OFFER SECTION</h3>
-            <div id="offerCarousel" class="carousel slide" data-ride="carousel">
+        <div class="col-lg-6">
+            <h3 class="text-primary">PRODUCT OFFER SECTION</h3>
+            <div id="productOfferCarousel" class="carousel slide" data-ride="carousel">
                 <div class="carousel-inner">
-                    <% offer.forEach((offer, index) => { %>
+                    <% productOffers.forEach((offer, index) => { %>
                     <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                        <a href="/offer/<%= offer._id %>">
-                            <img src="/<%= offer.bannerImg[0] %>" class="d-block w-100" alt="Offer Image" style="width: 100px; height: 500px;">
-
+                        <a href="/productoffer/<%= offer._id %>">
+                            <img src="/uploads/<%= offer.bannerImg[0] %>" class="d-block w-100" alt="Offer Image" style="width: 100px; height: 500px;">
                             <div class="carousel-caption d-none d-md-block">
-                               
+                                <!-- Add any additional information or buttons here -->
                             </div>
                         </a>
                     </div>
                     <% }) %>
                 </div>
-                <a class="carousel-control-prev" href="#offerCarousel" role="button" data-slide="prev">
+                <a class="carousel-control-prev" href="#productOfferCarousel" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
                 </a>
-                <a class="carousel-control-next" href="#offerCarousel" role="button" data-slide="next">
+                <a class="carousel-control-next" href="#productOfferCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h3 class="text-primary">CATEGORY OFFER SECTION</h3>
+            <div id="categoryOfferCarousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    <% categoryOffers.forEach((offer, index) => { %>
+                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                        <a href="/categoryoffer/<%= offer._id %>">
+                            <img src="/uploads/<%= offer.bannerImg[0] %>" class="d-block w-100" alt="Offer Image" style="width: 100px; height: 500px;">
+                            <div class="carousel-caption d-none d-md-block">
+                                <!-- Add any additional information or buttons here -->
+                            </div>
+                        </a>
+                    </div>
+                    <% }) %>
+                </div>
+                <a class="carousel-control-prev" href="#categoryOfferCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#categoryOfferCarousel" role="button" data-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="sr-only">Next</span>
                 </a>
@@ -206,6 +229,7 @@
         </div>
     </div>
 </div>
+
 <!-- Main Content End -->
 
 

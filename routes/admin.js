@@ -60,14 +60,31 @@ router.get('/generateReport', salesController.generateReport);
 
 //offer routes
 router.get('/offer',isAdmin,offerController.renderOffer)
-router.get('/addofferpage',isAdmin,offerController.renderAddoffer)
-router.post('/addoffer', isAdmin,uploadbanner, offerController.createOffer);
-router.get('/offers/:id/edit',isAdmin, offerController.editOffer);
-router.post('/edit/:id',isAdmin,uploadbanner,offerController.editofferpost);
-router.post('/offers/:id/delete',isAdmin ,offerController.deleteOffer);
-router.delete('/deleteofferimage/:offerId/:index',offerController.offerimagedelete);
+// router.get('/addofferpage',isAdmin,offerController.renderAddoffer)
+// router.post('/addoffer', isAdmin,uploadbanner, offerController.createOffer);
+// router.get('/offers/:id/edit',isAdmin, offerController.editOffer);
+// router.post('/edit/:id',isAdmin,uploadbanner,offerController.editofferpost);
+// router.post('/offers/:id/delete',isAdmin ,offerController.deleteOffer);
+// router.delete('/deleteofferimage/:offerId/:index',offerController.offerimagedelete);
+
+//productoffer routes
+router.get('/addproductofferpage',isAdmin,offerController.addproductofferpage)
+router.post('/addproductOffers',isAdmin,uploadbanner,offerController.createProductOffer);
+router.get('/:id/edit',isAdmin, offerController.editProductOfferPage);
+router.post('/:id/edit',isAdmin,uploadbanner, offerController.updateProductOffer);
+router.post('/:id/delete', offerController.deleteProductOffer);
+router.delete('/deleteproductofferimage/:offerId/:index',offerController.productofferimagedelete);
 
 
+//categoryoffer routes
+router.get('/addcategoryofferpage',isAdmin,offerController.addcategoryofferpage)
+router.post('/addcategoryOffers',isAdmin,uploadbanner, offerController.createCategoryOffer);
+router.get('/edit/:id',isAdmin, offerController.editCategoryOfferPage);
+router.post('/editcategory/:id',isAdmin, uploadbanner, offerController.editCategoryOffer);
+router.post('/deletecategory/:id', offerController.deleteCategoryOffer);
+router.delete('/deletecategoryofferimage/:offerId/:index',offerController.categoryofferimagedelete);
+
+//sales report routes
 router.get('/sales/daily', salesController.getDailySalesData);
 router.get('/sales/monthly', salesController.getMonthlySalesData);
 router.get('/sales/yearly', salesController.getYearlySalesData);

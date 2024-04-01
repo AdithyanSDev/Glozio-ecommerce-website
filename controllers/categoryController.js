@@ -40,7 +40,7 @@ exports.showEditCategoryForm = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
     const Category = await Category.findById(categoryId);
-    res.render('category/edit', { Category }); 
+    res.render('category/edit', { Category,errorMessage: null, name: '', description: '' }); 
   } catch (error) {
     console.error(error);
     res.render('404page')
@@ -52,11 +52,11 @@ exports.editCategory = async (req, res) => {
   try {
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
-      return res.status(400).send('Category already exists');
+      return  res.render('category/edit', { errorMessage: 'Category already exists', name, description });
     }
     const categoryId = req.params.categoryId;
     const category = await Category.findById(categoryId);
-    res.render('category/edit', { category }); // This line renders the edit.ejs template with the category data
+    res.render('category/edit', { category,errorMessage: null, name: '', description: '' }); 
   } catch (error) {
     console.error(error);
     res.render('404page')
@@ -66,7 +66,13 @@ exports.editCategory = async (req, res) => {
 exports.updateCategory = async (req, res) => {
   try {
     const categoryId = req.params.categoryId;
+    const category=await Category.findById(categoryId);
     const { name, description } = req.body;
+    console.log(name,description);
+    const existingCategory = await Category.findOne({ name });
+    if (existingCategory) {
+      return  res.render('category/edit', {category, errorMessage: 'Category already exists', name, description });
+    }
     await Category.findByIdAndUpdate(categoryId, { name, description });
     res.redirect('/admin/categories'); // Redirect to the categories list after updating
   } catch (error) {

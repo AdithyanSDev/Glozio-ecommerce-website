@@ -23,7 +23,9 @@ router.get('/sortProducts/:sortId' , productController.getSortedProducts ) ;
 router.get('/sortProductsCategory/:categoryId/:sortByValue', productController.getSortProductsCategory);
 router.get('/filterproductsbycategory/:categoryId', productController.filterProductsByCategory)
 router.get('/offers',verifyToken,productController.productOffer)
-router.get('/offer/:id',verifyToken, productController.getOfferDetail);
+
+router.get('/productoffer/:id',verifyToken, productController.getOfferDetail);
+router.get('/categoryoffer/:id', verifyToken, productController.getCategoryOfferDetail);
 
 router.get('/wallet',verifyToken,profileController.walletShow);
 

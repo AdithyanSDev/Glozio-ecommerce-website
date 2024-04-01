@@ -28,20 +28,19 @@ const verifyToken = async (req, res, next) => {
 
 const isAdmin = (req, res, next) => {
     const token = req.cookies.Authorization;
-    console.log('Received Authorization token:', token);
-
+   
     if (!token) {
         return res.redirect('/adminlogin')
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        console.log('JWT verification:', err ? 'Failed' : 'Successful');
+      
         if (err) {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
         if (decoded && decoded.userId === 'adithyansdev46@gmail.com') {
-            console.log('Decoded token:', decoded);
+           
             req.user = decoded; 
             next();
         } else {

@@ -208,7 +208,7 @@
             <h5 class="mb-1"><%= product.name %></h5>
             <p class="mb-1">Brand:  <%=product.brand %></p>
             
-            <strong class="text-dark "> ₹<%= Math.round (product.sellingPrice) %></strong> <p></p>
+            <strong class="text-dark "> ₹<%= Math.round (order.totalAmount) %></strong> <p></p>
         </div>
         <div class="order-status text-center p-3">
             <h5 class="ml-4">Order Status: <%= order.orderStatus %></h5>

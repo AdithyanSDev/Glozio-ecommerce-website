@@ -39,9 +39,14 @@ const OrderSchema = new mongoose.Schema({
         enum: ['Cash On Delivery','Wallet','Razorpay']
     },
     shippingAddress: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Address',
-        required: true
+        name: { type: String, required: true },
+        mobileNumber: { type: String, required: true },
+        pincode: { type: String, required: true },
+        locality: { type: String, required: true },
+        address: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        addressType: { type: String, enum: ['Home', 'Work'], required: true }
     },
     orderDate: {
         type: Date,

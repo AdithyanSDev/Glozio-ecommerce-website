@@ -3,6 +3,8 @@ const Category = require('../models/category');
 const Review = require('../models/product')
 const User=require('../models/user')
 const Offer=require('../models/offer')
+const ProductOffer = require('../models/productoffer');
+const CategoryOffer = require('../models/categoryoffer');
 const fs = require('fs');
 const path = require('path');
 const { image } = require('pdfkit');
@@ -33,7 +35,6 @@ exports.showAddProductForm = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
-
 
 exports.addProduct = async (req, res) => {
   try {
@@ -77,6 +78,15 @@ exports.addProduct = async (req, res) => {
     // Find the category by its ID and update its products array
     await Category.findByIdAndUpdate(category, { $push: { products: newProduct._id } });
 
+    // Check if there is an active category offer for the category of the new product
+    const activeOffer = await CategoryOffer.findOne({ category: category, expiryDate: { $gte: new Date() } });
+
+    // If an offer exists, associate the new product with that offer
+    if (activeOffer) {
+      // Update the new product with the category offer
+      await Product.findByIdAndUpdate(newProduct._id, { categoryOffer: activeOffer._id });
+    }
+
     // Redirect to the products page after successful addition
     res.redirect('/admin/products');
   } catch (error) {
@@ -85,7 +95,6 @@ exports.addProduct = async (req, res) => {
     res.status(500).send('Error adding product: ' + error.message);
   }
 }
-
 
   // Function to show the edit product form
   exports.showEditProductForm = async (req, res) => {
@@ -100,52 +109,72 @@ exports.addProduct = async (req, res) => {
     }
   };
 
-// editProduct controller method
-exports.editProduct = async (req, res, next) => {
-  try {
+
+  
+  exports.editProduct = async (req, res, next) => {
+    try {
       const productId = req.params.productId;
       const updates = req.body;
-      const images=req.files
+      const images = req.files;
       const product = await Product.findById(productId); // Fetch the product
       if (!product) {
-          return res.status(404).send('Product not found');
+        return res.status(404).send('Product not found');
       }
-
+  
       // Check if there are other products with the same name excluding the current product
       const existingProduct = await Product.findOne({ name: updates.name, _id: { $ne: productId } });
       if (existingProduct) {
-          return res.status(400).send('Another product with the same name already exists');
+        return res.status(400).send('Another product with the same name already exists');
       }
-
+  
+      // Calculate discount
+      const numericPrice = parseFloat(updates.price || product.price);
+      const numericSellingPrice = parseFloat(updates.sellingPrice || product.sellingPrice);
+      const discount = numericPrice > 0 ? ((numericPrice - numericSellingPrice) / numericPrice) * 100 : 0;
+      updates.discount = discount;
+  
+      // Handle category change
+      if (updates.category !== product.category.toString()) {
+        // Remove the product from the old category
+        await Category.updateOne(
+          { _id: product.category },
+          { $pull: { products: productId } }
+        );
+  
+        // Add the product to the new category
+        await Category.updateOne(
+          { _id: updates.category },
+          { $addToSet: { products: productId } }
+        );
+      }
+  
       // Handle image deletion
       if (req.query.index) {
-          const index = parseInt(req.query.index);
-          const imagePath = path.join(__dirname, '../uploads/', product.images[index]); // Use the absolute path of the image
-          if (imagePath) {
-              // Remove the image from the file system
-              fs.unlink(imagePath, (err) => {
-                  if (err) console.error(err);
-              });
-
-              // Remove the image from the images array
-              product.images.splice(index, 1);
-          }
+        const index = parseInt(req.query.index);
+        const imagePath = path.join(__dirname, '../uploads/', product.images[index]); // Use the absolute path of the image
+        if (imagePath) {
+          // Remove the image from the file system
+          fs.unlink(imagePath, (err) => {
+            if (err) console.error(err);
+          });
+  
+          // Remove the image from the images array
+          product.images.splice(index, 1);
+        }
       }
-      if(images&&images.length>0){
-        product.images=product.images.concat(images.map(image=>image.path))
-        await product.save()
+      if (images && images.length > 0) {
+        updates.images = product.images.concat(images.map(image => image.path));
       }
-      console.log(req.files)
-
+  
       // Update the product with the new data
       await Product.findByIdAndUpdate(productId, updates);
       res.redirect('/admin/products');
-  } catch (error) {
+    } catch (error) {
       next(error);
-  }
-};
-
-
+    }
+  };
+  
+  
 
 // Controller logic
 exports.imagedelete = async (req, res) => {
@@ -181,13 +210,29 @@ exports.imagedelete = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   const productId = req.params.productId;
   try {
+    // Find the product to be deleted
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).send('Product not found');
+    }
+
+    // Delete the product
     await Product.findByIdAndDelete(productId);
+
+    // Remove the product from the associated category
+    await Category.updateOne(
+      { _id: product.category },
+      { $pull: { products: productId } }
+    );
+
+    // Redirect with success message
     res.redirect('/admin/products?msg=del');
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
   }
 };
+
 exports.getSortedProducts = async (req, res) => {
   const { categoryId } = req.params;
   const sortBy = req.params.sortId;
@@ -295,47 +340,57 @@ exports.getSortProductsCategory = async (req, res) => {
 
 
 
-exports.productOffer=async(req,res)=>{
-  try{
-    const offer=await Offer.find()
-    const categories = await Category.find({ isDeleted: false }).populate('products');
-    const token = req.cookies.token;
-    res.render('offer',{categories,token,offer})
-  }catch(error){
-    console.error(error)
+exports.productOffer = async (req, res) => {
+  try {
+      const productOffers = await ProductOffer.find();
+      const categoryOffers = await CategoryOffer.find();
+      const categories = await Category.find({ isDeleted: false }).populate('products');
+      const token = req.cookies.token;
+      res.render('offer', { productOffers, categoryOffers, categories, token });
+  } catch (error) {
+      console.error(error);
   }
- 
-}
+};
+
 
 
 exports.getOfferDetail = async (req, res) => {
   try {
       const offerId = req.params.id;
-
+const token = req.cookies.token
+const categories=await Category.find()
       // Fetch the offer details
-      const offer = await Offer.findById(offerId);
+      const productoffer = await ProductOffer.findById(offerId);
 
       // Fetch the products associated with the offer
-      const products = await Product.find();
+      const products = await Product.find({ _id: { $in: productoffer.products } });
 
-      // Calculate discounted prices for products
-      const discountedProducts = products.map(product => {
-          const discountedPrice = product.price - (product.price * (offer.discount / 100));
-          return {
-              ...product.toObject(),
-              discountedPrice
-          };
-      });
-      const categories = await Category.find({ isDeleted: false }).populate('products');
-      const token = req.cookies.token;
-
-      // Render the offer detail page with offer and discounted products
-      res.render('offerdetail', { offer, products: discountedProducts ,categories,token});
+      // Render the offer detail page with offer and products
+      res.render('productofferdetail', { productoffer, products,token,categories });
   } catch (error) {
       console.error('Error fetching offer details:', error);
       res.status(500).json({ message: 'Internal server error' });
   }
 };
+exports.getCategoryOfferDetail = async (req, res) => {
+  try {
+      const offerId = req.params.id;
+      const token = req.cookies.token
+      const categories=await Category.find()
+      // Fetch the category offer details
+      const categoryOffer = await CategoryOffer.findById(offerId).populate('category');
+
+      // Fetch the products associated with the category offer
+      const products = await Product.find({ category: categoryOffer.category });
+
+      // Render the category offer detail page with offer and products
+      res.render('categoryofferdetail', { categoryOffer, products,token,categories });
+  } catch (error) {
+      console.error('Error fetching category offer details:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 
 exports.filterProducts=async(req,res)=>{

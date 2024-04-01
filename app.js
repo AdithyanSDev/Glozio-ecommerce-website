@@ -47,7 +47,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/auth/google/callback'
+  callbackURL: 'https://www.glozio.shop/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ email: profile.emails[0].value });
@@ -112,10 +112,10 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
   res.cookie('token', token, { maxAge: 3600000 }); // Set token in cookie with an expiration time of 1 hour
   res.redirect('/');
 });
-  // app.use((req,res)=>{
-  //   res.status(404).render('404page')
+  app.use((req,res)=>{
+    res.status(404).render('404page')
 
-  // })
+  })
 
 
 app.listen(PORT, () => {

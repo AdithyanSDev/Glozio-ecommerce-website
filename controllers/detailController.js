@@ -5,35 +5,35 @@ const Category = require('../models/category');
 const Cart = require('../models/cart');
 const Order=require('../models/order')
 
-exports.renderDetailPage = async (req, res) => {
-  try {
-      const productId = req.params.productId;
-      const product = await Product.findById(productId);
-      const userId = req.userId;
-      const token = req.cookies.token;
-      // Fetch user's orders to check if the product has been ordered by the user
-      const userOrders = await Order.find({ userId });
-      const orderedProductIds = userOrders.flatMap(order => order.orderedItems.map(item => item.productId));
+  exports.renderDetailPage = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        const product = await Product.findById(productId).populate('productOffer').populate('categoryOffer');; ;
+        const userId = req.userId;
+        const token = req.cookies.token;
+        // Fetch user's orders to check if the product has been ordered by the user
+        const userOrders = await Order.find({ userId });
+        const orderedProductIds = userOrders.flatMap(order => order.orderedItems.map(item => item.productId));
 
-      // Check if the current product has been ordered by the user
-      const hasOrdered = orderedProductIds.includes(productId);
+        // Check if the current product has been ordered by the user
+        const hasOrdered = orderedProductIds.includes(productId);
 
-      // Fetch reviews for the product
-      const reviews = await Review.find({ productId });
+        // Fetch reviews for the product
+        const reviews = await Review.find({ productId });
 
-      // Fetch reviews count for the product
-      const reviewCount = await Review.countDocuments({ productId });
+        // Fetch reviews count for the product
+        const reviewCount = await Review.countDocuments({ productId });
 
-      // Fetch related products based on the current product's category
-      const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
-      const usercart = await Cart.find({ user: userId }).populate('product.productId');
-      // Pass the hasOrdered flag to the template
-      res.render('detail', { product, reviews, reviewCount, relatedProducts, hasOrdered,token,usercart });
-  } catch (error) {
-      console.error(error);
-      res.render('404page');
-  }
-};
+        // Fetch related products based on the current product's category
+        const relatedProducts = await Product.find({ category: product.category, _id: { $ne: productId } }).limit(4);
+        const usercart = await Cart.find({ user: userId }).populate('product.productId');
+        // Pass the hasOrdered flag to the template
+        res.render('detail', { product, reviews, reviewCount, relatedProducts, hasOrdered,token,usercart });
+    } catch (error) {
+        console.error(error);
+        res.render('404page');
+    }
+  };
 
 
 

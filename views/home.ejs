@@ -318,8 +318,31 @@
                         </div>
                         <div class="text-center py-4">
                             <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
+                            <% let finalPrice = product.sellingPrice; %> <!-- Initialize final price with regular selling price -->
+                            <% if (product.productOffer) { %> <!-- Check if the product has an associated offer -->
+                                <% const { discount, title } = product.productOffer; %> <!-- Destructure the offer object -->
+                                <!-- Check if the offer is not expired -->
+                                <% if (product.productOffer.expiryDate >= new Date()) { %>
+                                    <% finalPrice -= discount; %> <!-- Subtract the flat discount amount -->
+                                    <div style="background-color: violet; color: white; padding: 5px;">
+                                        <%= title %> ₹<%=discount%> off/-
+                                    </div>
+                                <% } %>
+                            <% } %>
+
+                            <!-- Display category offer -->
+                            <% if (product.categoryOffer) { %>
+                                <% const { discount, title } = product.categoryOffer; %>
+                                <% if (product.categoryOffer.expiryDate >= new Date()) { %>
+                                    <% finalPrice -= (finalPrice * (discount / 100)); %> <!-- Subtract the discount percentage -->
+                                    <div  style="background-color: rgb(62, 69, 164); color: white; padding: 5px;">
+                                        <%= title %> <%=discount%>% off/-
+                                    </div>
+                                <% } %>
+                            <% } %>
+
                             <div class="d-flex align-items-center justify-content-center mt-2">
-                                <h5>₹<%= Math.round(product.sellingPrice) %> </h5> 
+                                <h5>₹<%= Math.round(finalPrice) %></h5> <!-- Display the final discounted price -->
                                 <h6 class="text-muted ml-2"><del>₹<%= Math.round(product.price) %></del></h6> 
                             </div>
                            
@@ -340,6 +363,7 @@
     </div>
 </div>
 <!-- Products End -->
+
 
 
   

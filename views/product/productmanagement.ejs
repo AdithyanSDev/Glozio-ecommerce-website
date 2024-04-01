@@ -130,52 +130,51 @@
       </nav>
       <!-- End Navbar -->
     
-                <table class="table table-striped table-dark">
-                    <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Category</th>
-                            <th scope="col">Price</th>
-                            <th scope="col">Discount</th>
-                            <th scope="col">Selling Price</th>
-                            <th scope="col">Stock</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% products.forEach(product => { %>
-                            <tr>
-                                <td>
-                                    <div>
-                                        <%= product.name %>
-                                        <div class="d-flex flex-row flex-wrap">
-                                            <% product.images.forEach(image => { %>
-                                                <img src="/<%= image %>" alt="<%= product.name %>" class="img-fluid mb-2 me-2" style="width: 20px;">
-                                            <% }); %>
-                                        </div>
-
-                                    </div>
-                                </td>
-                                <td><%= product.category ? product.category.name : 'Uncategorized' %></td>
-                                <td>₹<%= Math.round(product.price) %></td>
-                                <td><%= Math.round(product.discount) %>%</td>
-                                <td>₹<%= Math.round(product.sellingPrice) %> </td>
-                                <td><%= product.stock %></td>
-                                <td>
-                                    <a href="/admin/products/<%= product._id %>/edit" class="btn btn-link text-white px-3 mb-0">
-                                        <i class="material-icons text-sm me-2">edit</i>
-                                    </a>
-                                    <form id="deleteForm_<%= product._id %>" action="/admin/products/<%= product._id %>/delete" method="POST" style="display: inline;">
-                                      <button type="button" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="confirmDelete('<%= product._id %>')">
-                                          <i class="material-icons text-sm me-2">delete</i>
-                                      </button>
-                                  </form>
-                                  
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+      <table class="table table-striped table-dark">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Price</th>
+                <th scope="col">Discount</th>
+                <th scope="col">Selling Price</th>
+                <th scope="col">Stock</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% products.forEach(product => { %>
+                <tr>
+                    <td>
+                        <div>
+                            <%= product.name %>
+                            <div class="d-flex flex-row flex-wrap">
+                                <% product.images.forEach(image => { %>
+                                    <img src="/<%= image %>" alt="<%= product.name %>" class="img-fluid mb-2 me-2" style="width: 20px;">
+                                <% }); %>
+                            </div>
+                        </div>
+                    </td>
+                    <td><%= product.category ? product.category.name : 'Uncategorized' %></td>
+                    <td>₹<%= Math.max(Math.round(product.price), 0) %></td>
+                    <td><%= Math.round(product.discount) %>%</td>
+                    <td>₹<%= Math.max(Math.round(product.sellingPrice), 0) %> </td>
+                    <td><%= product.stock %></td>
+                    <td>
+                        <a href="/admin/products/<%= product._id %>/edit" class="btn btn-link text-white px-3 mb-0">
+                            <i class="material-icons text-sm me-2">edit</i>
+                        </a>
+                        <form id="deleteForm_<%= product._id %>" action="/admin/products/<%= product._id %>/delete" method="POST" style="display: inline;">
+                            <button type="button" class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="confirmDelete('<%= product._id %>')">
+                                <i class="material-icons text-sm me-2">delete</i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    
           
     
     

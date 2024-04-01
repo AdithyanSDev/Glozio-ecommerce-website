@@ -1,6 +1,10 @@
 // offerController.js
 const Offer = require('../models/offer');
 const cron = require('node-cron');
+const ProductOffer = require('../models/productoffer');
+const CategoryOffer = require('../models/categoryoffer');
+const Category = require('../models/category'); 
+const Product=require("../models/product");
 
 
 const deleteExpiredOffers = async () => {
@@ -25,118 +29,189 @@ cron.schedule('0 0 * * *', deleteExpiredOffers);
  exports.renderOffer=async(req,res)=>{
         
         try {
-        
+            const productOffers = await ProductOffer.find();
+            const categoryOffers = await CategoryOffer.find();
             const offer = await Offer.find();
-            res.render('adminoffer', { offer: offer });
+            res.render('adminoffer', { offer: offer,productOffers,categoryOffers     });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     }
 
 
-exports.renderAddoffer=async(req,res)=>{
-    res.render('addoffer')
+
+/////////////////////////////////product offer controller////////////////////////////////
+
+
+exports.addproductofferpage=async(req,res)=>{
+    try{
+        const products=await Product.find()
+        res.render('adminproductoffer',{products})
+    } catch (error) {
+        console.error('Error creating product offer:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
 }
-
-// Controller function to create a new offer
-exports.createOffer = async (req, res) => {
-    console.log(req.body); // Log request body
-    console.log(req.files); // Log uploaded files
-
+// Create a new product offer
+exports.createProductOffer = async (req, res) => {
     try {
-        const { title, description, type, discount, expiryDate } = req.body;
+        const { title, description, discount, expiryDate, products } = req.body;
+        const bannerImg = req.files.map(file => file.filename);
+        const productIds = req.body.products;
 
-        // Check if files were uploaded
-        if (!req.files || req.files.length === 0) {
-            throw new Error('No files were uploaded.');
-        }
+        // Fetch products to validate prices
+        const productsToUpdate = await Product.find({ _id: { $in: productIds } });
 
-        // Get the filenames of the uploaded images
-        const bannerImgs = req.files.map(file => file.filename);
-
-        // Create a new offer instance
-        const newOffer = new Offer({
-            title,
-            description,
-            type,
-            discount,
-            expiryDate,
-            bannerImg: bannerImgs // Assign array of filenames
+        // Check if the offer will cause the price to be negative
+        const invalidProducts = productsToUpdate.filter(product => {
+            const newSellingPrice = product.sellingPrice - discount;
+            return newSellingPrice < 0; // Product price will be negative
         });
 
-        const savedOffer = await newOffer.save();
-        const offer = await Offer.find();
-        res.redirect('/admin/offer');
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// Controller for editing an offer
-exports.editOffer = async (req, res) => {
-    try {
-        const offer = await Offer.findById(req.params.id);
-        if (!offer) {
-            return res.status(404).send('Offer not found');
+        if (invalidProducts.length > 0) {
+            return res.redirect('/admin/addproductofferpage?msg=invalid')
         }
-        // Render edit form
-        res.render('editOffer', { offer });
+
+        // Create the new product offer
+        const newProductOffer = new ProductOffer({
+            title,
+            description,
+            bannerImg,
+            discount,
+            products: productIds, // Use the extracted product IDs
+            expiryDate
+        });
+
+        // Save the new product offer
+        await newProductOffer.save();
+
+        // Update the products with the offer reference
+        await Product.updateMany(
+            { _id: { $in: productIds } },
+            { $set: { productOffer: newProductOffer._id } }
+        );
+
+        res.redirect('/admin/offer'); // Redirect to product offers page
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal server error');
+        console.error('Error creating product offer:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
-exports.editofferpost = async (req, res) => {
-    console.log(req.params);
-    console.log(req.body); 
 
+
+// Render the page for editing a product offer
+exports.editProductOfferPage = async (req, res) => {
+    try {
+        const productOffer = await ProductOffer.findById(req.params.id);
+        if (!productOffer) {
+            return res.status(404).send('Product offer not found');
+        }
+        const products = await Product.find(); // Fetch products
+        res.render('editproductoffer', { productOffer, products }); // Pass products to the view
+    } catch (error) {
+        console.error('Error rendering edit product offer page:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+// Update an existing product offer
+exports.updateProductOffer = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
-        const images = req.files;
-        let offer = await Offer.findById(id);
-        if (!offer) {
-            return res.status(404).send('Offer not found');
+
+        // Extract product IDs from the products object
+        let productIds = req.body.products;
+        if (!Array.isArray(productIds)) {
+            // If productIds is not an array, convert it to an array
+            productIds = [productIds];
         }
-        const existingOffer = await Offer.findOne({ title: updates.title, _id: { $ne: id } });
-        if (existingOffer) {
-            return res.status(400).send('Another offer with the same name already exists');
+
+        // Fetch products to validate prices
+        const productsToUpdate = await Product.find({ _id: { $in: productIds } });
+
+        // Check if the offer will cause the price to be negative
+        const invalidProducts = productsToUpdate.filter(product => {
+            const newSellingPrice = product.sellingPrice - updates.discount;
+            return newSellingPrice < 0; // Product price will be negative
+        });
+
+        if (invalidProducts.length >= 0) {
+            return res.redirect(`/admin/${id}/edit?msg=invalid`)
         }
-        if (images && images.length > 0) {
-            offer.bannerImg = offer.bannerImg ? offer.bannerImg.concat(images.map(image => image.path)) : images.map(image => image.path);
-            await offer.save();
+
+        // Check if files are uploaded
+        if (req.files && req.files.length > 0) {
+            const bannerImg = req.files.map(file => file.filename);
+            updates.bannerImg = bannerImg;
         }
-        console.log(req.files);
-        await Offer.findByIdAndUpdate(id, updates);
-        res.redirect('/admin/offer');
+
+        // Check if products are selected
+        if (productIds && productIds.length > 0) {
+            updates.products = productIds;
+
+            // Update the products with the offer reference
+            await Product.updateMany(
+                { _id: { $in: productIds } },
+                { $set: { productOffer: id } }
+            );
+        } else {
+            // If no new products are selected, keep the existing ones
+            const existingOffer = await ProductOffer.findById(id);
+            updates.products = existingOffer.products;
+        }
+
+        await ProductOffer.findByIdAndUpdate(id, updates);
+
+        res.redirect('/admin/offer'); // Redirect to product offers page
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
+        console.error('Error updating product offer:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
+// Delete a product offer
+exports.deleteProductOffer = async (req, res) => {
+    try {
+        // Find and delete the product offer
+        const productOffer = await ProductOffer.findByIdAndDelete(req.params.id);
+        if (!productOffer) {
+            return res.status(404).send('Product Offer not found');
+        }
 
-exports.offerimagedelete = async (req, res) => {
+        // Remove the reference to the deleted product offer from all products
+        await Product.updateMany(
+            { productOffer: productOffer._id },
+            { $unset: { productOffer: 1 } }
+        );
+
+        res.redirect('/admin/offer'); // Redirect to product offers page
+    } catch (error) {
+        console.error('Error deleting product offer:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+exports.productofferimagedelete = async (req, res) => {
     try {
         console.log("Entering image deletion controller");
         const offerId = req.params.offerId;
         const index = req.params.index;
         console.log("Index:", index);
   console.log(offerId)
-        let offer = await Offer.findById(offerId);
-        console.log("offer:", offer);
+        let productoffer = await ProductOffer.findById(offerId);
+        console.log("offer:", productoffer);
   
-        if (!offer) {
+        if (!productoffer) {
             return res.status(404).json({ message: "Offer not found" });
         }
   
-        if (index < 0 || index >= offer.bannerImg.length) {
+        if (index < 0 || index >= productoffer.bannerImg.length) {
             return res.status(400).json({ message: "Invalid image index" });
         }
   
-        offer.bannerImg.splice(index, 1);
-        await offer.save();
+        productoffer.bannerImg.splice(index, 1);
+        await productoffer.save();
   
         res.status(200).json({ message: "Image deleted successfully" });
     } catch (error) {
@@ -147,16 +222,183 @@ exports.offerimagedelete = async (req, res) => {
 
 
 
-// Controller for deleting an offer
-exports.deleteOffer = async (req, res) => {
+ //////////////////category offer controller//////////////////////////////////
+  exports.addcategoryofferpage = async (req, res) => {
     try {
-        const offer = await Offer.findByIdAndDelete(req.params.id);
-        if (!offer) {
-            return res.status(404).send('Offer not found');
+        // Fetch categories from the database
+        const categories = await Category.find();
+        res.render('admincategoryoffer', { categories }); // Pass categories to the EJS template
+    } catch (error) {
+        console.error('Error creating category offer:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+// Controller function to create a new category offer
+exports.createCategoryOffer = async (req, res) => {
+    try {
+        const { title, description, discount, category, expiryDate } = req.body;
+console.log(discount)
+        // Check if discount is 100
+        if (discount === '100') {
+            return res.redirect('/admin/addcategoryofferpage?msg=invaliddiscount');
         }
-        res.redirect('/admin/offer'); // Redirect to the offers page after deletion
+        
+
+        // Check if files were uploaded
+        if (!req.files || req.files.length === 0) {
+            throw new Error('No files were uploaded.');
+        }
+
+        // Get the filenames of the uploaded images
+        const bannerImgs = req.files.map(file => file.filename);
+
+        // Create a new category offer instance
+        const newCategoryOffer = new CategoryOffer({
+            title,
+            description,
+            discount,
+            category,
+            expiryDate,
+            bannerImg: bannerImgs // Assign array of filenames
+        });
+
+        // Save the category offer
+        const savedCategoryOffer = await newCategoryOffer.save();
+
+        // Update products with the new category offer
+        await Product.updateMany(
+            { category: category }, // Find products with the same category
+            { $set: { categoryOffer: savedCategoryOffer._id } } // Set categoryOffer reference
+        );
+
+        res.redirect('/admin/offer');
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+// In your offerController.js file
+exports.editCategoryOfferPage = async (req, res) => {
+    try {
+        const categories = await Category.find();
+        const categoryOffer = await CategoryOffer.findById(req.params.id).populate('category');
+        if (!categoryOffer) {
+            return res.status(404).send('Category offer not found');
+        }
+        res.render('editcategoryoffer', { categoryOffer, categories });
+    } catch (error) {
+        console.error('Error rendering edit category offer page:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+exports.editCategoryOffer = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        const images = req.files;
+
+        let categoryOffer = await CategoryOffer.findById(id);
+        if (!categoryOffer) {
+            return res.status(404).send('Category Offer not found');
+        }
+
+        // Update banner images if new images are uploaded
+        if (images && images.length > 0) {
+            const newBannerImages = images.map(image => image.filename);
+            categoryOffer.bannerImg = categoryOffer.bannerImg ? categoryOffer.bannerImg.concat(newBannerImages) : newBannerImages;
+        }
+
+        // Check if the discount value is 100%
+        if (updates.discount === '100') {
+            return res.redirect(`/admin/edit/${id}?msg=error`);
+        }
+
+        // Update the category offer without modifying product prices
+        await categoryOffer.save();
+
+        // Remove 'products' property if it's not intended to be updated
+        delete updates.products;
+
+        // Get the previous category of the category offer
+        const previousCategory = categoryOffer.category;
+
+        // Update the category offer details
+        await CategoryOffer.findByIdAndUpdate(id, updates);
+
+        // Get the new category of the category offer after updates
+        const newCategory = updates.category;
+
+        // Update the products in the previous category
+        await Product.updateMany(
+            { category: previousCategory, categoryOffer: id },
+            { $unset: { categoryOffer: 1 } }
+        );
+
+        // Update the products in the new category
+        await Product.updateMany(
+            { category: newCategory },
+            { $set: { categoryOffer: id } }
+        );
+
+        res.redirect('/admin/offer');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+exports.deleteCategoryOffer = async (req, res) => {
+    try {
+        // Find and delete the category offer
+        const categoryOffer = await CategoryOffer.findByIdAndDelete(req.params.id);
+        if (!categoryOffer) {
+            return res.status(404).send('Category Offer not found');
+        }
+
+        // Remove the reference to the deleted category offer from all products
+        await Product.updateMany(
+            { categoryOffer: categoryOffer._id },
+            { $unset: { categoryOffer: 1 } }
+        );
+
+        res.redirect('/admin/offer'); 
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal server error');
     }
 };
+
+
+exports.categoryofferimagedelete = async (req, res) => {
+    try {
+        console.log("Entering image deletion controller");
+        const offerId = req.params.offerId;
+        const index = req.params.index;
+        console.log("Index:", index);
+  console.log(offerId)
+        let categoryoffer = await CategoryOffer.findById(offerId);
+        console.log("offer:", categoryoffer);
+  
+        if (!categoryoffer) {
+            return res.status(404).json({ message: "Offer not found" });
+        }
+  
+        if (index < 0 || index >= categoryoffer.bannerImg.length) {
+            return res.status(400).json({ message: "Invalid image index" });
+        }
+  
+        categoryoffer.bannerImg.splice(index, 1);
+        await categoryoffer.save();
+  
+        res.status(200).json({ message: "Image deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting image:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+  };

@@ -202,6 +202,7 @@
             <button type="submit" class="btn btn-primary">Update Address</button>
         </form>
         
+        
     </div>
  
   <!-- Footer Start -->
@@ -329,6 +330,82 @@
             }
 
             // Example: Add more validation checks for other fields if needed
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const updateAddressForm = document.getElementById('updateAddressForm');
+        const formInputs = updateAddressForm.querySelectorAll('input, select');
+
+        updateAddressForm.addEventListener('submit', function (event) {
+            // Remove previous error styling and messages
+            formInputs.forEach(input => {
+                input.classList.remove('is-invalid');
+                const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                if (errorElement) {
+                    errorElement.textContent = '';
+                }
+            });
+
+            // Prevent form submission
+            event.preventDefault();
+
+            let isValid = true;
+
+            // Loop through each form input/select element
+            formInputs.forEach(input => {
+                // Trim leading and trailing white spaces
+                input.value = input.value.trim();
+
+                // Check if input value is empty
+                if (!input.value) {
+                    isValid = false;
+                    // Show error message
+                    const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                    if (errorElement) {
+                        errorElement.textContent = 'This field is required.';
+                    }
+                    input.classList.add('is-invalid');
+                } else {
+                    // Validate name input to allow only letters
+                    if (input.name === 'name' && !/^[a-zA-Z]+$/.test(input.value)) {
+                        isValid = false;
+                        // Show error message
+                        const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                        if (errorElement) {
+                            errorElement.textContent = 'Only letters are allowed in the name.';
+                        }
+                        input.classList.add('is-invalid');
+                    }
+                }
+
+                // Additional validation for mobile number and pincode
+                if (input.name === 'mobileNumber' && input.value === '0000000000') {
+                    isValid = false;
+                    // Show error message
+                    const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                    if (errorElement) {
+                        errorElement.textContent = 'Mobile number cannot be all zeros.';
+                    }
+                    input.classList.add('is-invalid');
+                }
+
+                if (input.name === 'pincode' && input.value === '000000') {
+                    isValid = false;
+                    // Show error message
+                    const errorElement = input.parentNode.querySelector('.invalid-feedback');
+                    if (errorElement) {
+                        errorElement.textContent = 'Pincode cannot be all zeros.';
+                    }
+                    input.classList.add('is-invalid');
+                }
+            });
+
+            // If form is valid, submit the form
+            if (isValid) {
+                updateAddressForm.submit();
+            }
         });
     });
 </script>

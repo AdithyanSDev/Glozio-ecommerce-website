@@ -380,7 +380,7 @@ canvas {
                 <% if (locals.success) { %>
                     <p class="success-message"><%= locals.success %></p>
                 <% } %>
-                <button type="submit">Sign Up</button>
+                <button type="submit" onclick="return validatePassword()">Sign Up</button>
             </form>
         </div>
         <div class="form-container sign-in">
@@ -440,7 +440,37 @@ canvas {
             }
         }
     </script>
-    
+    <script>
+     function validatePassword() {
+    var password = document.getElementById("password").value;
+    var confirmPassword = document.getElementById("confirmPassword").value;
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        Swal.fire({
+            icon: "error",
+            title: "Password doesn't match",
+            confirmButtonText: "Ok",
+        });
+        return false;
+    }
+
+    // Check if password meets strength requirements
+    var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})");
+    if (!strongRegex.test(password)) {
+        Swal.fire({
+            icon: "error",
+            title: "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long",
+            confirmButtonText: "Ok",
+        });
+        return false;
+    }
+
+    return true;
+}
+
+
+    </script>
       
       <script>
         const container = document.getElementById('container');

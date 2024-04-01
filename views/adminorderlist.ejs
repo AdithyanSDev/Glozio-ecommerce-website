@@ -5,10 +5,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
-  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <
   <title>
-    
+    GLozio
   </title>
   <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
@@ -168,16 +167,21 @@
                         <td><%= order.orderDate.toDateString() %></td>
                         <td>₹<%= order.totalAmount %></td>
                         <td>
-                            <select class="form-select" id="orderStatus<%= index %>" name="orderStatus" onchange="updateOrderStatus('<%= order._id %>', this.value)" style="color: cornsilk;">
-                                <option class="text-dark" value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                <option class="text-dark value="Processing" <%= order.orderStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
-                                <option class="text-dark value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                <option class="text-dark value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                <option class="text-dark value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                <option class="text-dark" value="ReturnRequested" <%= order.orderStatus === 'ReturnRequested' ? 'selected' : '' %>>Return Requested</option>
-                                <option class="text-dark value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
-                            </select>
-                        </td>
+                          <select class="form-select" id="orderStatus<%= index %>" name="orderStatus" onchange="updateOrderStatus('<%= order._id %>', this.value)" style="color: rgb(11, 26, 46);"
+                              <% if (order.orderStatus === 'Cancelled') { %>
+                                  disabled
+                              <% } %>
+                          >
+                              <option class="text-dark" value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                              <option class="text-dark value="Processing" <%= order.orderStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
+                              <option class="text-dark value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                              <option class="text-dark value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                              <option class="text-dark value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                              <option class="text-dark" value="ReturnRequested" <%= order.orderStatus === 'ReturnRequested' ? 'selected' : '' %>>Return Requested</option>
+                              <option class="text-dark value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                          </select>
+                      </td>
+                      
                         <td><%= order.paymentMethod %></td>
                         <td><%= order.paymentStatus %></td>
                     </tr>

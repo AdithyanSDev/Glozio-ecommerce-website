@@ -58,7 +58,6 @@ exports.generateReport = async (req, res) => {
 };
 async function generatePDFReport(res, reportTitle, salesData) {
     try {
-        
         const doc = new PDFDocument();
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
@@ -68,29 +67,52 @@ async function generatePDFReport(res, reportTitle, salesData) {
         doc.fontSize(18).text(`Sales Report (${reportTitle})`, { align: 'center' });
         doc.moveDown(); 
 
-        // Check if salesData is an array and has at least one element
-        if (Array.isArray(salesData) && salesData.length > 0) {
-            const { totalSales, totalOrderAmount, totalDiscount, totalCouponDiscount } = salesData[0];
-            
-            // Table Headers
-            const tableHeaders = ['Date', 'Total Sales', 'Total Order Amount', 'Total Discount', 'Total Coupon Discount'];
-           
-            const tableData = 
-               salesData.map(({ date, totalSales, totalOrderAmount, totalDiscount, totalCouponDiscount }) => 
-                [new Date(date).toLocaleDateString(), totalSales, 'Rs.' + totalOrderAmount, 'Rs.' + totalDiscount, 'Rs.' + totalCouponDiscount]
-               )
-        
-            
-      
+        // Calculate overall totals
+        let overallTotalSales = 0;
+        let overallTotalOrderAmount = 0;
+        let overallTotalDiscount = 0;
+        let overallTotalCouponDiscount = 0;
+
+        for (const sale of salesData) {
+            overallTotalSales += sale.totalSales;
+            overallTotalOrderAmount += sale.totalOrderAmount;
+            overallTotalDiscount += sale.totalDiscount;
+            overallTotalCouponDiscount += sale.totalCouponDiscount;
+        }
+
+        // Overall Sales Table
+        const overallSalesTableHeaders = ['Date', 'Total Sales', 'Total Order Amount', 'Total Discount', 'Total Coupon Discount'];
+        const overallSalesTableData = [
+            ['-', overallTotalSales, 'Rs.' + overallTotalOrderAmount, 'Rs.' + overallTotalDiscount, 'Rs.' + overallTotalCouponDiscount]
+        ];
+        doc.moveDown().fontSize(16).text('Overall Sales', { align: 'center' }).moveDown(0.5);
+        doc.table({
+            headers: overallSalesTableHeaders,
+            rows: overallSalesTableData,
+            widths: Array(overallSalesTableHeaders.length).fill('*'),
+            heights: 20,
+            headerRows: 1
+        });
+
+        // Individual Sales Tables
+        for (const sale of salesData) {
+            doc.moveDown().fontSize(14).text(`Sales on - ${new Date(sale.date).toLocaleDateString()}`, { align: 'left' }).moveDown(0.5);
+
+            const individualSalesHeaders = ['Product', 'Quantity', 'Price', 'Discount'];
+            const individualSalesTableData = sale.individualSales.map(item => [
+                item.product.name,
+                item.quantity,
+                'Rs.' + item.price,
+                Math.round(item.discount) + '%'
+            ]);
+
             doc.table({
-                headers: tableHeaders,
-                rows: tableData,
-                widths: Array(tableHeaders.length).fill('*'), 
+                headers: individualSalesHeaders,
+                rows: individualSalesTableData,
+                widths: Array(individualSalesHeaders.length).fill('*'),
                 heights: 20,
                 headerRows: 1
             });
-        } else {
-            doc.text('No sales data available.');
         }
 
         doc.end();
@@ -99,6 +121,7 @@ async function generatePDFReport(res, reportTitle, salesData) {
         res.status(500).json({ message: 'Error generating PDF report' });
     }
 }
+
 
 
 
@@ -137,56 +160,54 @@ async function getCustomRangeSales(startDate, endDate) {
     const end = new Date(endDate);
     return await getOrderData(start, end);
 }
-
 async function getOrderData(startDate, endDate) {
     try {
         const orders = await Order.find({
             orderDate: { $gte: startDate, $lte: endDate },
+        }).populate({
+            path: 'orderedItems.productId',
+            select: 'name price discount images'
         });
 
-        let totalSales = 0;
-        let totalOrderAmount = 0;
-        let totalDiscount = 0;
-        let totalCouponDiscount = 0;
+        let salesData = [];
 
         for (const order of orders) {
-            // Calculate total sales by summing up the quantity of ordered items
-            totalSales += order.orderedItems.reduce((acc, item) => acc + item.quantity, 0);
-            totalOrderAmount += order.totalAmount;
+            let individualSales = [];
+            let totalOrderAmount = 0;
 
-            // Calculate total discount for all products in the order
             for (const item of order.orderedItems) {
-                const product = await Product.findById(item.productId);
-                if (product) {
-                    // Calculate discount for the product
-                    const discount = (product.price - product.sellingPrice) * item.quantity;
-                    totalDiscount += discount;
-                }
+                // Calculate total order amount
+                totalOrderAmount += item.quantity * item.productId.price;
+
+                // Add individual sale details
+                individualSales.push({
+                    product: item.productId,
+                    quantity: item.quantity,
+                    price: item.productId.price,
+                    discount: item.productId.discount
+                });
             }
 
-            // Add coupon discount to the total coupon discount
-            totalCouponDiscount += order.couponDiscount || 0;
+            // Calculate total discount
+            let totalDiscount = totalOrderAmount - order.totalAmount;
+
+            salesData.push({
+                date: order.orderDate,
+                totalSales: order.orderedItems.length, // Total number of items in the order
+                totalOrderAmount: totalOrderAmount,
+                totalDiscount: totalDiscount,
+                totalCouponDiscount: order.couponDiscount || 0,
+                individualSales: individualSales
+            });
         }
 
-        // Fetch all coupons and sum their discount amounts
-        const coupons = await Coupon.find({});
-        const couponDiscounts = coupons.reduce((acc, coupon) => acc + coupon.discountAmount, 0);
-
-        // Add the sum of coupon discount amounts to the total coupon discount
-        totalCouponDiscount += couponDiscounts;
-
-        return [{
-            date: startDate,
-            totalSales,
-            totalOrderAmount,
-            totalDiscount,
-            totalCouponDiscount
-        }];
+        return salesData;
     } catch (error) {
         console.error("Error in getOrderData:", error);
         throw error; // Throw the error to be caught in the calling function
     }
 }
+
 
 //home chart logic
 exports.getDailySalesData = async (req, res) => {

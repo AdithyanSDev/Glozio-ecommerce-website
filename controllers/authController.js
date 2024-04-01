@@ -7,12 +7,11 @@ const Category= require('../models/category')
 const Review = require('../models/review');
 const Coupon = require('../models/coupon');
 const Offer=require('../models/offer')
-
-
+const ProductOffer=require('../models/productoffer')
 
 exports.renderHomePage = async (req, res) => {
   try {
-    const products = await Product.find({ isDeleted: false }).populate('category');
+    const products = await Product.find({ isDeleted: false }).populate('category').populate('productOffer').populate('categoryOffer'); // Populate both productOffer and categoryOffer fields
     // Fetch review counts for each product
     const productReviewCounts = await Promise.all(products.map(async product => {
       const reviewCount = await Review.countDocuments({ productId: product._id });
@@ -234,22 +233,32 @@ exports.logout = async (req, res) => {
 };
 exports.productsByCategory = async (req, res) => {
   try {
-    const categoryId = req.params.categoryId;
-    const category = await Category.findById(categoryId).populate('products');
-    if (!category) {
-      return res.status(404).send('Category not found');
-    }
-    const productIds = category.products.map(product => product._id);
-    const products = await Product.find({ _id: { $in: productIds } });
-    const reviews = await Review.find({ productIds });
-    const reviewCount = await Review.countDocuments({ productIds });
+      const categoryId = req.params.categoryId;
+      const category = await Category.findById(categoryId).populate('products');
+      if (!category) {
+          return res.status(404).send('Category not found');
+      }
+      const productIds = category.products.map(product => product._id);
+      const products = await Product.find({ _id: { $in: productIds } });
+      const reviewCount = await Review.countDocuments({ productIds });
 
-    // Add filteredProducts to the data object
-    const filteredProducts = []; // Initialize as an empty array initially
-    res.render('productlist', { category, products, reviewCount, categoryId, filteredProducts });
+      // Calculate total price and discounted price for products with offers
+      const updatedProducts = await Promise.all(products.map(async product => {
+          let finalPrice = product.sellingPrice; // Initialize final price with regular selling price
+          if (product.productOffer) {
+              const offer = await ProductOffer.findById(product.productOffer);
+              if (offer && offer.expiryDate >= new Date()) { // Check if the offer is not expired
+                  finalPrice -= offer.discount; // Reduce the price by the discount amount
+              }
+          }
+          return { ...product.toObject(), finalPrice }; // Add finalPrice to the product object
+      }));
+
+      // Render the product list page with updated products
+      res.render('productlist', { category, products: updatedProducts, reviewCount, categoryId });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Internal Server Error');
+      console.error(err);
+      res.status(500).send('Internal Server Error');
   }
 };
 
@@ -294,7 +303,7 @@ exports.changePassword = async (req, res) => {
     res.redirect('/api/user/profile?msg=changed')
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.render('404page')
   }
 };
 
@@ -395,7 +404,7 @@ exports.resetpassword = async (req, res) => {
     // Update user's password in the database
     user.password = hashedPassword;
     await user.save();
-
+console.log("haiiiiiiiii ")
     // Redirect to the user login page
     res.redirect('/api/user/login')
   } catch (error) {

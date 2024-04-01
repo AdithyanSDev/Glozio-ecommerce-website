@@ -78,7 +78,7 @@
         </div>
         <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
             <div class="col-lg-4">
-                <a href="" class="text-decoration-none">
+                <a href="/" class="text-decoration-none">
                     <span class="h1 text-uppercase text-black bg-white px-2">Glozio</span>
 
 
@@ -177,7 +177,7 @@
 <!-- offerdetail.ejs -->
 <div class="container-fluid py-4">
     <div class="border p-4"> <!-- Add border and padding -->
-        <h4 class="mb-4 text-primary ">Offer valid till <%= offer.expiryDate.toDateString() %></h4>
+        <h4 class="mb-4 text-primary ">Offer valid till <%= productoffer.expiryDate.toDateString() %></h4>
         <div class="row" id="productList">   
             <% products.forEach(product => { %>
                 <div class="col-lg-2 col-md-2 col-sm-4 col-6 pb-4"> 
@@ -196,7 +196,7 @@
                         <div class="text-center py-4">
                             <a class="h6 text-decoration-none text-truncate" href="/detail/<%= product._id %>"><%= product.name %></a>
                             <div class="d-flex align-items-center justify-content-center mt-2">
-                                <h5>₹<%= Math.round(product.discountedPrice) %></h5>
+                                <h5>₹<%= Math.round(product.sellingPrice) %></h5>
                                 <h6 class="text-muted ml-2"><del>₹<%= product.price %></del></h6>
                             </div>
                             <div class="d-flex align-items-center justify-content-center mb-1">
@@ -209,7 +209,7 @@
                             </div>
                             <!-- Add discount information -->
                             <div class="text-success">
-                                Price drop up to <%= offer.discount %>%
+                                Price drop up to <%= productoffer.discount %>/-
                             </div>
                         </div>
                     </div>

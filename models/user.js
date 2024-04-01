@@ -27,10 +27,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Wallet'
   },
-  couponUsed: {
-    type: Boolean,
-    default: false
-  }
+  coupons:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Coupon'
+  }]
 });
 
 const User = mongoose.model('User', userSchema);

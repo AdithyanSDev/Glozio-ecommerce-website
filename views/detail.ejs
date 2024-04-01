@@ -177,97 +177,122 @@
 
 
     <!-- Shop Detail Start -->
-    <div class="container-fluid pb-5">
-        <div class="row ">
-            <div class="col-lg-5 mb-30">
-                <div class="row">
-                    <div class="col-4 ms-4">
-                  <% for (let i = 0; i < product.images.length; i++) { %>
-                  <div class="thumbnail my-3" onclick="displayImage(this)">
-                    <img src="/<%= product.images[i] %>" class="pro_image w-75" alt="<%= product.product_name %>">
-                  </div>
-                  <% } %>
-                </div>
-                  
-                  <div class="col-7 mt-3">
-                  <div class="main-image" id="img-container">
-                    <div id="lens"></div>
-                    <img src="/<%= product.images[0] %>"class="pro_image w-100" id=featured alt="Main Image">
-                  </div>
-                </div>
-                </div>
-                
-            </div>
-            
-            
-            
-
-            
-            
-            <div class="col-lg-6 h-auto mb-30">
-                <div class="h-100 bg-light p-30">
-                    <h3><%= product.name %></h3>
-                    <div class="d-flex mb-3">
-                        <div class="text-primary mr-2">
-                            <small class="fas fa-star"></small>
-                            <small class="fas fa-star"></small>
-                            <small class="fas fa-star"></small>
-                            <small class="fas fa-star-half-alt"></small>
-                            <small class="far fa-star"></small>
+   <!-- Products Start -->
+<div class="container-fluid pb-5">
+    <div class="row ">
+        <div class="col-lg-5 mb-30">
+            <!-- Image Thumbnails -->
+            <div class="row">
+                <div class="col-4 ms-4">
+                    <% for (let i = 0; i < product.images.length; i++) { %>
+                        <div class="thumbnail my-3" onclick="displayImage(this)">
+                            <img src="/<%= product.images[i] %>" class="pro_image w-75" alt="<%= product.name %>">
                         </div>
-                        <small class="pt-1"><%= reviewCount %></small>
-                    </div>
-                    <h3 class="font-weight-semi-bold mb-4">
-                        ₹<%= Math.round(product.sellingPrice) %> 
-                        <% if (product.discount > 0) { %>
-                            <small class="text-muted ml-2">
-                                <del>₹<%= Math.round(product.price) %></del> 
-                            </small>
-                        <% } %>
-                    </h3>
-                    
-                    
-                    
-                    <p class="font-weight-bold mb-2 <%= product.stock === 0 ? 'text-danger' : 'text-success' %>">
-                        <% if (product.stock > 0) { %>
-                        Stock: <%= product.stock %>
-                        <% } else { %>
-                        Stock: Out of Stock
-                        <% } %>
-                    </p>
-                    <!-- Display Highlights/Specs -->
-                    <h4 class="font-weight-bold mb-2">Highlights/Specs</h4>
-                    <ul>
-                        <% product.highlights.forEach(highlight => { %>
-                        <li><%= highlight %></li>
-                        <% }); %>
-                    </ul>
-                    
-                    
-               
+                    <% } %>
                 </div>
+                <div class="col-7 mt-3">
+                    <!-- Main Image -->
+                    <div class="main-image" id="img-container">
+                        <div id="lens"></div>
+                        <img src="/<%= product.images[0] %>"class="pro_image w-100" id=featured alt="Main Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 h-auto mb-30">
+            <!-- Product Details -->
+            <% if (product.productOffer) { %> <!-- Check if the product has an associated offer -->
+                <% const { discount, title } = product.productOffer; %> <!-- Destructure the offer object -->
+                <!-- Check if the offer is not expired -->
+                <% if (product.productOffer.expiryDate >= new Date()) { %>
+                    <div class="col-4" style="background-color: violet; color: white; padding: 5px;">
+                        <%= title %> ₹<%=discount%> off/-   
+                    </div>
+                <% } %>
+            <% } %>
+            <% if (product.categoryOffer) { %>
+                <% const { discount, title } = product.categoryOffer; %>
+                <% if (product.categoryOffer.expiryDate >= new Date()) { %>
+                    <div class="col-4" style="background-color: rgb(57, 26, 197); color: white; padding: 5px;">
+                        <%= title %> <%=discount%>% off/-
+                    </div>
+                <% } %>
+            <% } %>
+            
+            <div class="h-100 bg-light p-30">
+                <h3><%= product.name %></h3>
+                <div class="d-flex mb-3">
+                    <!-- Star Rating -->
+                    <div class="text-primary mr-2">
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star-half-alt"></small>
+                        <small class="far fa-star"></small>
+                    </div>
+                    <!-- Review Count -->
+                    <small class="pt-1"><%= reviewCount %></small>
+                </div>
+                <!-- Price -->
+                <h3 class="font-weight-semi-bold mb-4">
+                    <% let finalPrice = product.sellingPrice; %> <!-- Initialize final price with regular selling price -->
+                    <% if (product.productOffer && product.productOffer.expiryDate >= new Date()) { %>
+                        <% const { discount: productDiscount } = product.productOffer; %> <!-- Get product offer discount -->
+                        <% finalPrice -= productDiscount; %> <!-- Subtract product offer discount -->
+                    <% } %>
+                    <% if (product.categoryOffer && product.categoryOffer.expiryDate >= new Date()) { %>
+                        <% const { discount: categoryDiscount } = product.categoryOffer; %> <!-- Get category offer discount -->
+                        <% finalPrice -= (finalPrice * (categoryDiscount / 100)); %> <!-- Subtract category offer percentage discount -->
+                    <% } %>
+                    ₹<%= Math.round(finalPrice) %> <!-- Display the final discounted price -->
+                    <!-- Display original price if there's a discount -->
+                    <% if (product.discount > 0) { %>
+                        <small class="text-muted ml-2">
+                            <del>₹<%= Math.round(product.price) %></del>
+                        </small>
+                    <% } %>
+                </h3>
+                
+                <!-- Stock Status -->
+                <p class="font-weight-bold mb-2 <%= product.stock === 0 ? 'text-danger' : 'text-success' %>">
+                    <% if (product.stock > 0) { %>
+                        Stock: <%= product.stock %>
+                    <% } else { %>
+                        Stock: Out of Stock
+                    <% } %>
+                </p>
+                <!-- Highlights/Specs -->
+                <h4 class="font-weight-bold mb-2">Highlights/Specs</h4>
+                <ul>
+                    <% product.highlights.forEach(highlight => { %>
+                        <li><%= highlight %></li>
+                    <% }); %>
+                </ul>
+                <!-- Add to Cart Button -->
                 <div class="d-flex align-items-center mb-4 pt-2">
+                    <!-- Quantity Input -->
                     <div class="input-group quantity mr-3" style="width: 130px;">
+                        <!-- Quantity Decrease Button -->
                         <div class="input-group-btn">
                             <button class="btn btn-primary btn-minus">
                                 <i class="fa fa-minus"></i>
                             </button>
                         </div>
+                        <!-- Quantity Display -->
                         <input type="text" class="form-control bg-secondary border-0 text-center" value="1">
+                        <!-- Quantity Increase Button -->
                         <div class="input-group-btn">
                             <button class="btn btn-primary btn-plus">
                                 <i class="fa fa-plus"></i>
                             </button>
                         </div>
                     </div>
+                    <!-- Add to Cart Button Form -->
                     <form action="/addcart" method="POST">
                         <input type="hidden" name="productId" value="<%= product._id %>">
                         <% if (product.stock > 0) { %>
                             <% let isInCart = usercart.some(cartItem => cartItem.product.some(item => item.productId.equals(product._id))); %>
-                        
-                        
                             <% if (isInCart) { %>
-                                
                                 <a href="/cart" class="btn btn-primary px-3">
                                     <i class="fa fa-shopping-cart mr-1"></i> Go to Cart
                                 </a>
@@ -282,15 +307,7 @@
                             </button>
                         <% } %>
                     </form>
-                    
-                    
-                    
-                    
-                    
-                    
-                   
-                    
-                    
+                    <!-- Wishlist Button -->
                     <% if (product.isWishlisted) { %>
                         <!-- Product is wishlisted -->
                         <form action="/wishlist/remove/<%= product.wishlistId %>" method="post">
@@ -314,15 +331,13 @@
                             </div>
                         </form>
                     <% } %>
-                    
-                    
-                    
-                   
-                    
                 </div>
-            </div> 
-        </div>
             </div>
+        </div> 
+    </div>
+</div>
+<!-- Products End -->
+
         </div>
         <div class="row px-xl-5">
             <div class="col">
